@@ -1,0 +1,12 @@
+[[customizations.user]]
+name = "user"
+password = "123456"
+groups = ["wheel"]
+
+[[customizations.filesystem]]
+mountpoint = "/boot"
+size = 209715200
+
+[[customizations.filesystem]]
+mountpoint = "/boot/efi"
+size = 1073741824
