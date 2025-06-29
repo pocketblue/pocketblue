@@ -19,5 +19,6 @@ RUN dnf -y install 'dnf5-command(copr)' && \
     dnf -y install mobility-tweaks && \
     dnf -y install iio-sensor-proxy && \
     dnf -y install phrog && \
+    systemctl enable phrog.service && \
     dnf clean all && \
     bootc container lint
