@@ -1,0 +1,43 @@
+name: Build container image
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'Containerfile'
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04-arm
+    env:
+      IMAGE_NAME: silvermobility
+      REGISTRY: ghcr.io/onesaladleaf
+
+    steps:
+    - name: Clone the repository
+      uses: actions/checkout@v4
+
+    - name: Build the container
+      id: build-container
+      uses: redhat-actions/buildah-build@v2
+      with:
+        image: ${{ env.IMAGE_NAME }}
+        tags: latest ${{ github.sha }}
+        containerfiles: |
+          ./Containerfile
+
+    - name: Log in to the GitHub Container registry
+      uses: redhat-actions/podman-login@v1
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Push to GitHub Container Repository
+      id: push-to-ghcr
+      uses: redhat-actions/push-to-registry@v2
+      with:
+        image: ${{ steps.build-container.outputs.image }}
+        tags: ${{ steps.build-container.outputs.tags }}
+        registry: ${{ env.REGISTRY }}

@@ -1,7 +1,6 @@
+name: Build raw disk image
 on:
-  - push
-  - pull_request
-  - workflow_dispatch
+  workflow_dispatch:
 
 jobs:
   build:
@@ -14,33 +13,15 @@ jobs:
     - name: Clone the repository
       uses: actions/checkout@v4
 
-    - name: Build the container
-      id: build-container
-      uses: redhat-actions/buildah-build@v2
+    - name: Build the image
+      id: build-raw
+      uses: osbuild/bootc-image-builder-action@v0.0.2
       with:
-        image: ${{ env.IMAGE_NAME }}
-        tags: latest ${{ github.sha }}
-        containerfiles: |
-          ./Containerfile
-
-    - name: Build the raw disk image
-      run: |
-        set -uexo pipefail
-
-        sudo podman run \
-          --rm \
-          -it \
-          --privileged \
-          --pull=newer \
-          --security-opt label=type:unconfined_t \
-          -v ./config.toml:/config.toml:ro \
-          -v ./output:/output \
-          -v /var/lib/containers/storage:/var/lib/containers/storage \
-          quay.io/centos-bootc/bootc-image-builder:latest \
-          --type raw \
-          --use-librepo=True \
-          --rootfs btrfs \
-          ${{ steps.build-container.outputs.image }}:latest
+        config-file: ./config.toml
+        image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+        rootfs: btrfs
+        types: |
+          raw
 
     - name: Post-process image artifacts
       run: |
