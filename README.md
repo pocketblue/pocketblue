@@ -1,0 +1,3 @@
+## A custom Fedora Atomic image for mobile devices (currently only OnePlus 6/6T)
+
+todo...
