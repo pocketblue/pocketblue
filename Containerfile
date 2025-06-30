@@ -5,6 +5,7 @@ COPY usr/ /usr/
 
 RUN dnf -y install 'dnf5-command(copr)' && \
     dnf -y copr enable gmanka/sdm845 && \
+    dnf -y copr enable @mobility/common && \
     dnf -y copr enable samcday/phrog && \
     dnf -y install kernel-0:6.15.0-0.rc2.15.sdm845.fc43 && \
     dnf -y install @standard --exclude="qemu-user-static" && \
