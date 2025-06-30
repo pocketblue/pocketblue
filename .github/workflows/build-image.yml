@@ -6,7 +6,7 @@ jobs:
   build:
     runs-on: ubuntu-24.04-arm
     env:
-      IMAGE_NAME: silvermobility
+      IMAGE_NAME: pocketblue
       REGISTRY: ghcr.io/onesaladleaf
 
     steps:
@@ -51,5 +51,5 @@ jobs:
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: silvermobility
+        name: pocketblue
         path: ./artifacts

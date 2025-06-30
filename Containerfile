@@ -1,14 +1,9 @@
 FROM quay.io/fedora/fedora-bootc:rawhide
 
 COPY etc/ /etc/
-COPY firmware-oneplus-sdm845/usr /usr/
-COPY firmware-oneplus-sdm845/lib /usr/lib/
 
-RUN mv /usr/lib/firmware/qcom/sdm845/oneplus6/ipa_fws.mbn{,.disabled} && \
-    mv /usr/lib/firmware/postmarketos/* /usr/lib/firmware/updates && \
-    rmdir /usr/lib/firmware/postmarketos && \
-    dnf -y install 'dnf5-command(copr)' && \
-    dnf -y copr enable @mobility/sdm845 && \
+RUN dnf -y install 'dnf5-command(copr)' && \
+    dnf -y copr enable gmanka/sdm845 && \
     dnf -y copr enable samcday/phrog && \
     dnf -y install kernel-0:6.15.0-0.rc2.15.sdm845.fc43 && \
     dnf -y install @standard --exclude="qemu-user-static" && \
@@ -25,5 +20,10 @@ RUN mv /usr/lib/firmware/qcom/sdm845/oneplus6/ipa_fws.mbn{,.disabled} && \
     dnf -y install iio-sensor-proxy && \
     dnf -y install phrog && \
     systemctl enable phrog.service && \
-    dnf clean all && \
-    bootc container lint
+    dnf clean all
+
+COPY firmware-oneplus-sdm845/usr /usr/
+COPY firmware-oneplus-sdm845/lib /usr/lib/
+RUN mv /usr/lib/firmware/qcom/sdm845/oneplus6/ipa_fws.mbn{,.disabled} && \
+    mv /usr/lib/firmware/postmarketos/* /usr/lib/firmware/updates && \
+    rmdir /usr/lib/firmware/postmarketos
