@@ -8,19 +8,21 @@ RUN dnf -y install 'dnf5-command(copr)' && \
     dnf -y copr enable @mobility/common && \
     dnf -y copr enable samcday/phrog && \
     dnf -y install kernel-0:6.15.0-0.rc2.15.sdm845.fc43 && \
-    dnf -y install @standard --exclude="qemu-user-static" && \
-    dnf -y install @hardware-support && \
-    dnf -y install bcm283x-firmware && \
-    dnf -y install grubby && \
-    dnf -y install grub2-efi-aa64 grub2-efi-aa64-modules systemd-oomd-defaults systemd-resolved && \
-    dnf -y install fedora-release-mobility && \
-    dnf -y install glibc-langpack-en && \
-    dnf -y install btrfs-progs udisks2-btrfs && \
-    dnf -y install @core @base-graphical @phosh-desktop --exclude selinux-policy-targeted,dracut-config-rescue && \
-    dnf -y install bootmac hexagonrpc libssc pd-mapper qrtr rmtfs tqftpserv alsa-ucm-mobility-sdm845 qcom-firmware && \
-    dnf -y install mobility-tweaks && \
-    dnf -y install iio-sensor-proxy && \
-    dnf -y install phrog && \
+    dnf -y install \
+        @standard \
+        @hardware-support \
+        bcm283x-firmware \
+        grubby \
+        grub2-efi-aa64 grub2-efi-aa64-modules systemd-oomd-defaults systemd-resolved \
+        fedora-release-mobility \
+        glibc-langpack-en \
+        btrfs-progs udisks2-btrfs \
+        @core @base-graphical @phosh-desktop \
+        bootmac hexagonrpc libssc pd-mapper qrtr rmtfs tqftpserv alsa-ucm-mobility-sdm845 qcom-firmware \
+        mobility-tweaks \
+        iio-sensor-proxy \
+        phrog \
+        --exclude selinux-policy-targeted,dracut-config-rescue,qemu-user-static && \
     systemctl enable phrog.service && \
     systemctl enable hexagonrpcd-adsp-rootpd.service && \
     systemctl enable hexagonrpcd-adsp-sensorspd.service && \
