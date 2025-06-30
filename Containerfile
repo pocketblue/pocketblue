@@ -1,8 +1,13 @@
 FROM quay.io/fedora/fedora-bootc:rawhide
 
 COPY etc/ /etc/
+COPY firmware-oneplus-sdm845/usr /usr/
+COPY firmware-oneplus-sdm845/lib /usr/lib/
 
-RUN dnf -y install 'dnf5-command(copr)' && \
+RUN mv /usr/lib/firmware/qcom/sdm845/oneplus6/ipa_fws.mbn{,.disabled} && \
+    mv /usr/lib/firmware/postmarketos/* /usr/lib/firmware/updates && \
+    rmdir /usr/lib/firmware/postmarketos && \
+    dnf -y install 'dnf5-command(copr)' && \
     dnf -y copr enable @mobility/sdm845 && \
     dnf -y copr enable samcday/phrog && \
     dnf -y install kernel-0:6.15.0-0.rc2.15.sdm845.fc43 && \
