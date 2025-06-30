@@ -1,6 +1,7 @@
 FROM quay.io/fedora/fedora-bootc:rawhide
 
 COPY etc/ /etc/
+COPY usr/ /usr/
 
 RUN dnf -y install 'dnf5-command(copr)' && \
     dnf -y copr enable gmanka/sdm845 && \
@@ -20,6 +21,9 @@ RUN dnf -y install 'dnf5-command(copr)' && \
     dnf -y install iio-sensor-proxy && \
     dnf -y install phrog && \
     systemctl enable phrog.service && \
+    systemctl enable hexagonrpcd-adsp-rootpd.service && \
+    systemctl enable hexagonrpcd-adsp-sensorspd.service && \
+    systemctl enable hexagonrpcd-sdsp.service && \
     dnf clean all
 
 COPY firmware-oneplus-sdm845/usr /usr/
