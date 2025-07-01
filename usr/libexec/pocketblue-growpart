@@ -1,0 +1,41 @@
+#!/bin/bash
+set -eu
+
+backing_device=$(findmnt -vno SOURCE /sysroot)
+echo "Backing device: ${backing_device}"
+syspath=/sys/class/block/$(basename ${backing_device})
+if ! test -d "${syspath}"; then
+    echo "failed to find backing device ${syspath}"; exit 1
+fi
+
+# Handling devicemapper targets is a whole other thing
+case $backing_device in
+    /dev/mapper/*) "Not growing $backing_device"; exit 0 ;;
+esac
+
+# Note that we expect that the rootfs is on a partition
+partition=$(cat $syspath/partition)
+
+# Walk up to find the parent blockdev
+parentpath=$(dirname $(realpath $syspath))
+devmajmin=$(cat $parentpath/dev)
+parent=/dev/block/${devmajmin}
+
+# Grow the partition
+tmpf=$(mktemp)
+# Ignore errors because growpart exits 1 if nothing changed;
+# we need to check the output for NOCHANGE:
+if ! /usr/bin/growpart "${parent}" "${partition}" > ${tmpf}; then
+    cat "${tmpf}"
+    if grep -qEe '^NOCHANGE: ' ${tmpf}; then
+        exit 0
+    fi
+    echo "growpart failed"
+    exit 1
+fi
+cat "${tmpf}"
+# Now, temporarily remount the sysroot writable in our mount namespace
+mount -o remount,rw /sysroot
+# And defer to systemd's growfs wrapper which handles dispatching on
+# the target filesystem type.
+/usr/lib/systemd/systemd-growfs /sysroot
