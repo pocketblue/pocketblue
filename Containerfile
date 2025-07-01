@@ -12,13 +12,14 @@ RUN dnf -y install 'dnf5-command(copr)' && \
         @standard \
         @hardware-support \
         bcm283x-firmware \
+        qcom-firmware \
         grubby \
         grub2-efi-aa64 grub2-efi-aa64-modules systemd-oomd-defaults systemd-resolved \
         fedora-release-mobility \
         glibc-langpack-en \
         btrfs-progs udisks2-btrfs \
         @core @base-graphical @phosh-desktop \
-        bootmac hexagonrpc libssc pd-mapper qrtr rmtfs tqftpserv alsa-ucm-mobility-sdm845 qcom-firmware \
+        bootmac hexagonrpc libssc pd-mapper qrtr rmtfs tqftpserv alsa-ucm-mobility-sdm845 qbootctl \
         mobility-tweaks \
         iio-sensor-proxy \
         phrog \
@@ -30,6 +31,7 @@ RUN dnf -y install 'dnf5-command(copr)' && \
     systemctl enable pd-mapper.service && \
     systemctl enable rmtfs.service && \
     systemctl enable tqftpserv.service && \
+    systemctl enable qbootctl.service && \
     dnf clean all
 
 COPY firmware-oneplus-sdm845/usr /usr/

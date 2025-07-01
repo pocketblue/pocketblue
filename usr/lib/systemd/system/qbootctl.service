@@ -1,0 +1,10 @@
+[Unit]
+Description=Qualcomm boot slot ctrl mark boot successful
+
+[Service]
+ExecStart=/usr/bin/qbootctl -m
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
