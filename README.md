@@ -72,4 +72,23 @@ sudo dd if=root.raw of=/dev/sda17 bs=4M status=progress
 sync
 ```
 
-Then reboot the device.
+Reboot the device.
+
+- Default username: `user`
+- Default password: `123456`
+
+### Upgrading the system
+
+Use bootc to upgrade the system to the latest image:
+
+```bash
+sudo bootc upgrade
+```
+
+After that, you should reboot your device. However, shutdown and reboot are currently
+broken and may not work. To finish the upgrade process run the following command
+before rebooting the device:
+
+```bash
+sudo systemctl stop ostree-finalize-staged.service
+```
