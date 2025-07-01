@@ -9,6 +9,6 @@ After=sysinit.target
 Before=basic.target
 
 [Service]
-ExecStart=/usr/libexec/pocketblue-growpart
+ExecStart=/usr/libexec/pocketblue-growfs
 # So we can temporarily remount the sysroot writable
 MountFlags=slave

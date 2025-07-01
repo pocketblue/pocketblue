@@ -32,7 +32,7 @@ RUN dnf -y install 'dnf5-command(copr)' && \
     systemctl enable rmtfs.service && \
     systemctl enable tqftpserv.service && \
     systemctl enable qbootctl.service && \
-    systemctl enable pocketblue-growpart.service && \
+    systemctl enable pocketblue-growfs.service && \
     dnf clean all
 
 COPY firmware-oneplus-sdm845/usr /usr/

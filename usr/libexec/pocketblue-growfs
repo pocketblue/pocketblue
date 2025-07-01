@@ -1,0 +1,4 @@
+#!/bin/bash
+set -eu
+mount -o remount,rw /sysroot
+/usr/lib/systemd/systemd-growfs /sysroot
