@@ -7,7 +7,7 @@ RUN dnf -y install 'dnf5-command(copr)' && \
     dnf -y copr enable gmanka/sdm845 && \
     dnf -y copr enable @mobility/common && \
     dnf -y copr enable samcday/phrog && \
-    dnf -y install kernel-0:6.15.0-0.rc2.15.sdm845.fc43 && \
+    dnf -y install kernel-0:6.15.0-0.rc2.15.sdm845.fc43 kernel-modules-extra && \
     dnf -y install \
         @standard \
         @hardware-support \
@@ -24,9 +24,11 @@ RUN dnf -y install 'dnf5-command(copr)' && \
         phrog \
         --exclude selinux-policy-targeted,dracut-config-rescue,qemu-user-static && \
     systemctl enable phrog.service && \
-    systemctl enable hexagonrpcd-adsp-rootpd.service && \
-    systemctl enable hexagonrpcd-adsp-sensorspd.service && \
+    systemctl enable bootmac-bluetooth.service && \
     systemctl enable hexagonrpcd-sdsp.service && \
+    systemctl enable pd-mapper.service && \
+    systemctl enable rmtfs.service && \
+    systemctl enable tqftpserv.service && \
     dnf clean all
 
 COPY firmware-oneplus-sdm845/usr /usr/
