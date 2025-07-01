@@ -22,6 +22,7 @@ RUN dnf -y install 'dnf5-command(copr)' && \
         mobility-tweaks \
         iio-sensor-proxy \
         phrog \
+        vim \
         --exclude selinux-policy-targeted,dracut-config-rescue,qemu-user-static && \
     systemctl enable phrog.service && \
     systemctl enable bootmac-bluetooth.service && \
