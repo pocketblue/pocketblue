@@ -5,10 +5,13 @@ on:
       image_name:
         required: true
         type: string
-      image_tag:
+      image_tags:
         required: true
         type: string
       registry:
+        required: true
+        type: string
+      base_tag:
         required: true
         type: string
 
@@ -27,11 +30,11 @@ jobs:
       uses: redhat-actions/buildah-build@v2
       with:
         image: ${{ inputs.image_name }}
-        tags: ${{ inputs.image_tag }}
+        tags: ${{ inputs.image_tags }}
         containerfiles: |
           ./Containerfile
         build-args: |
-          tag=${{ inputs.image_tag }}
+          tag=${{ inputs.base_tag }}
 
     - name: Log in to the GitHub Container registry
       uses: redhat-actions/podman-login@v1
