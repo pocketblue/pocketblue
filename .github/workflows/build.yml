@@ -1,18 +1,20 @@
-name: Build container image
+name: Build a container image
 on:
-  workflow_dispatch:
-  push:
-    paths:
-      - 'Containerfile'
-    branches:
-      - main
+  workflow_call:
+    inputs:
+      image_name:
+        required: true
+        type: string
+      image_tag:
+        required: true
+        type: string
+      registry:
+        required: true
+        type: string
 
 jobs:
   build:
     runs-on: ubuntu-24.04-arm
-    env:
-      IMAGE_NAME: pocketblue
-      REGISTRY: ghcr.io/onesaladleaf
 
     steps:
     - name: Clone the repository
@@ -20,19 +22,21 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Build the container
+    - name: Build the container image
       id: build-container
       uses: redhat-actions/buildah-build@v2
       with:
-        image: ${{ env.IMAGE_NAME }}
-        tags: latest ${{ github.sha }}
+        image: ${{ inputs.image_name }}
+        tags: ${{ inputs.image_tag }}
         containerfiles: |
           ./Containerfile
+        build-args: |
+          tag=${{ inputs.image_tag }}
 
     - name: Log in to the GitHub Container registry
       uses: redhat-actions/podman-login@v1
       with:
-        registry: ${{ env.REGISTRY }}
+        registry: ${{ inputs.registry }}
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
@@ -42,4 +46,4 @@ jobs:
       with:
         image: ${{ steps.build-container.outputs.image }}
         tags: ${{ steps.build-container.outputs.tags }}
-        registry: ${{ env.REGISTRY }}
+        registry: ${{ inputs.registry }}

@@ -1,0 +1,17 @@
+name: Build rawhide image
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "Containerfile"
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build and publish the rawhide image
+    uses: ./.github/workflows/build.yml
+    with:
+      image_name: pocketblue
+      image_tag: rawhide
+      registry: ghcr.io/onesaladleaf

@@ -1,0 +1,12 @@
+name: Build stable image
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build and publish the stable image
+    uses: ./.github/workflows/build.yml
+    with:
+      image_name: pocketblue
+      image_tag: 42
+      registry: ghcr.io/onesaladleaf
