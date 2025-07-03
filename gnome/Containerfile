@@ -11,10 +11,6 @@ RUN dnf -y install 'dnf5-command(copr)' && \
         gnome-shell-0:*^mobile* \
         ptyxis \
         --exclude \
-        gnome-console,\
-        gnome-photos,\
-        phoc,\
-        phosh,\
-        squeekboard && \
+        gnome-console,gnome-photos,phoc,phosh,squeekboard && \
     systemctl enable gdm.service && \
     dnf clean all
