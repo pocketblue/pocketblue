@@ -31,3 +31,15 @@ jobs:
       base_tag: rawhide
       containerfiles: |
         ./phosh/Containerfile
+
+  gnome:
+    name: Build the gnome image
+    uses: ./.github/workflows/build.yml
+    needs: base
+    with:
+      image_name: pocketblue-gnome
+      image_tags: rawhide
+      registry: ghcr.io/onesaladleaf
+      base_tag: rawhide
+      containerfiles: |
+        ./gnome/Containerfile
