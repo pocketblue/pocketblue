@@ -13,6 +13,7 @@ jobs:
       base_tag: 42
       containerfiles: |
         ./base/Containerfile
+      context: base
 
   phosh:
     name: Build the phosh image
@@ -25,6 +26,7 @@ jobs:
       base_tag: 42
       containerfiles: |
         ./phosh/Containerfile
+      context: phosh
 
   gnome:
     name: Build the gnome image
@@ -37,3 +39,4 @@ jobs:
       base_tag: 42
       containerfiles: |
         ./gnome/Containerfile
+      context: gnome

@@ -19,6 +19,7 @@ jobs:
       base_tag: rawhide
       containerfiles: |
         ./base/Containerfile
+      context: base
 
   phosh:
     name: Build the phosh image
@@ -31,6 +32,7 @@ jobs:
       base_tag: rawhide
       containerfiles: |
         ./phosh/Containerfile
+      context: phosh
 
   gnome:
     name: Build the gnome image
@@ -43,3 +45,4 @@ jobs:
       base_tag: rawhide
       containerfiles: |
         ./gnome/Containerfile
+      context: gnome
