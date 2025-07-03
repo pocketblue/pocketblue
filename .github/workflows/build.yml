@@ -14,6 +14,9 @@ on:
       base_tag:
         required: true
         type: string
+      containerfiles:
+        required: true
+        type: string
 
 jobs:
   build:
@@ -31,8 +34,7 @@ jobs:
       with:
         image: ${{ inputs.image_name }}
         tags: ${{ inputs.image_tags }}
-        containerfiles: |
-          ./Containerfile
+        containerfiles: ${{ inputs.containerfiles }}
         build-args: |
           tag=${{ inputs.base_tag }}
 

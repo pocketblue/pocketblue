@@ -1,0 +1,9 @@
+ARG tag
+
+FROM ghcr.io/onesaladleaf/pocketblue-base:$tag
+
+RUN dnf -y install 'dnf5-command(copr)' && \
+    dnf -y copr enable samcday/phrog && \
+    dnf -y install @phosh-desktop phrog && \
+    systemctl enable phrog.service && \
+    dnf clean all

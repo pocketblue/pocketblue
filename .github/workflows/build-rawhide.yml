@@ -1,18 +1,33 @@
-name: Build rawhide image
+name: Build rawhide images
 on:
   workflow_dispatch:
   push:
     paths:
-      - "Containerfile"
+      - "base/**"
+      - "phosh/**"
     branches:
       - main
 
 jobs:
-  build:
-    name: Build and publish the rawhide image
+  base:
+    name: Build the base image
     uses: ./.github/workflows/build.yml
     with:
-      image_name: pocketblue
+      image_name: pocketblue-base
       image_tags: rawhide
       registry: ghcr.io/onesaladleaf
       base_tag: rawhide
+      containerfiles: |
+        ./base/Containerfile
+
+  phosh:
+    name: Build the phosh image
+    uses: ./.github/workflows/build.yml
+    needs: base
+    with:
+      image_name: pocketblue-phosh
+      image_tags: rawhide
+      registry: ghcr.io/onesaladleaf
+      base_tag: rawhide
+      containerfiles: |
+        ./phosh/Containerfile

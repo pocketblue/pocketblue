@@ -6,7 +6,7 @@ jobs:
   build:
     runs-on: ubuntu-24.04-arm
     env:
-      IMAGE_NAME: pocketblue
+      IMAGE_NAME: pocketblue-phosh
       REGISTRY: ghcr.io/onesaladleaf
 
     steps:

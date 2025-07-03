@@ -1,13 +1,27 @@
-name: Build stable image
+name: Build stable images
 on:
   workflow_dispatch:
 
 jobs:
-  build:
-    name: Build and publish the stable image
+  base:
+    name: Build the base image
     uses: ./.github/workflows/build.yml
     with:
-      image_name: pocketblue
+      image_name: pocketblue-base
       image_tags: 42 latest
       registry: ghcr.io/onesaladleaf
       base_tag: 42
+      containerfiles: |
+        ./base/Containerfile
+
+  phosh:
+    name: Build the phosh image
+    uses: ./.github/workflows/build.yml
+    needs: base
+    with:
+      image_name: pocketblue-phosh
+      image_tags: 42 latest
+      registry: ghcr.io/onesaladleaf
+      base_tag: 42
+      containerfiles: |
+        ./phosh/Containerfile

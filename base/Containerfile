@@ -8,26 +8,25 @@ COPY usr/ /usr/
 RUN dnf -y install 'dnf5-command(copr)' && \
     dnf -y copr enable gmanka/sdm845 && \
     dnf -y copr enable @mobility/common && \
-    dnf -y copr enable samcday/phrog && \
     dnf -y install kernel-0:6.15.0-0.rc2.15.sdm845.* kernel-modules-extra && \
     dnf -y install \
-        @standard \
+        @core \
         @hardware-support \
+        @standard \
+        @base-graphical \
+        --exclude dracut-config-rescue && \
+    dnf -y install \
         bcm283x-firmware \
         qcom-firmware \
-        grubby \
-        grub2-efi-aa64 grub2-efi-aa64-modules systemd-oomd-defaults systemd-resolved \
-        fedora-release-mobility \
+        grub2-efi-aa64 grub2-efi-aa64-modules grubby \
+        systemd-oomd-defaults systemd-resolved \
         glibc-langpack-en \
         btrfs-progs udisks2-btrfs \
-        @core @base-graphical @phosh-desktop \
         bootmac hexagonrpc libssc pd-mapper qrtr rmtfs tqftpserv alsa-ucm-mobility-sdm845 qbootctl \
+        fedora-release-mobility \
         mobility-tweaks \
         iio-sensor-proxy \
-        phrog \
-        vim \
-        --exclude selinux-policy-targeted,dracut-config-rescue,qemu-user-static && \
-    systemctl enable phrog.service && \
+        vim && \
     systemctl enable bootmac-bluetooth.service && \
     systemctl enable hexagonrpcd-sdsp.service && \
     systemctl enable pd-mapper.service && \
