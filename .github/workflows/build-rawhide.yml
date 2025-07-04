@@ -14,17 +14,16 @@ jobs:
     strategy:
       matrix:
         device: [oneplus6]
-    steps:
-      - uses: ./.github/workflows/build.yml
-        with:
-          image_name: ${{ matrix.device }}-base
-          image_tags: rawhide
-          base_name: ""
-          base_tag: rawhide
-          containerfiles: |
-            ./devices/${{ matrix.device }}/Containerfile
-          context: devices/${{ matrix.device }}
-        secrets: inherit
+    uses: ./.github/workflows/build.yml
+    with:
+      image_name: ${{ matrix.device }}-base
+      image_tags: rawhide
+      base_name: ""
+      base_tag: rawhide
+      containerfiles: |
+        ./devices/${{ matrix.device }}/Containerfile
+      context: devices/${{ matrix.device }}
+    secrets: inherit
 
   desktops:
     name: Build the desktop images
@@ -32,14 +31,13 @@ jobs:
       matrix:
         device: [oneplus6]
         desktop: [gnome-mobile, phosh]
-    steps:
-      - uses: ./.github/workflows/build.yml
-        with:
-          image_name: ${{ matrix.device }}-${{ matrix.desktop }}
-          image_tags: rawhide
-          base_name: ${{ matrix.device }}-base
-          base_tag: rawhide
-          containerfiles: |
-            ./desktops/${{ matrix.desktop }}/Containerfile
-          context: desktops/${{ matrix.desktop }}
-        secrets: inherit
+    uses: ./.github/workflows/build.yml
+    with:
+      image_name: ${{ matrix.device }}-${{ matrix.desktop }}
+      image_tags: rawhide
+      base_name: ${{ matrix.device }}-base
+      base_tag: rawhide
+      containerfiles: |
+        ./desktops/${{ matrix.desktop }}/Containerfile
+      context: desktops/${{ matrix.desktop }}
+    secrets: inherit
