@@ -1,4 +1,4 @@
-name: Build rawhide images
+name: Build stable images
 on:
   workflow_dispatch:
 
