@@ -5,6 +5,9 @@ FROM quay.io/fedora/fedora-bootc:$base_tag
 COPY etc/ /etc/
 COPY usr/ /usr/
 
+# workaround (see https://github.com/ublue-os/bluefin-lts/issues/3)
+RUN mkdir -p /var/roothome
+
 RUN dnf -y install 'dnf5-command(copr)' && \
     dnf -y copr enable gmanka/sdm845 && \
     dnf -y copr enable onesaladleaf/mobility-common && \
