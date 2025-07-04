@@ -7,7 +7,7 @@ jobs:
     name: Build the base device images
     strategy:
       matrix:
-        device: [mipad5]
+        device: [mipad5, oneplus6]
     uses: ./.github/workflows/build.yml
     with:
       image_name: ${{ matrix.device }}-base
@@ -24,7 +24,7 @@ jobs:
     needs: devices
     strategy:
       matrix:
-        device: [mipad5]
+        device: [mipad5, oneplus6]
         desktop: [gnome-desktop, gnome-mobile, phosh]
     uses: ./.github/workflows/build.yml
     with:
