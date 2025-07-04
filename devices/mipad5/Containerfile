@@ -5,6 +5,9 @@ FROM quay.io/fedora/fedora-bootc:$base_tag
 COPY etc/ /etc/
 COPY usr/ /usr/
 
+# workaround (see https://github.com/ublue-os/bluefin-lts/issues/3)
+RUN mkdir -p /var/roothome
+
 RUN dnf -y install 'dnf5-command(copr)' && \
     dnf -y copr enable nik012003/nabu-support && \
     dnf -y install linux-sm8150 && \
