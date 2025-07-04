@@ -5,6 +5,6 @@ FROM quay.io/pocketblue/$base_name:$base_tag
 
 RUN dnf -y install 'dnf5-command(copr)' && \
     dnf -y copr enable samcday/phrog && \
-    dnf -y install @phosh-desktop phrog && \
+    dnf -y install @phosh-desktop phrog --exclude gdm && \
     systemctl enable phrog.service && \
     dnf clean all
