@@ -8,6 +8,9 @@ on:
       image_tags:
         required: true
         type: string
+      base_name:
+        required: true
+        type: string
       base_tag:
         required: true
         type: string
@@ -37,7 +40,8 @@ jobs:
         containerfiles: ${{ inputs.containerfiles }}
         context: ${{ inputs.context }}
         build-args: |
-          tag=${{ inputs.base_tag }}
+          base_name=${{ inputs.base_name }}
+          base_tag=${{ inputs.base_tag }}
 
     - name: Log in to the registry
       uses: redhat-actions/podman-login@v1

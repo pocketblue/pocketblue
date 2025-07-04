@@ -3,47 +3,43 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - "base/**"
-      - "phosh/**"
-      - "gnome-mobile/**"
+      - "devices/**"
+      - "desktops/**"
     branches:
       - main
 
 jobs:
-  base:
-    name: Build the base image
-    uses: ./.github/workflows/build.yml
-    with:
-      image_name: base
-      image_tags: rawhide
-      base_tag: rawhide
-      containerfiles: |
-        ./base/Containerfile
-      context: base
-    secrets: inherit
+  devices:
+    name: Build the base device images
+    strategy:
+      matrix:
+        device: [oneplus6]
+    steps:
+      - uses: ./.github/workflows/build.yml
+        with:
+          image_name: ${{ matrix.device }}-base
+          image_tags: rawhide
+          base_name: ""
+          base_tag: rawhide
+          containerfiles: |
+            ./devices/${{ matrix.device }}/Containerfile
+          context: devices/${{ matrix.device }}
+        secrets: inherit
 
-  phosh:
-    name: Build the phosh image
-    uses: ./.github/workflows/build.yml
-    needs: base
-    with:
-      image_name: phosh
-      image_tags: rawhide
-      base_tag: rawhide
-      containerfiles: |
-        ./phosh/Containerfile
-      context: phosh
-    secrets: inherit
-
-  gnome:
-    name: Build the gnome mobile image
-    uses: ./.github/workflows/build.yml
-    needs: base
-    with:
-      image_name: gnome-mobile
-      image_tags: rawhide
-      base_tag: rawhide
-      containerfiles: |
-        ./gnome-mobile/Containerfile
-      context: gnome-mobile
-    secrets: inherit
+  desktops:
+    name: Build the desktop images
+    strategy:
+      matrix:
+        device: [oneplus6]
+        desktop: [gnome-mobile, phosh]
+    steps:
+      - uses: ./.github/workflows/build.yml
+        with:
+          image_name: ${{ matrix.device }}-${{ matrix.desktop }}
+          image_tags: rawhide
+          base_name: ${{ matrix.device }}-base
+          base_tag: rawhide
+          containerfiles: |
+            ./desktops/${{ matrix.desktop }}/Containerfile
+          context: desktops/${{ matrix.desktop }}
+        secrets: inherit

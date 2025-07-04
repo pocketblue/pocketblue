@@ -1,6 +1,7 @@
-ARG tag
+ARG base_name
+ARG base_tag
 
-FROM quay.io/pocketblue/base:$tag
+FROM quay.io/pocketblue/$base_name:$base_tag
 
 RUN dnf -y install 'dnf5-command(copr)' && \
     dnf -y copr enable samcday/phrog && \
