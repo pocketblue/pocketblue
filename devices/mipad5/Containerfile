@@ -23,7 +23,6 @@ RUN dnf -y install 'dnf5-command(copr)' && \
         fedora-release-ostree-desktop \
         fedora-release-mobility \
         vim && \
-    systemctl enable pd-mapper.service && \
     systemctl enable rmtfs.service && \
     systemctl enable tqftpserv.service && \
     systemctl enable qbootctl.service && \
