@@ -1,23 +1,31 @@
-name: Build raw disk image
+name: Create a raw disk image
 on:
-  workflow_dispatch:
+  workflow_call:
+    inputs:
+      image_name:
+        required: true
+        type: string
+      image_tag:
+        required: true
+        type: string
+      esp_size:
+        required: true
+        type: number
 
 jobs:
   build:
     runs-on: ubuntu-24.04-arm
-    env:
-      IMAGE_NAME: phosh
 
     steps:
     - name: Clone the repository
       uses: actions/checkout@v4
 
-    - name: Build the image
+    - name: Raw disk image
       id: build-raw
       uses: osbuild/bootc-image-builder-action@v0.0.2
       with:
-        config-file: ./base/config.toml
-        image: ${{ vars.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+        config-file: ./config.toml
+        image: ${{ vars.REGISTRY }}/${{ inputs.image_name }}:${{ inputs.image_tag }}
         rootfs: btrfs
         types: |
           raw
@@ -35,7 +43,7 @@ jobs:
 
         VOLID=$(file efipart.vfat | grep -Eo "serial number 0x.{8}" | cut -d\  -f3)
 
-        truncate -s 268435456 artifacts/esp.raw
+        truncate -s ${{ inputs.esp_size }} artifacts/esp.raw
         mkfs.vfat -F 32 -S 4096 -n EFI -i $VOLID artifacts/esp.raw
 
         mkdir -p esp.old esp.new
@@ -50,5 +58,5 @@ jobs:
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: pocketblue
+        name: pocketblue-${{ inputs.image_name }}-${{ inputs.image_tag }}
         path: ./artifacts
