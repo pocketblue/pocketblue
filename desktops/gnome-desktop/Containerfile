@@ -3,9 +3,7 @@ ARG base_tag
 
 FROM quay.io/pocketblue/$base_name:$base_tag
 
-RUN # @gnome-desktop comes with a lot of components unnecessary for mobile devices. \
-    # For now, install @phosh-desktop and replace phosh with gnome-shell \
-    dnf -y install \
+RUN dnf -y install \
         @phosh-desktop \
         gnome-shell \
         ptyxis \
