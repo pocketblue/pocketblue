@@ -24,7 +24,7 @@ jobs:
     needs: devices
     strategy:
       matrix:
-        device: [mipad5, oneplus6]
+        device: [mipad5]
         desktop: [gnome-desktop, gnome-mobile, phosh]
     uses: ./.github/workflows/build.yml
     with:
