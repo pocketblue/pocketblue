@@ -1,6 +1,6 @@
 ARG tag
 
-FROM ghcr.io/onesaladleaf/pocketblue-base:$tag
+FROM quay.io/pocketblue/base:$tag
 
 RUN dnf -y install 'dnf5-command(copr)' && \
     dnf -y copr enable samcday/phrog && \

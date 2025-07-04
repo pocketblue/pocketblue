@@ -8,9 +8,6 @@ on:
       image_tags:
         required: true
         type: string
-      registry:
-        required: true
-        type: string
       base_tag:
         required: true
         type: string
@@ -42,17 +39,16 @@ jobs:
         build-args: |
           tag=${{ inputs.base_tag }}
 
-    - name: Log in to the GitHub Container registry
+    - name: Log in to the registry
       uses: redhat-actions/podman-login@v1
       with:
-        registry: ${{ inputs.registry }}
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+        registry: ${{ vars.REGISTRY }}
+        username: ${{ secrets.QUAY_USERNAME }}
+        password: ${{ secrets.QUAY_TOKEN }}
 
-    - name: Push to GitHub Container Repository
-      id: push-to-ghcr
+    - name: Push to the repository
       uses: redhat-actions/push-to-registry@v2
       with:
         image: ${{ steps.build-container.outputs.image }}
         tags: ${{ steps.build-container.outputs.tags }}
-        registry: ${{ inputs.registry }}
+        registry: ${{ vars.REGISTRY }}

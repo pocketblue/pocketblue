@@ -6,8 +6,7 @@ jobs:
   build:
     runs-on: ubuntu-24.04-arm
     env:
-      IMAGE_NAME: pocketblue-phosh
-      REGISTRY: ghcr.io/onesaladleaf
+      IMAGE_NAME: phosh
 
     steps:
     - name: Clone the repository
@@ -17,8 +16,8 @@ jobs:
       id: build-raw
       uses: osbuild/bootc-image-builder-action@v0.0.2
       with:
-        config-file: ./config.toml
-        image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+        config-file: ./base/config.toml
+        image: ${{ vars.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
         rootfs: btrfs
         types: |
           raw

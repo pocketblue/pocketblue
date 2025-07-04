@@ -5,6 +5,7 @@ on:
     paths:
       - "base/**"
       - "phosh/**"
+      - "gnome-mobile/**"
     branches:
       - main
 
@@ -13,36 +14,36 @@ jobs:
     name: Build the base image
     uses: ./.github/workflows/build.yml
     with:
-      image_name: pocketblue-base
+      image_name: base
       image_tags: rawhide
-      registry: ghcr.io/onesaladleaf
       base_tag: rawhide
       containerfiles: |
         ./base/Containerfile
       context: base
+    secrets: inherit
 
   phosh:
     name: Build the phosh image
     uses: ./.github/workflows/build.yml
     needs: base
     with:
-      image_name: pocketblue-phosh
+      image_name: phosh
       image_tags: rawhide
-      registry: ghcr.io/onesaladleaf
       base_tag: rawhide
       containerfiles: |
         ./phosh/Containerfile
       context: phosh
+    secrets: inherit
 
   gnome:
-    name: Build the gnome image
+    name: Build the gnome mobile image
     uses: ./.github/workflows/build.yml
     needs: base
     with:
-      image_name: pocketblue-gnome
+      image_name: gnome-mobile
       image_tags: rawhide
-      registry: ghcr.io/onesaladleaf
       base_tag: rawhide
       containerfiles: |
-        ./gnome/Containerfile
-      context: gnome
+        ./gnome-mobile/Containerfile
+      context: gnome-mobile
+    secrets: inherit
