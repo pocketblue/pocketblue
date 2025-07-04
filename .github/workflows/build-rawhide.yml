@@ -31,7 +31,7 @@ jobs:
     strategy:
       matrix:
         device: [oneplus6]
-        desktop: [gnome-mobile, phosh]
+        desktop: [gnome-desktop, gnome-mobile, phosh]
     uses: ./.github/workflows/build.yml
     with:
       image_name: ${{ matrix.device }}-${{ matrix.desktop }}

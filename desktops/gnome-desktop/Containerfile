@@ -1,0 +1,15 @@
+ARG base_name
+ARG base_tag
+
+FROM quay.io/pocketblue/$base_name:$base_tag
+
+RUN # @gnome-desktop comes with a lot of components unnecessary for mobile devices. \
+    # For now, install @phosh-desktop and replace phosh with gnome-shell \
+    dnf -y install \
+        @phosh-desktop \
+        gnome-shell \
+        ptyxis \
+        --exclude \
+        gnome-console,gnome-photos,phoc,phosh,squeekboard && \
+    systemctl enable gdm.service && \
+    dnf clean all
