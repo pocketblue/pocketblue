@@ -1,0 +1,14 @@
+name: Raw images for OnePlus 6/6T
+on:
+  workflow_dispatch:
+
+jobs:
+  mipad5:
+    strategy:
+      matrix:
+        desktop: [gnome-mobile, phosh]
+    uses: ./.github/workflows/raw-image.yml
+    with:
+      image_name: oneplus6-${{ matrix.desktop }}
+      image_tag: rawhide
+      esp_size: 268435456
