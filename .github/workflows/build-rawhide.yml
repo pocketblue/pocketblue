@@ -27,6 +27,7 @@ jobs:
 
   desktops:
     name: Build the desktop images
+    needs: devices
     strategy:
       matrix:
         device: [oneplus6]
