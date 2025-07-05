@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  mipad5:
+  oneplus6:
     strategy:
       matrix:
         desktop: [gnome-mobile, phosh]
