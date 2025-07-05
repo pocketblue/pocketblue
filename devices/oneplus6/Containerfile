@@ -11,6 +11,9 @@ RUN mkdir -p /var/roothome
 RUN dnf -y install 'dnf5-command(copr)' && \
     dnf -y copr enable gmanka/sdm845 && \
     dnf -y copr enable onesaladleaf/mobility-common && \
+    if [ "$base_tag" != "rawhide" ]; then \
+        dnf -y copr enable nik012003/nabu-support; \
+    fi && \
     dnf -y install kernel-0:6.15.0-0.rc2.15.sdm845.* kernel-modules-extra && \
     dnf -y install \
         @core \
@@ -25,7 +28,7 @@ RUN dnf -y install 'dnf5-command(copr)' && \
         systemd-oomd-defaults systemd-resolved \
         glibc-langpack-en \
         btrfs-progs udisks2-btrfs \
-        bootmac hexagonrpc libssc pd-mapper qrtr rmtfs alsa-ucm-mobility-sdm845 qbootctl \
+        bootmac hexagonrpc libssc pd-mapper qrtr tqftpserv rmtfs alsa-ucm-mobility-sdm845 qbootctl \
         fedora-release-ostree-desktop \
         fedora-release-mobility \
         mobility-tweaks \
@@ -35,14 +38,9 @@ RUN dnf -y install 'dnf5-command(copr)' && \
     systemctl enable hexagonrpcd-sdsp.service && \
     systemctl enable pd-mapper.service && \
     systemctl enable rmtfs.service && \
+    systemctl enable tqftpserv.service && \
     systemctl enable qbootctl.service && \
     dnf clean all
-
-RUN if [ "$base_tag" = "rawhide" ]; then \
-    dnf -y install tqftpserv && \
-    systemctl enable tqftpserv.service && \
-    dnf clean all; \
-fi
 
 COPY firmware-oneplus-sdm845/usr /usr/
 COPY firmware-oneplus-sdm845/lib /usr/lib/
