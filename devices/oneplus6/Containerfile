@@ -40,6 +40,9 @@ RUN dnf -y install 'dnf5-command(copr)' && \
     systemctl enable rmtfs.service && \
     systemctl enable tqftpserv.service && \
     systemctl enable qbootctl.service && \
+    if [ "$base_tag" != "rawhide" ]; then \
+        systemctl mask qrtr-ns.service; \
+    fi && \
     dnf clean all
 
 COPY firmware-oneplus-sdm845/usr /usr/
