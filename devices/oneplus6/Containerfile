@@ -12,7 +12,8 @@ RUN dnf -y install 'dnf5-command(copr)' && \
     dnf -y copr enable gmanka/sdm845 && \
     dnf -y copr enable onesaladleaf/mobility-common && \
     if [ "$base_tag" != "rawhide" ]; then \
-        dnf -y copr enable nik012003/nabu-support; \
+        dnf -y copr enable nik012003/nabu-support && \
+        dnf -y copr enable onesaladleaf/pocketblue; \
     fi && \
     dnf -y install kernel-0:6.15.0-0.rc2.15.sdm845.* kernel-modules-extra && \
     dnf -y install \
@@ -40,9 +41,6 @@ RUN dnf -y install 'dnf5-command(copr)' && \
     systemctl enable rmtfs.service && \
     systemctl enable tqftpserv.service && \
     systemctl enable qbootctl.service && \
-    if [ "$base_tag" != "rawhide" ]; then \
-        systemctl mask qrtr-ns.service; \
-    fi && \
     dnf clean all
 
 COPY firmware-oneplus-sdm845/usr /usr/
