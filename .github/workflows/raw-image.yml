@@ -60,3 +60,4 @@ jobs:
       with:
         name: pocketblue-${{ inputs.image_name }}-${{ inputs.image_tag }}
         path: ./artifacts
+        compression-level: 9
