@@ -20,6 +20,7 @@ RUN dnf -y install 'dnf5-command(copr)' && \
     dnf -y install \
         grub2-efi-aa64 grub2-efi-aa64-modules grubby \
         systemd-oomd-defaults systemd-resolved \
+        NetworkManager-tui \
         glibc-langpack-en \
         btrfs-progs udisks2-btrfs \
         pd-mapper qrtr rmtfs tqftpserv alsa-ucm-conf-xiaomi-nabu qbootctl xiaomi-nabu-firmware \
