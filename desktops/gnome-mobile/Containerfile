@@ -5,14 +5,8 @@ FROM quay.io/pocketblue/$base_name:$base_tag
 
 RUN dnf -y install 'dnf5-command(copr)' && \
     dnf -y copr enable @mobility/gnome-mobile && \
-    # @gnome-desktop comes with a lot of components unnecessary for mobile devices. \
-    # For now, install @phosh-desktop and replace phosh with gnome-mobile \
-    dnf -y install \
-        @phosh-desktop \
-        gnome-shell-0:*^mobile* \
-        ptyxis \
-        gnome-backgrounds \
-        --exclude \
-        gnome-console,gnome-photos,phoc,phosh,squeekboard && \
+    dnf -y install @gnome-desktop gnome-shell-0:*^mobile* --exclude \
+        gnome-boxes,gnome-connections,gnome-text-editor,yelp,baobab,evince,evince-djvu,gnome-calculator,gnome-calendar,gnome-characters,gnome-classic-session,gnome-clocks,gnome-contacts,gnome-font-viewer,gnome-logs,gnome-maps,gnome-system-monitor,gnome-user-docs,gnome-weather,totem,loupe,simple-scan,snapshot,gnome-tour,malcontent-control && \
     systemctl enable gdm.service && \
     dnf clean all
+
