@@ -53,10 +53,12 @@ jobs:
         sudo cp -a esp.old/. esp.new/
         sudo umount esp.old/ esp.new/
 
-        gzip artifacts/*
+        sudo apt install -y p7zip
+        7z -mx=9 a pocketblue-${{ inputs.image_name }}-${{ inputs.image_tag }}.7z artifacts/*
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: pocketblue-${{ inputs.image_name }}-${{ inputs.image_tag }}
-        path: ./artifacts
+        path: ./pocketblue-${{ inputs.image_name }}-${{ inputs.image_tag }}.7z
+        compression-level: 0
