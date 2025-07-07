@@ -21,20 +21,23 @@ jobs:
 
     - name: Build the container image
       id: build-container
-      run: |
-        sudo /usr/bin/buildah bud \
-            -f ./base/Containerfile \
-            --build-arg base_tag=${{ inputs.base_tag }} \
-            --format docker \
-            --tls-verify=true \
-            --cap-add=all \
-            --security-opt=label=type:container_runtime_t \
-            --device /dev/fuse \
-            -t base:${{ inputs.base_tag }}-single \
-            ./base
+      uses: redhat-actions/buildah-build@v2
+      with:
+        image: base
+        tags: ${{ inputs.base_tag }}-single
+        containerfiles: |
+          ./base/Containerfile
+        context: base
+        build-args: |
+          base_tag=${{ inputs.base_tag }}
+        extra-args: |
+          --cap-add=all
+          --security-opt=label=type:container_runtime_t
+          --device /dev/fuse
 
     - name: Rechunk the image
       run: |
+        set -uexo pipefail
         sudo podman run \
             --rm \
             --privileged \
@@ -45,18 +48,15 @@ jobs:
                 base:${{ inputs.image_tag }}
 
     - name: Log in to the registry
-      run: |
-        sudo podman login \
-            ${{ vars.REGISTRY }} \
-            -u ${{ secrets.QUAY_USERNAME }} \
-            -p ${{ secrets.QUAY_TOKEN }} \
-            --verbose
+      uses: redhat-actions/podman-login@v1
+      with:
+        registry: ${{ vars.REGISTRY }}
+        username: ${{ secrets.QUAY_USERNAME }}
+        password: ${{ secrets.QUAY_TOKEN }}
 
     - name: Push to the repository
-      run: |
-        sudo podman push \
-            --quiet \
-            --digestfile base-${{ inputs.image_tag }}_digest.txt \
-            base:${{ inputs.image_tag }} \
-            ${{ vars.REGISTRY }}/base:${{ inputs.image_tag }} \
-            --tls-verify=true
+      uses: redhat-actions/push-to-registry@v2
+      with:
+        image: base
+        tags: ${{ inputs.image_tag }}
+        registry: ${{ vars.REGISTRY }}
