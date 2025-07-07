@@ -6,7 +6,7 @@ COPY etc/ /etc/
 COPY usr/ /usr/
 
 RUN dnf -y copr enable nik012003/nabu-support && \
-    rpm-ostree override remove kernel --install linux-sm8150 && \
+    dnf -y install linux-sm8150 && \
     dnf -y install \
         xiaomi-nabu-firmware \
         pd-mapper qrtr rmtfs tqftpserv \
