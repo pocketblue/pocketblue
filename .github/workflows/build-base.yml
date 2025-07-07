@@ -38,14 +38,16 @@ jobs:
     - name: Rechunk the image
       run: |
         set -uexo pipefail
+        podman save base:${{ inputs.base_tag }}-single | sudo podman load
         sudo podman run \
             --rm \
             --privileged \
             -v /var/lib/containers:/var/lib/containers \
             quay.io/fedora/fedora-bootc:${{ inputs.base_tag }} \
             /usr/libexec/bootc-base-imagectl rechunk \
-                base:${{ inputs.base_tag }}-single \
-                base:${{ inputs.image_tag }}
+                localhost/base:${{ inputs.base_tag }}-single \
+                localhost/base:${{ inputs.image_tag }}
+        sudo podman save base:${{ inputs.image_tag }} | podman load
 
     - name: Log in to the registry
       uses: redhat-actions/podman-login@v1
