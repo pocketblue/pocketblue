@@ -3,12 +3,24 @@ on:
   workflow_dispatch:
 
 jobs:
+  # base:
+  #   name: Build the base image
+  #   uses: ./.github/workflows/build-base.yml
+  #   with:
+  #     image_tag: 42
+  #     base_tag: 42
+  #   secrets: inherit
   base:
     name: Build the base image
-    uses: ./.github/workflows/build-base.yml
+    uses: ./.github/workflows/build.yml
     with:
-      image_tag: 42
+      image_name: base
+      image_tags: 42 latest
+      base_name: ""
       base_tag: 42
+      containerfiles: |
+        ./base/Containerfile
+      context: base
     secrets: inherit
 
   devices:
