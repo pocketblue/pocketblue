@@ -3,8 +3,22 @@ on:
   workflow_dispatch:
 
 jobs:
+  base:
+    name: Build the base image
+    uses: ./.github/workflows/build.yml
+    with:
+      image_name: base
+      image_tags: 42 latest
+      base_name: ""
+      base_tag: 42
+      containerfiles: |
+        ./base/Containerfile
+      context: base
+    secrets: inherit
+
   devices:
-    name: Build the base device images
+    name: Build the device images
+    needs: base
     strategy:
       matrix:
         device: [mipad5, oneplus6]
