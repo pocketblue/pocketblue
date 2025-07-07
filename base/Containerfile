@@ -39,5 +39,6 @@ RUN dnf -y install 'dnf5-command(copr)' && \
     bootc container lint
 
 LABEL containers.bootc 1
-LABEL ostree.bootable 1
 ENV container=oci
+STOPSIGNAL SIGRTMIN+3
+CMD ["/sbin/init"]
