@@ -9,6 +9,7 @@ RUN dnf -y copr enable gmanka/sdm845 && \
         # for tqftpserv on 42 \
         dnf -y copr enable nik012003/nabu-support; \
     fi && \
+    mkdir /boot/dtb && \
     dnf -y install \
         kernel-0:*.sdm845.* \
         kernel-modules-extra-0:*.sdm845.* && \
