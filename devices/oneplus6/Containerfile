@@ -11,7 +11,7 @@ RUN dnf -y copr enable gmanka/sdm845 && \
     fi && \
     dnf -y install \
         kernel-0:*.sdm845.* \
-        kernel-modules-extra && \
+        kernel-modules-extra-0:*.sdm845.* && \
     dnf -y install \
         bcm283x-firmware \
         qcom-firmware \
