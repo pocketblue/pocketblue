@@ -42,6 +42,10 @@ jobs:
         build-args: |
           base_name=${{ inputs.base_name }}
           base_tag=${{ inputs.base_tag }}
+        extra-args: |
+          --cap-add=all
+          --security-opt=label=type:container_runtime_t
+          --device /dev/fuse
 
     - name: Log in to the registry
       uses: redhat-actions/podman-login@v1
