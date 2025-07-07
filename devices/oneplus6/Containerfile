@@ -1,41 +1,26 @@
 ARG base_tag
 
-FROM quay.io/fedora/fedora-bootc:$base_tag
+FROM quay.io/pocketblue/base:$base_tag
 
-COPY etc/ /etc/
 COPY usr/ /usr/
 
-# workaround (see https://github.com/ublue-os/bluefin-lts/issues/3)
-RUN mkdir -p /var/roothome
-
-RUN dnf -y install 'dnf5-command(copr)' && \
-    dnf -y copr enable gmanka/sdm845 && \
-    dnf -y copr enable onesaladleaf/mobility-common && \
+RUN dnf -y copr enable gmanka/sdm845 && \
     if [ "$base_tag" != "rawhide" ]; then \
-        dnf -y copr enable nik012003/nabu-support && \
-        dnf -y copr enable onesaladleaf/pocketblue; \
+        # for tqftpserv on 42 \
+        dnf -y copr enable nik012003/nabu-support; \
     fi && \
-    dnf -y install kernel-0:6.15.0-0.rc2.15.sdm845.* kernel-modules-extra && \
     dnf -y install \
-        @core \
-        @hardware-support \
-        @standard \
-        @base-graphical \
-        --exclude dracut-config-rescue && \
+        kernel-0:*.sdm845.* \
+        kernel-modules-extra && \
     dnf -y install \
         bcm283x-firmware \
         qcom-firmware \
-        grub2-efi-aa64 grub2-efi-aa64-modules grubby \
-        systemd-oomd-defaults systemd-resolved \
-        NetworkManager-tui \
-        glibc-langpack-en \
-        btrfs-progs udisks2-btrfs \
-        bootmac hexagonrpc libssc pd-mapper qrtr tqftpserv rmtfs alsa-ucm-mobility-sdm845 qbootctl \
-        fedora-release-ostree-desktop \
-        fedora-release-mobility \
-        mobility-tweaks \
-        iio-sensor-proxy \
-        vim && \
+        bootmac \
+        hexagonrpc \
+        libssc \
+        pd-mapper qrtr rmtfs tqftpserv \
+        alsa-ucm-mobility-sdm845 \
+        qbootctl && \
     systemctl enable bootmac-bluetooth.service && \
     systemctl enable hexagonrpcd-sdsp.service && \
     systemctl enable pd-mapper.service && \

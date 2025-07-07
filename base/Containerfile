@@ -1,0 +1,34 @@
+ARG base_tag
+
+FROM quay.io/fedora/fedora-bootc:$base_tag
+
+COPY etc/ /etc/
+COPY usr/ /usr/
+
+# workaround (see https://github.com/ublue-os/bluefin-lts/issues/3)
+RUN mkdir -p /var/roothome
+
+RUN dnf -y install 'dnf5-command(copr)' && \
+    dnf -y copr enable onesaladleaf/mobility-common && \
+    dnf -y copr enable onesaladleaf/pocketblue && \
+    dnf -y install \
+        @core \
+        @hardware-support \
+        @standard \
+        @base-graphical \
+        --exclude dracut-config-rescue && \
+    dnf -y install \
+        grub2-efi-aa64 grub2-efi-aa64-modules \
+        systemd-oomd-defaults \
+        systemd-resolved \
+        glibc-langpack-en \
+        btrfs-progs \
+        udisks2-btrfs \
+        fedora-release-ostree-desktop \
+        fedora-release-mobility \
+        mobility-tweaks && \
+    dnf -y install \
+        grubby \
+        NetworkManager-tui \
+        vim && \
+    dnf clean all

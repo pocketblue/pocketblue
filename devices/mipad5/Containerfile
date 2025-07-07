@@ -1,32 +1,17 @@
 ARG base_tag
 
-FROM quay.io/fedora/fedora-bootc:$base_tag
+FROM quay.io/pocketblue/base:$base_tag
 
 COPY etc/ /etc/
 COPY usr/ /usr/
 
-# workaround (see https://github.com/ublue-os/bluefin-lts/issues/3)
-RUN mkdir -p /var/roothome
-
-RUN dnf -y install 'dnf5-command(copr)' && \
-    dnf -y copr enable nik012003/nabu-support && \
+RUN dnf -y copr enable nik012003/nabu-support && \
     dnf -y install linux-sm8150 && \
     dnf -y install \
-        @core \
-        @hardware-support \
-        @standard \
-        @base-graphical \
-        --exclude dracut-config-rescue && \
-    dnf -y install \
-        grub2-efi-aa64 grub2-efi-aa64-modules grubby \
-        systemd-oomd-defaults systemd-resolved \
-        NetworkManager-tui \
-        glibc-langpack-en \
-        btrfs-progs udisks2-btrfs \
-        pd-mapper qrtr rmtfs tqftpserv alsa-ucm-conf-xiaomi-nabu qbootctl xiaomi-nabu-firmware \
-        fedora-release-ostree-desktop \
-        fedora-release-mobility \
-        vim && \
+        xiaomi-nabu-firmware \
+        pd-mapper qrtr rmtfs tqftpserv \
+        alsa-ucm-conf-xiaomi-nabu \
+        qbootctl && \
     systemctl enable rmtfs.service && \
     systemctl enable tqftpserv.service && \
     systemctl enable qbootctl.service && \
