@@ -1,7 +1,7 @@
 ARG base_tag
 
 FROM quay.io/fedora/fedora-bootc:$base_tag as builder
-RUN /usr/libexec/bootc-base-imagectl build-rootfs --manifest=standard /target-rootfs
+RUN /usr/libexec/bootc-base-imagectl build-rootfs --manifest=minimal /target-rootfs
 
 FROM scratch
 COPY --from=builder /target-rootfs/ /
@@ -35,7 +35,6 @@ RUN dnf -y install 'dnf5-command(copr)' && \
         NetworkManager-tui \
         vim && \
     dnf clean all && \
-    rm /var/{log,cache}/* -rf && \
     bootc container lint
 
 LABEL containers.bootc 1
