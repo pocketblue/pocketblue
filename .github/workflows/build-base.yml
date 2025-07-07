@@ -38,7 +38,7 @@ jobs:
     - name: Rechunk the image
       run: |
         set -uexo pipefail
-        podman run \
+        sudo podman run \
             --rm \
             --privileged \
             -v /var/lib/containers:/var/lib/containers \
