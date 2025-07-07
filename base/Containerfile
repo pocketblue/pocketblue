@@ -25,8 +25,7 @@ RUN dnf -y install 'dnf5-command(copr)' && \
         btrfs-progs \
         udisks2-btrfs \
         fedora-release-ostree-desktop \
-        fedora-release-mobility \
-        mobility-tweaks && \
+        fedora-release-mobility && \
     dnf -y install \
         grubby \
         NetworkManager-tui \

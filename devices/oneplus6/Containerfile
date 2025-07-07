@@ -20,7 +20,8 @@ RUN dnf -y copr enable gmanka/sdm845 && \
         libssc \
         pd-mapper qrtr rmtfs tqftpserv \
         alsa-ucm-mobility-sdm845 \
-        qbootctl && \
+        qbootctl \
+        mobility-tweaks && \
     systemctl enable bootmac-bluetooth.service && \
     systemctl enable hexagonrpcd-sdsp.service && \
     systemctl enable pd-mapper.service && \
