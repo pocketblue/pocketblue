@@ -9,12 +9,9 @@ RUN dnf -y copr enable gmanka/sdm845 && \
         # for tqftpserv on 42 \
         dnf -y copr enable nik012003/nabu-support; \
     fi && \
-    rpm-ostree override remove kernel kernel-{core,modules,modules-core} \
-        --install kernel-0:*.sdm845.* \
-        --install kernel-core-0:*.sdm845.* \
-        --install kernel-modules-0:*.sdm845.* \
-        --install kernel-modules-core-0:*.sdm845.* && \
-    dnf -y install kernel-modules-extra && \
+    dnf -y install \
+        kernel-0:*.sdm845.* \
+        kernel-modules-extra && \
     dnf -y install \
         bcm283x-firmware \
         qcom-firmware \
