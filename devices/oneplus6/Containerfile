@@ -36,5 +36,6 @@ RUN dnf -y copr enable gmanka/sdm845 && \
 COPY firmware-oneplus-sdm845/usr /usr/
 COPY firmware-oneplus-sdm845/lib /usr/lib/
 RUN mv /usr/lib/firmware/qcom/sdm845/oneplus6/ipa_fws.mbn{,.disabled} && \
+    mkdir -p /usr/lib/firmware/updates && \
     mv /usr/lib/firmware/postmarketos/* /usr/lib/firmware/updates && \
     rmdir /usr/lib/firmware/postmarketos
