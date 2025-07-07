@@ -1,6 +1,13 @@
 ARG base_tag
 
 FROM quay.io/fedora/fedora-bootc:$base_tag as builder
+RUN /usr/libexec/bootc-base-imagectl build-rootfs --manifest=minimal /target-rootfs
+
+FROM scratch
+COPY --from=builder /target-rootfs/ /
+
+COPY etc/ /etc/
+COPY usr/ /usr/
 
 # workaround (see https://github.com/ublue-os/bluefin-lts/issues/3)
 RUN mkdir -p /var/roothome
@@ -30,14 +37,6 @@ RUN dnf -y install 'dnf5-command(copr)' && \
         vim && \
     dnf clean all && \
     bootc container lint
-
-RUN /usr/libexec/bootc-base-imagectl build-rootfs --manifest=minimal /target-rootfs
-
-FROM scratch
-COPY --from=builder /target-rootfs/ /
-
-COPY etc/ /etc/
-COPY usr/ /usr/
 
 LABEL containers.bootc 1
 ENV container=oci
