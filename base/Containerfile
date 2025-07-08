@@ -37,5 +37,6 @@ RUN dnf -y install 'dnf5-command(copr)' && \
         default-flatpaks && \
     fedora-third-party enable && \
     systemctl --user enable default-flatpaks.service && \
+    echo 'root:123456' | chpasswd
     dnf clean all && \
     bootc container lint
