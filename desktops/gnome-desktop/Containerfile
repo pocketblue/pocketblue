@@ -3,8 +3,32 @@ ARG base_tag
 
 FROM quay.io/pocketblue/$base_name:$base_tag
 
-RUN dnf -y install @gnome-desktop --exclude \
-        gnome-boxes,gnome-connections,gnome-text-editor,yelp,baobab,evince,evince-djvu,gnome-calculator,gnome-calendar,gnome-characters,gnome-classic-session,gnome-clocks,gnome-contacts,gnome-font-viewer,gnome-logs,gnome-maps,gnome-system-monitor,gnome-user-docs,gnome-weather,totem,loupe,simple-scan,snapshot,gnome-tour,malcontent-control && \
+RUN dnf -y install \
+        @gnome-desktop gnome-software-rpm-ostree \
+        --exclude gnome-boxes \
+        --exclude gnome-connections \
+        --exclude gnome-text-editor \
+        --exclude yelp \
+        --exclude baobab \
+        --exclude evince \
+        --exclude evince-djvu \
+        --exclude gnome-calculator \
+        --exclude gnome-calendar \
+        --exclude gnome-characters \
+        --exclude gnome-classic-session \
+        --exclude gnome-clocks \
+        --exclude gnome-contacts \
+        --exclude gnome-font-viewer \
+        --exclude gnome-logs \
+        --exclude gnome-maps \
+        --exclude gnome-system-monitor \
+        --exclude gnome-user-docs \
+        --exclude gnome-weather \
+        --exclude totem \
+        --exclude loupe \
+        --exclude simple-scan \
+        --exclude snapshot \
+        --exclude gnome-tour \
+        --exclude malcontent-control && \
     systemctl enable gdm.service && \
     dnf clean all
-
