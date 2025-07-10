@@ -11,14 +11,13 @@ RUN mkdir -p /var/roothome
 RUN dnf -y install 'dnf5-command(copr)' && \
     dnf -y copr enable onesaladleaf/mobility-common && \
     dnf -y copr enable onesaladleaf/pocketblue && \
-    dnf -y install \
+    dnf -y --verbose install \
         rpm-ostree \
         @core \
         @hardware-support \
         @standard \
         @base-graphical \
         --exclude dracut-config-rescue && \
-    echo "Does it even reach this line" && \
     dnf -y install \
         grub2-efi-aa64 grub2-efi-aa64-modules \
         systemd-oomd-defaults \
