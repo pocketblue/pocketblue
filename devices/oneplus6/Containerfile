@@ -1,6 +1,5 @@
-ARG base_tag
-
-FROM quay.io/pocketblue/base:$base_tag
+ARG from
+FROM $from
 
 COPY usr/ /usr/
 

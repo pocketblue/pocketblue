@@ -1,6 +1,5 @@
-ARG base_tag
-
-FROM quay.io/fedora/fedora-bootc:$base_tag
+ARG from
+FROM $from
 
 COPY etc/ /etc/
 COPY usr/ /usr/
