@@ -1,7 +1,7 @@
 # Pocketblue
 
 Pocketblue is a custom Fedora Atomic image for mobile devices based on fedora-bootc and Fedora Mobility.
-Currently only OnePlus 6/6T are supported.
+Currently only OnePlus 6/6T are supported. Xiaomi Mi Pad 5 support is in the works.
 
 ### Installation
 
@@ -12,15 +12,15 @@ This is a work-in-progress. During the installation process all data on your dev
 
 #### 1. Download the partition images
 
-Download the artifacts from the latest run of the [Build raw disk image](https://github.com/onesaladleaf/pocketblue/actions/workflows/build-image.yml) workflow in Github Actions
+Download the artifacts of the latest "[Raw images for OnePlus 6/6T](https://github.com/onesaladleaf/pocketblue/actions/workflows/release-oneplus6.yml)" workflow run
 
 Extract the images:
 
 ```bash
-mkdir images
-unzip pocketblue.zip -d images
-cd images
-gzip -d esp.raw.gz boot.raw.gz root.raw.gz
+unzip pocketblue-*.zip
+rm pocketblue-*.zip
+7z x pocketblue-*.7z
+cd artifacts
 ```
 
 #### 2. Download and flash U-Boot
