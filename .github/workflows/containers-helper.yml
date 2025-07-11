@@ -1,0 +1,46 @@
+on:
+  workflow_call:
+    inputs:
+      push_tags:
+        required: true
+        type: string
+      from_tag:
+        required: true
+        type: string
+      from_image:
+        required: true
+        type: string
+      image:
+        required: true
+        type: string
+      containerfile:
+        required: true
+        type: string
+
+jobs:
+  build:
+    name: ${{ inputs.image }}:${{ inputs.from_tag }}
+    runs-on: ubuntu-24.04-arm
+    permissions:
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - id: getcontext
+        shell: bash
+        run: echo "context=$(dirname ${{ inputs.containerfile }})" >> $GITHUB_OUTPUT
+      - uses: redhat-actions/buildah-build@v2
+        with:
+          build-args: from=${{ inputs.from_image }}:${{ inputs.from_tag }}
+          image: ${{ inputs.image }}
+          context: ${{ steps.getcontext.outputs.context }}
+          containerfiles: ${{ inputs.containerfile }}
+          tags: ${{ inputs.push_tags }}
+      - uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ inputs.image }}
+          tags: ${{ inputs.push_tags }}
+          registry: ${{ vars.REGISTRY }}
+          username: ${{ vars.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_TOKEN }}

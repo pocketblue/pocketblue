@@ -1,0 +1,14 @@
+on:
+  push: {}
+  workflow_dispatch: {}
+
+jobs:
+  containers_42:
+    name: containers 42
+    permissions:
+      packages: write
+    secrets: inherit
+    uses: ./.github/workflows/containers-devices-desktops.yml
+    with:
+      from_tag: '42'
+      push_tags: 42 latest

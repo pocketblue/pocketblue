@@ -1,0 +1,13 @@
+on:
+  workflow_dispatch: {}
+
+jobs:
+  containers_rawhide:
+    name: containers rawhide
+    permissions:
+      packages: write
+    secrets: inherit
+    uses: ./.github/workflows/containers-devices-desktops.yml
+    with:
+      from_tag: rawhide
+      push_tags: rawhide
