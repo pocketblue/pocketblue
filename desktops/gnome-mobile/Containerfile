@@ -5,6 +5,7 @@ RUN dnf -y copr enable @mobility/gnome-mobile && \
     dnf -y install \
         @gnome-desktop \
         gnome-shell-0:*^mobile* \
+        gnome-shell-extension-nekotorch \
         gnome-software-rpm-ostree \
         --exclude gnome-boxes \
         --exclude gnome-connections \
