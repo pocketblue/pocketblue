@@ -29,6 +29,7 @@ RUN dnf -y install 'dnf5-command(copr)' && \
         grubby \
         NetworkManager-tui \
         default-flatpaks \
+        git \
         vim && \
     echo 'root:123456' | chpasswd && \
     dnf clean all && \
