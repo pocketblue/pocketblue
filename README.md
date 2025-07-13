@@ -79,10 +79,10 @@ Reboot the device.
 
 ### Upgrading the system
 
-Use bootc to upgrade the system to the latest image:
+Use rpm-ostree to upgrade the system to the latest image:
 
 ```bash
-sudo bootc upgrade
+sudo rpm-ostree upgrade
 ```
 
 After that, you should reboot your device. However, shutdown and reboot are currently
