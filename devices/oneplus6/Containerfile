@@ -3,7 +3,7 @@ FROM $from
 
 COPY usr/ /usr/
 
-RUN dnf -y copr enable gmanka/sdm845 && \
+RUN dnf -y copr enable onesaladleaf/sdm845 && \
     if [ "$base_tag" != "rawhide" ]; then \
         # for tqftpserv on 42 \
         dnf -y copr enable nik012003/nabu-support; \
