@@ -11,6 +11,9 @@ on:
       esp_size:
         required: true
         type: number
+      rootfs:
+        required: true
+        type: string
 
 jobs:
   build:
@@ -26,7 +29,7 @@ jobs:
       with:
         config-file: ./config.toml
         image: ${{ vars.REGISTRY }}/${{ inputs.image_name }}:${{ inputs.image_tag }}
-        rootfs: btrfs
+        rootfs: ${{ inputs.rootfs }}
         types: |
           raw
 
