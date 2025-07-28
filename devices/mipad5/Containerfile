@@ -4,14 +4,28 @@ FROM $from
 COPY etc/ /etc/
 COPY usr/ /usr/
 
-RUN dnf -y copr enable nik012003/nabu-support && \
-    dnf -y install linux-sm8150 && \
+RUN mkdir -p /boot/dtb && \
+    dnf -y copr enable gmanka/sm8150 && \
+    dnf -y remove \
+        kernel \
+        kernel-core \
+        kernel-modules \
+        kernel-modules-core \
+        kernel-modules-extra \
+        kernel-devel \
+        kernel-headers && \
+    dnf -y install kernel-*.sm8150.* && \
+    dnf -y copr enable nik012003/nabu-support && \
     dnf -y install \
-        xiaomi-nabu-firmware \
-        pd-mapper qrtr rmtfs tqftpserv \
         alsa-ucm-conf-xiaomi-nabu \
-        qbootctl && \
+        xiaomi-nabu-firmware \
+        tqftpserv \
+        pd-mapper \
+        qbootctl \
+        rmtfs \
+        qrtr && \
     systemctl enable rmtfs.service && \
     systemctl enable tqftpserv.service && \
     systemctl enable qbootctl.service && \
-    dnf clean all
+    dnf clean all && \
+    bootc container lint
