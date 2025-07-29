@@ -1,17 +1,18 @@
 ARG from
 FROM $from
 
+COPY etc/ /etc/
 COPY usr/ /usr/
 
-RUN dnf -y copr enable onesaladleaf/sdm845 && \
-    if [ "$base_tag" != "rawhide" ]; then \
+RUN if [ "$base_tag" != "rawhide" ]; then \
         # for tqftpserv on 42 \
-        dnf -y copr enable nik012003/nabu-support; \
+        dnf -y config-manager setopt copr:copr.fedorainfracloud.org:nik012003:nabu-support.enabled=1; \
     fi && \
     mkdir /boot/dtb && \
+    dnf -y remove kernel && \
     dnf -y install \
-        kernel-0:*.sdm845.* \
-        kernel-modules-extra-0:*.sdm845.* && \
+        kernel \
+        kernel-modules-extra && \
     dnf -y install \
         bcm283x-firmware \
         qcom-firmware \

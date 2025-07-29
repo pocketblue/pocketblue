@@ -8,8 +8,6 @@ COPY usr/ /usr/
 RUN mkdir -p /var/roothome
 
 RUN dnf -y install 'dnf5-command(copr)' && \
-    dnf -y copr enable onesaladleaf/mobility-common && \
-    dnf -y copr enable onesaladleaf/pocketblue && \
     dnf -y install \
         @core \
         @hardware-support \
@@ -31,6 +29,5 @@ RUN dnf -y install 'dnf5-command(copr)' && \
         default-flatpaks \
         git \
         vim && \
-    echo 'root:123456' | chpasswd && \
     dnf clean all && \
     bootc container lint
