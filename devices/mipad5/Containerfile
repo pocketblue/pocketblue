@@ -5,7 +5,6 @@ COPY etc/ /etc/
 COPY usr/ /usr/
 
 RUN mkdir -p /boot/dtb && \
-    dnf -y copr enable gmanka/sm8150 && \
     dnf -y remove \
         kernel \
         kernel-core \
@@ -14,8 +13,7 @@ RUN mkdir -p /boot/dtb && \
         kernel-modules-extra \
         kernel-devel \
         kernel-headers && \
-    dnf -y install kernel-*.sm8150.* && \
-    dnf -y copr enable nik012003/nabu-support && \
+    dnf -y install kernel && \
     dnf -y install \
         alsa-ucm-conf-xiaomi-nabu \
         xiaomi-nabu-firmware \

@@ -1,0 +1,10 @@
+[copr:copr.fedorainfracloud.org:nik012003:nabu-support]
+name=Copr repo for nabu-support owned by nik012003
+baseurl=https://download.copr.fedorainfracloud.org/results/nik012003/nabu-support/fedora-$releasever-$basearch/
+type=rpm-md
+skip_if_unavailable=True
+gpgcheck=1
+gpgkey=https://download.copr.fedorainfracloud.org/results/nik012003/nabu-support/pubkey.gpg
+repo_gpgcheck=0
+enabled=0
+enabled_metadata=1

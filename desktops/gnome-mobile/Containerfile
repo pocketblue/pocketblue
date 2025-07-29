@@ -5,7 +5,7 @@ COPY etc/ /etc/
 
 RUN dnf -y install \
         @gnome-desktop \
-        gnome-shell-0:*^mobile* \
+        gnome-shell \
         gnome-shell-extension-nekotorch \
         gnome-software-rpm-ostree \
         --exclude gnome-boxes \
