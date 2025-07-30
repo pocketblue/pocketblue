@@ -13,7 +13,7 @@ jobs:
     permissions:
       packages: write
     secrets: inherit
-    uses: ./.github/workflows/containers-helper.yml
+    uses: ./.github/workflows/helper-containers.yml
     with:
       push_tags: ${{ inputs.push_tags }}
       from_tag: ${{ inputs.from_tag }}
@@ -28,7 +28,7 @@ jobs:
     strategy:
       matrix:
         device: [oneplus6, mipad5]
-    uses: ./.github/workflows/containers-helper.yml
+    uses: ./.github/workflows/helper-containers.yml
     with:
       push_tags: ${{ inputs.push_tags }}
       from_tag: ${{ inputs.from_tag }}
@@ -44,7 +44,7 @@ jobs:
       matrix:
         device: [oneplus6, mipad5]
         desktop: [gnome-mobile, gnome-desktop, phosh]
-    uses: ./.github/workflows/containers-helper.yml
+    uses: ./.github/workflows/helper-containers.yml
     with:
       push_tags: ${{ inputs.push_tags }}
       from_tag: ${{ inputs.from_tag }}

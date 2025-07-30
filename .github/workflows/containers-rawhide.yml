@@ -8,7 +8,7 @@ jobs:
     permissions:
       packages: write
     secrets: inherit
-    uses: ./.github/workflows/containers-devices-desktops.yml
+    uses: ./.github/workflows/helper-containers-devices-desktops.yml
     with:
       from_tag: rawhide
       push_tags: rawhide
