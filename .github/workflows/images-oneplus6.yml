@@ -1,4 +1,4 @@
-name: Raw images for OnePlus 6/6T
+name: images oneplus6
 on:
   workflow_dispatch:
 
@@ -7,7 +7,7 @@ jobs:
     strategy:
       matrix:
         desktop: [gnome-mobile, phosh]
-    uses: ./.github/workflows/raw-image.yml
+    uses: ./.github/workflows/helper-images.yml
     with:
       image_name: oneplus6-${{ matrix.desktop }}
       image_tag: 42

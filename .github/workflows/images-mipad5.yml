@@ -1,4 +1,4 @@
-name: Raw images for Mi Pad 5
+name: images mipad5
 on:
   workflow_dispatch:
 
@@ -7,7 +7,7 @@ jobs:
     strategy:
       matrix:
         desktop: [gnome-desktop, gnome-mobile, phosh]
-    uses: ./.github/workflows/raw-image.yml
+    uses: ./.github/workflows/helper-images.yml
     with:
       image_name: mipad5-${{ matrix.desktop }}
       image_tag: 42

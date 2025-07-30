@@ -1,4 +1,3 @@
-name: Create a raw disk image
 on:
   workflow_call:
     inputs:
