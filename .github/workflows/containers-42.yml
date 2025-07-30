@@ -1,3 +1,4 @@
+name: containers 42
 on:
   push: {}
   workflow_dispatch: {}
