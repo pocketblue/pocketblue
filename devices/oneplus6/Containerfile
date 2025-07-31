@@ -22,6 +22,7 @@ RUN if [ "$base_tag" != "rawhide" ]; then \
         pd-mapper qrtr rmtfs tqftpserv \
         alsa-ucm-mobility-sdm845 \
         qbootctl \
+        pil-squasher \
         mobility-tweaks && \
     systemctl enable bootmac-bluetooth.service && \
     systemctl enable hexagonrpcd-sdsp.service && \
