@@ -1,0 +1,14 @@
+[Unit]
+Description=Daemon to support Qualcomm Hexagon SDSP virtual filesystem
+After=sdm845-fwload.service tqftpserv.service sys-devices-virtual-misc-fastrpc\x2dsdsp.device
+Requires=sdm845-fwload.service tqftpserv.service sys-devices-virtual-misc-fastrpc\x2dsdsp.device
+
+[Service]
+ExecStart=/usr/bin/hexagonrpcd -f /dev/fastrpc-sdsp -d sdsp -s -R /mnt/sdm-fwload/extract/usrshare/qcom/sdm845/OnePlus/oneplus6
+Restart=always
+RestartSec=3
+User=fastrpc
+Group=fastrpc
+
+[Install]
+WantedBy=multi-user.target
