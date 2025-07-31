@@ -22,6 +22,7 @@ RUN if [ "$base_tag" != "rawhide" ]; then \
         pd-mapper qrtr rmtfs tqftpserv \
         alsa-ucm-mobility-sdm845 \
         qbootctl \
+        pil-squasher \
         mobility-tweaks && \
     systemctl enable bootmac-bluetooth.service && \
     systemctl enable hexagonrpcd-sdsp.service && \
@@ -30,12 +31,8 @@ RUN if [ "$base_tag" != "rawhide" ]; then \
     systemctl enable tqftpserv.service && \
     systemctl enable qbootctl.service && \
     systemctl enable msm-modem-uim-selection.service && \
-    dnf clean all && \
-    bootc container lint
+    dnf clean all
 
-COPY firmware-oneplus-sdm845/usr /usr/
-COPY firmware-oneplus-sdm845/lib /usr/lib/
-RUN mv /usr/lib/firmware/qcom/sdm845/oneplus6/ipa_fws.mbn{,.disabled} && \
-    mkdir -p /usr/lib/firmware/updates && \
-    mv /usr/lib/firmware/postmarketos/* /usr/lib/firmware/updates && \
-    rmdir /usr/lib/firmware/postmarketos
+COPY fwload/usr/ /usr/
+
+RUN bootc container lint
