@@ -1,6 +1,10 @@
 name: containers 42
 on:
-  push: {}
+  push:
+    paths:
+      - 'base/**'
+      - 'devices/**'
+      - 'desktops/**'
   workflow_dispatch: {}
 
 jobs:
