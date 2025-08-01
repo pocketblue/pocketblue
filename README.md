@@ -12,7 +12,7 @@ This is a work-in-progress. During the installation process all data on your dev
 
 #### 1. Download the partition images
 
-Download the artifacts of the latest "[Raw images for OnePlus 6/6T](https://github.com/onesaladleaf/pocketblue/actions/workflows/release-oneplus6.yml)" workflow run
+Download the artifacts of the latest "[images oneplus6](https://github.com/onesaladleaf/pocketblue/actions/workflows/images-oneplus6.yml)" workflow run
 
 Extract the images:
 
@@ -92,3 +92,8 @@ before rebooting the device:
 ```bash
 sudo systemctl stop ostree-finalize-staged.service
 ```
+
+### Related projects
+
+- [fedora-remix-mobility/fedora-kiwi-descriptions](https://github.com/fedora-remix-mobility/fedora-kiwi-descriptions) - KIWI image descriptions for Fedora Mobility
+- [sdm845-live-fedora](https://github.com/samcday/sdm845-live-fedora) - a compact Fedora UKI that can be directly booted from the OnePlus6(T) bootloader
