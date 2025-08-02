@@ -15,6 +15,7 @@ until adb devices 2>/dev/null | grep recovery --silent ; do sleep 1; done
 set -x
 
 adb shell getprop ro.product.device | grep nabu
+adb shell twrp unmount /data
 adb push images/parted /bin/parted
 adb shell 'if [ -e /dev/block/sda31 ]; then parted -s /dev/block/sda rm 31; fi'
 adb shell 'if [ -e /dev/block/sda32 ]; then parted -s /dev/block/sda rm 32; fi'
