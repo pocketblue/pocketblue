@@ -6,7 +6,7 @@ jobs:
   oneplus6:
     strategy:
       matrix:
-        desktop: [gnome-mobile, phosh]
+        desktop: [gnome-mobile, phosh, plasma-mobile]
     uses: ./.github/workflows/helper-images.yml
     with:
       device: oneplus6
