@@ -1,24 +1,33 @@
-# work in progress
-
-pocketblue not boots on mipad5 for now, we are working on fixing it
-
-### following instruction installs a broken system which not boots
+### install fedora atomic on mipad5
 
 - **your current os and all your files will be deleted**
-- download latest pocketblue build for mipad5 [from here](https://github.com/onesaladleaf/pocketblue/actions/workflows/images-mipad5.yml)
-- you only will be able to download it if you logged in on github
+- you should have `bash`, `adb` and `fastboot` installed on your computer
+- download latest `pocketblue-mipad5-gnome-desktop-42.zip` for mipad5 [from here](https://github.com/onesaladleaf/pocketblue/actions/workflows/images-mipad5.yml)
+- you can download it only if you are logged into your github account
 - unarchive it
+- unlock bootloader on mipad5
+- boot into fastboot and connect mipad5 to your computer via usb
 - run `bash flash_mipad5.sh`
+- reboot and enjoy fedora
+- if you have black screen try reboot mipad couple of times again, after that fedora should boot
+
+### known bugs
+
+- charging status not shown in gnome taskbar
+- you should check charging status using btop which is preinstalled
+- some chargers works, some chargers not work
+- you should also try charge mipad5 from your computer or from your laptop
+- if nothing works, you can boot into twrp and do charging in twrp, or boot into fastboot and do charging in fastboot
 
 ### uninstall fedora and get stock rom back
 
 - download `MIUI 14.0.8.0.TKXMIXM` archive [from here](https://miuirom.org/tablets/xiaomi-pad-5)
 - unarchive it
 - run `bash flash_all.sh`
+- reboot and enjoy stock rom
+- no need for repartitioning or do anything else
 
-### files used by install script
-
-here is a list of files we use, sources, and license info
+### files used by install script, license info, source links
 
 - `root.raw` - root partition for fedora, built by `.github/workflows/images-mipad5.yml`
 - `boot.raw` - /boot partition, built by `.github/workflows/images-mipad5.yml`
