@@ -9,6 +9,7 @@ jobs:
         desktop: [gnome-desktop, gnome-mobile, phosh]
     uses: ./.github/workflows/helper-images.yml
     with:
+      device: mipad5
       image_name: mipad5-${{ matrix.desktop }}
       image_tag: 42
       esp_size: 536870912

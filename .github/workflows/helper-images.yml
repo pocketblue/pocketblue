@@ -1,6 +1,9 @@
 on:
   workflow_call:
     inputs:
+      device:
+        required: true
+        type: string
       image_name:
         required: true
         type: string
@@ -34,13 +37,15 @@ jobs:
 
     - name: Post-process image artifacts
       env:
-        OUTPUT_DIR: ${{ steps.build-raw.outputs.output-directory }}
-        ESP_SIZE: ${{ inputs.esp_size }}
+        DEVICE: ${{ inputs.device }}
         IMAGE_NAME: ${{ inputs.image_name }}
         IMAGE_TAG: ${{ inputs.image_tag }}
+        ESP_SIZE: ${{ inputs.esp_size }}
+        OUTPUT_DIR: ${{ steps.build-raw.outputs.output-directory }}
       run: |
         sudo apt install -y p7zip
-        bash scripts/image.sh
+        bash scripts/build_image.sh
+        bash scripts/artifacts_$DEVICE.sh
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
