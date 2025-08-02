@@ -10,6 +10,8 @@
 - run `bash flash_mipad5.sh`
 - reboot and enjoy fedora
 - to upgrade system use `rpm-ostree upgrade`
+- default username: `user`
+- default password: `123456`
 
 ### known bugs
 
