@@ -7,7 +7,7 @@ curl -L https://github.com/map220v/android_device_xiaomi_nabu/releases/download/
 curl -L https://github.com/ArKT-7/automated-nabu-lineage-installer/releases/download/lineage-22.1-20250207-UNOFFICIAL-nabu/dtbo.img -o artifacts/images/dtbo.img
 curl -L https://github.com/gmankab/parted/releases/download/v3.6/parted -o artifacts/images/parted
 
-curl -LO https://gitlab.com/sm8150-mainline/u-boot/-/jobs/9720400108/artifacts/download
+curl -L https://gitlab.com/sm8150-mainline/u-boot/-/jobs/9720400108/artifacts/download -o uboot.zip
 7z x uboot.zip -o./uboot
 cp uboot/.output/u-boot.img artifacts/images/uboot.img
 
