@@ -15,4 +15,5 @@ python avb/avbtool.py make_vbmeta_image --flags 2 --padding_size 4096 --output a
 
 cp scripts/flash_mipad5.sh artifacts
 
-7z -mx=9 a "pocketblue-$IMAGE_NAME-$IMAGE_TAG.7z" artifacts/*
+cd artifacts
+7z -mx=9 a "../pocketblue-$IMAGE_NAME-$IMAGE_TAG.7z" *
