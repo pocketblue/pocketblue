@@ -2,6 +2,9 @@
 
 set -uexo pipefail
 
+which adb
+which fastboot
+
 echo 'waiting for device appear in fastboot'
 fastboot getvar product 2>&1 | grep nabu
 fastboot flash vbmeta_ab images/vbmeta_disabled.img

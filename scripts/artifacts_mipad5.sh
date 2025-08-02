@@ -1,3 +1,9 @@
+#!/usr/bin/env bash
+
+set -uexo pipefail
+
+which 7z
+
 mkdir artifacts/images
 mv artifacts/root.raw artifacts/images
 mv artifacts/boot.raw artifacts/images
@@ -14,7 +20,7 @@ cp uboot/.output/u-boot.img artifacts/images/uboot.img
 git clone --depth=1 https://android.googlesource.com/platform/external/avb
 python avb/avbtool.py make_vbmeta_image --flags 2 --padding_size 4096 --output artifacts/images/vbmeta_disabled.img
 
-cp scripts/flash_mipad5.sh artifacts
+install -Dm 0755 scripts/flash_mipad5.sh artifacts/flash_mipad5.sh
 
 cd artifacts
 7z -mx=9 a "../pocketblue-$IMAGE_NAME-$IMAGE_TAG.7z" *
