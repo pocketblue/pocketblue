@@ -37,4 +37,6 @@ fastboot flash boot_ab     images/uboot.img
 fastboot flash esp         images/esp.raw
 fastboot flash fedora_boot images/boot.raw
 fastboot flash userdata    images/root.raw
+
+echo 'done flashing, rebooting now. if mipad5 not rebooted automatically, you should reboot it manually with power button'
 fastboot reboot
