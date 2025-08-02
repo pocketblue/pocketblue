@@ -1,6 +1,9 @@
 on:
   workflow_call:
     inputs:
+      esp_size:
+        required: true
+        type: number
       device:
         required: true
         type: string
@@ -8,14 +11,11 @@ on:
         required: true
         type: string
       image_tag:
-        required: true
         type: string
-      esp_size:
-        required: true
-        type: number
+        default: '42'
       rootfs:
-        required: true
         type: string
+        default: btrfs
 
 jobs:
   build:

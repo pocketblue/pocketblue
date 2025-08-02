@@ -11,6 +11,4 @@ jobs:
     with:
       device: oneplus6
       image_name: oneplus6-${{ matrix.desktop }}
-      image_tag: 42
       esp_size: 268435456
-      rootfs: btrfs
