@@ -24,6 +24,6 @@ sudo mount -o loop artifacts/esp.raw esp.new
 sudo cp -a esp.old/. esp.new/
 sudo umount esp.old/ esp.new/
 
-dd if=/dev/zero bs=1 count=512 >> artifacts/root.raw
+sudo dd if=/dev/zero bs=1 count=512 >> artifacts/root.raw
 
 7z -mx=9 a "pocketblue-$IMAGE_NAME-$IMAGE_TAG.7z" artifacts/*
