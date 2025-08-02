@@ -9,8 +9,8 @@ This is a work-in-progress. During the installation process all data on your dev
 
 ### Installation
 
-- [oneplus6](docs/oneplus6.md) (works)
-- [mipad5](docs/mipad5.md) (broken for now)
+- [oneplus6](docs/oneplus6.md)
+- [mipad5](docs/mipad5.md)
 
 ### Related projects
 
