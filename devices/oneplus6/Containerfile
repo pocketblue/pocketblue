@@ -31,6 +31,7 @@ RUN if [ "$base_tag" != "rawhide" ]; then \
     systemctl enable tqftpserv.service && \
     systemctl enable qbootctl.service && \
     systemctl enable msm-modem-uim-selection.service && \
+    systemctl disable bootc-fetch-apply-updates.timer && \
     dnf clean all
 
 COPY fwload/usr/ /usr/
