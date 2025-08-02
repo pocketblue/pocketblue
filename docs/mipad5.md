@@ -9,7 +9,7 @@
 - boot into fastboot and connect mipad5 to your computer via usb
 - run `bash flash_mipad5.sh`
 - reboot and enjoy fedora
-- if you have black screen try reboot mipad couple of times again, after that fedora should boot
+- to upgrade system use `rpm-ostree upgrade`
 
 ### known bugs
 
