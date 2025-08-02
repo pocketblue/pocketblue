@@ -43,7 +43,7 @@ jobs:
     strategy:
       matrix:
         device: [oneplus6, mipad5]
-        desktop: [gnome-mobile, gnome-desktop, phosh]
+        desktop: [gnome-mobile, gnome-desktop, phosh, plasma-desktop, plasma-mobile]
     uses: ./.github/workflows/helper-containers.yml
     with:
       push_tags: ${{ inputs.push_tags }}
