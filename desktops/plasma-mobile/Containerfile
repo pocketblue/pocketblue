@@ -1,0 +1,22 @@
+ARG from
+FROM $from
+
+RUN dnf -y install \
+        @kde-mobile-environment \
+        plasma-discover-rpm-ostree \
+        --exclude 'KDE Mobile Apps' \
+        --exclude ark \
+        --exclude filelight \
+        --exclude kalk \
+        --exclude kasts \
+        --exclude kclock \
+        --exclude khelpcenter \
+        --exclude kinfocenter \
+        --exclude kwrite \
+        --exclude krecorder \
+        --exclude neochat \
+        --exclude okular-mobile \
+        --exclude arianna \
+        --exclude plasma-systemmonitor && \
+    systemctl enable sddm.service && \
+    dnf clean all
