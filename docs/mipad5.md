@@ -2,7 +2,7 @@
 
 - **your current os and all your files will be deleted**
 - you should have `bash`, `adb` and `fastboot` installed on your computer
-- download latest `pocketblue-mipad5-gnome-desktop-42.zip` for mipad5 [from here](https://github.com/onesaladleaf/pocketblue/actions/workflows/images-mipad5.yml)
+- download latest `pocketblue-mipad5-gnome-desktop-42.zip` for [from here](https://github.com/onesaladleaf/pocketblue/actions/workflows/images-mipad5.yml)
 - you can download it only if you are logged into your github account
 - unarchive it
 - unlock bootloader on mipad5
