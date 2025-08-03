@@ -3,8 +3,9 @@ FROM $from
 
 RUN dnf -y install \
         @kde-desktop \
-        plasma-discover-rpm-ostree \
         fedora-release-kinoite \
+        plasma-discover-rpm-ostree \
+        NetworkManager-wifi \
         --exclude ark \
         --exclude filelight \
         --exclude kcharselect \
@@ -12,6 +13,14 @@ RUN dnf -y install \
         --exclude khelpcenter \
         --exclude kinfocenter \
         --exclude kwrite \
-        --exclude plasma-systemmonitor && \
+        --exclude plasma-systemmonitor \
+        --exclude akonadi-server \
+        --exclude akonadi-server-mysql \
+        --exclude colord-kde \
+        --exclude cups-pk-helper \
+        --exclude plasma-print-manager \
+        --exclude kde-connect \
+        --exclude plasma-workspace-wallpapers \
+        --exclude plasma-desktop-doc && \
     systemctl enable sddm.service && \
     dnf clean all

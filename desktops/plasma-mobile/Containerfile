@@ -4,6 +4,7 @@ FROM $from
 RUN dnf -y install \
         @kde-mobile-environment \
         plasma-discover-rpm-ostree \
+        NetworkManager-wifi \
         --exclude ark \
         --exclude filelight \
         --exclude kcharselect \
