@@ -5,6 +5,7 @@ RUN dnf -y install \
         @gnome-desktop \
         gnome-software-rpm-ostree \
         fedora-release-silverblue \
+        default-flatpaks \
         --exclude gnome-boxes \
         --exclude gnome-connections \
         --exclude gnome-text-editor \

@@ -8,6 +8,7 @@ RUN dnf -y install \
         gnome-shell \
         gnome-shell-extension-nekotorch \
         gnome-software-rpm-ostree \
+        default-flatpaks \
         --exclude gnome-boxes \
         --exclude gnome-connections \
         --exclude gnome-text-editor \

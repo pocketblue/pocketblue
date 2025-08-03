@@ -26,7 +26,6 @@ RUN dnf -y install 'dnf5-command(copr)' && \
     dnf -y install \
         grubby \
         NetworkManager-tui \
-        default-flatpaks \
         git \
         vim && \
     dnf clean all && \
