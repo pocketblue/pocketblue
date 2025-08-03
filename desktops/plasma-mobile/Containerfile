@@ -27,7 +27,6 @@ RUN dnf -y install \
         --exclude marknote \
         --exclude neochat \
         --exclude okular-mobile \
-        --exclude qmlkonsole \
         --exclude qrca \
         --exclude spacebar \
         --exclude tokodon && \
