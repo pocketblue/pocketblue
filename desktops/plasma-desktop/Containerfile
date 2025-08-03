@@ -7,16 +7,11 @@ RUN dnf -y install \
         fedora-release-kinoite \
         --exclude ark \
         --exclude filelight \
-        --exclude kalk \
-        --exclude kasts \
-        --exclude kclock \
+        --exclude kcharselect \
+        --exclude kdebugsettings \
         --exclude khelpcenter \
         --exclude kinfocenter \
         --exclude kwrite \
-        --exclude krecorder \
-        --exclude neochat \
-        --exclude okular-mobile \
-        --exclude arianna \
         --exclude plasma-systemmonitor && \
     systemctl enable sddm.service && \
     dnf clean all
