@@ -19,7 +19,9 @@ set -x
 
 adb shell getprop ro.product.device | grep nabu
 adb shell twrp unmount /data
+adb push images/sgdisk /bin/sgdisk
 adb push images/parted /bin/parted
+adb shell sgdisk --resize-table 64 /dev/block/sda
 adb shell 'if [ -e /dev/block/sda31 ]; then parted -s /dev/block/sda rm 31; fi'
 adb shell 'if [ -e /dev/block/sda32 ]; then parted -s /dev/block/sda rm 32; fi'
 adb shell 'if [ -e /dev/block/sda33 ]; then parted -s /dev/block/sda rm 33; fi'
