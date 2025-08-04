@@ -25,6 +25,11 @@ RUN if [ "$base_tag" != "rawhide" ]; then \
         pil-squasher \
         mobility-tweaks \
         buffyboard && \
+    dnf -y install \
+        alsa-utils \
+        pipewire \
+        pipewire-alsa \
+        pipewire-pulseaudio && \
     systemctl enable bootmac-bluetooth.service && \
     systemctl enable hexagonrpcd-sdsp.service && \
     systemctl enable pd-mapper.service && \
