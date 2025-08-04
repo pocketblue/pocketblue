@@ -15,18 +15,24 @@ RUN dnf -y install 'dnf5-command(copr)' && \
         @base-graphical \
         --exclude dracut-config-rescue && \
     dnf -y install \
-        grub2-efi-aa64 grub2-efi-aa64-modules \
+        NetworkManager-tui \
+        fedora-release-ostree-desktop \
+        fedora-release-mobility \
         systemd-oomd-defaults \
         systemd-resolved \
+        grub2-efi-aa64-modules \
+        grub2-efi-aa64 \
         glibc-langpack-en \
-        btrfs-progs \
         udisks2-btrfs \
-        fedora-release-ostree-desktop \
-        fedora-release-mobility && \
-    dnf -y install \
+        btrfs-progs \
+        tqftpserv \
+        pd-mapper \
         grubby \
-        NetworkManager-tui \
+        rmtfs \
+        qrtr \
         git \
         vim && \
+    systemctl enable tqftpserv.service && \
+    systemctl enable rmtfs.service && \
     dnf clean all && \
     bootc container lint

@@ -15,16 +15,10 @@ RUN mkdir -p /boot/dtb && \
         kernel-headers && \
     dnf -y install kernel && \
     dnf -y install \
-        btop \
         alsa-ucm-conf-xiaomi-nabu \
         xiaomi-nabu-firmware \
-        tqftpserv \
-        pd-mapper \
         qbootctl \
-        rmtfs \
-        qrtr && \
-    systemctl enable rmtfs.service && \
-    systemctl enable tqftpserv.service && \
+        btop && \
     systemctl enable qbootctl.service && \
     dnf clean all && \
     bootc container lint

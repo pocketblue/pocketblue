@@ -14,28 +14,23 @@ RUN if [ "$base_tag" != "rawhide" ]; then \
         kernel \
         kernel-modules-extra && \
     dnf -y install \
-        bcm283x-firmware \
-        qcom-firmware \
-        bootmac \
-        hexagonrpc \
-        libssc \
-        pd-mapper qrtr rmtfs tqftpserv \
-        alsa-ucm-mobility-sdm845 \
-        qbootctl \
-        pil-squasher \
-        mobility-tweaks \
-        buffyboard && \
-    dnf -y install \
         alsa-utils \
         pipewire \
         pipewire-alsa \
-        pipewire-pulseaudio && \
+        pipewire-pulseaudio \
+        alsa-ucm-mobility-sdm845 \
+        bcm283x-firmware \
+        mobility-tweaks \
+        qcom-firmware \
+        pil-squasher \
+        buffyboard \
+        hexagonrpc \
+        qbootctl \
+        bootmac \
+        libssc && \
+    systemctl enable qbootctl.service && \
     systemctl enable bootmac-bluetooth.service && \
     systemctl enable hexagonrpcd-sdsp.service && \
-    systemctl enable pd-mapper.service && \
-    systemctl enable rmtfs.service && \
-    systemctl enable tqftpserv.service && \
-    systemctl enable qbootctl.service && \
     systemctl enable msm-modem-uim-selection.service && \
     systemctl disable bootc-fetch-apply-updates.timer && \
     dnf clean all
