@@ -13,10 +13,10 @@ RUN mkdir -p /boot/dtb && \
         kernel-modules-extra \
         kernel-devel \
         kernel-headers && \
-    dnf -y install kernel && \
     dnf -y install \
-        alsa-ucm-conf-xiaomi-nabu \
+        kernel \
         xiaomi-nabu-firmware \
+        xiaomi-nabu-audio \
         qbootctl \
         btop && \
     systemctl enable qbootctl.service && \
