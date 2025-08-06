@@ -1,5 +1,13 @@
 ### Installation
 
+#### 0. Previous installations
+
+If you previously installed the system using U-Boot's mass storage mode, you must erase the previous EFI partition. You can do it through mass storage mode:
+
+```bash
+sudo wipefs -a /dev/disk/by-partlabel/op2
+```
+
 #### 1. Download the partition images
 
 Download the artifacts of the latest "[images oneplus6](https://github.com/onesaladleaf/pocketblue/actions/workflows/images-oneplus6.yml)" workflow run
@@ -13,67 +21,48 @@ rm pocketblue-*.zip
 cd artifacts
 ```
 
-#### 2. Download and flash U-Boot
+#### 2. Download U-Boot
 
 Download U-Boot from https://github.com/fedora-remix-mobility/u-boot/releases
 
 - `uboot-sdm845-oneplus-enchilada.img` for OnePlus 6
 - `uboot-sdm845-oneplus-fajita.img` for OnePlus 6T
 
-Flash U-Boot to your device:
+#### 3. Flash the images
 
-```bash
-fastboot erase dtbo_a
-fastboot erase dtbo_b
-fastboot flash boot uboot-sdm845-oneplus-*.img --slot=all
-fastboot reboot
-```
+Target partitions:
 
-The device will boot into U-Boot menu. Select the `enable usb mass storage` option with volume keys and press the power button.
-
-#### 3. Flash Pocketblue
-
-Find the target partitions:
-
-```bash
-lsblk -o NAME,PARTLABEL | grep -E 'op2|system|userdata'
-```
-
-Example output:
-
-```
-├─sda7  op2
-├─sda13 system_a
-├─sda14 system_b
-└─sda17 userdata
-```
-
-Write the images:
-
-- esp.raw -> op2
+- uboot-\*.img -> boot_\*
 - boot.raw -> system_a
+- esp.raw -> system_b
 - root.raw -> userdata
 
 ```bash
-sudo dd if=esp.raw  of=/dev/sda7  bs=4M status=progress
-sudo dd if=boot.raw of=/dev/sda13 bs=4M status=progress
-sudo wipefs -a /dev/sda14 # system_b is not used
-sudo dd if=root.raw of=/dev/sda17 bs=4M status=progress
-sync
+fastboot erase dtbo
+
+fastboot flash boot uboot-sdm845-oneplus-*.img --slot=all
+
+fastboot flash system_a boot.raw
+fastboot flash system_b esp.raw
+fastboot flash userdata root.raw
+
+# reboot, this might take a while
+fastboot reboot
 ```
 
-Reboot the device.
+Wait for your device to reboot and boot into Pocketblue. You may have to reboot again if wifi, modem or bluetooth don't work.
 
 - Default username: `user`
 - Default password: `123456`
 
-
 ### Upgrading the system
 
-Use rpm-ostree to upgrade the system to the latest image:
+Use rpm-ostree or bootc to upgrade the system to the latest image:
 
 ```bash
 sudo rpm-ostree upgrade
+# or
+sudo bootc upgrade
 ```
 
 After that, you should reboot your device. However, shutdown and reboot are currently
