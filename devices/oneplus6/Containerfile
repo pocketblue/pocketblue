@@ -4,11 +4,7 @@ FROM $from
 COPY etc/ /etc/
 COPY usr/ /usr/
 
-RUN if [ "$base_tag" != "rawhide" ]; then \
-        # for tqftpserv on 42 \
-        dnf -y config-manager setopt copr:copr.fedorainfracloud.org:nik012003:nabu-support.enabled=1; \
-    fi && \
-    mkdir /boot/dtb && \
+RUN mkdir /boot/dtb && \
     dnf -y remove kernel && \
     dnf -y install \
         kernel \
