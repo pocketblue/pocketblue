@@ -83,3 +83,10 @@ before rebooting the device:
 ```bash
 sudo systemctl stop ostree-finalize-staged.service
 ```
+
+### Enabled copr repositories
+
+- [@mobility/common](https://copr.fedorainfracloud.org/coprs/g/mobility/common) - [source](https://github.com/fedora-remix-mobility/packages)
+- [onesaladleaf/pocketblue](https://copr.fedorainfracloud.org/coprs/onesaladleaf/pocketblue) - [source](https://github.com/onesaladleaf/pocketblue-rpms)
+- [onesaladleaf/sdm845](https://copr.fedorainfracloud.org/coprs/onesaladleaf/sdm845) - [forked from](https://copr.fedorainfracloud.org/coprs/g/mobility/sdm845), [source](https://github.com/fedora-remix-mobility/packages), [kernel source](https://github.com/fedora-remix-mobility/sdm845-kernel)
+- [@mobility/gnome-mobile](https://copr.fedorainfracloud.org/coprs/g/mobility/gnome-mobile) - only enabled in `quay.io/pocketblue/mipad5-gnome-mobile` image
