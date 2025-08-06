@@ -28,7 +28,7 @@ toolbox create --distro=ubuntu --release=24.04
 ### debian
 
 ```shell
-toolbox create --image  quay.io/toolbx-images/debian-toolbox
+toolbox create --image quay.io/toolbx-images/debian-toolbox
 ```
 
 ### alpine
