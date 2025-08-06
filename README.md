@@ -12,6 +12,10 @@ This is a work-in-progress. During the installation process all data on your dev
 - [oneplus6](docs/oneplus6.md)
 - [mipad5](docs/mipad5.md)
 
+### Toolbox using guide
+
+- [toolbox](docs/toolbox.md)
+
 ### Related projects
 
 - [fedora-remix-mobility/fedora-kiwi-descriptions](https://github.com/fedora-remix-mobility/fedora-kiwi-descriptions) - KIWI image descriptions for Fedora Mobility
