@@ -11,6 +11,12 @@ ExecStart=modprobe hci_uart
 # Make sure SLPI remoteproc has started.
 ExecStart=bash -c 'for f in /sys/class/remoteproc/remoteproc*; do if [[ "$(cat $f/name)" == "slpi" ]]; then echo start > $f/state; fi; done'
 
+ExecStart=modprobe apr
+ExecStart=modprobe wcd934x
+ExecStart=modprobe soundwire-qcom
+ExecStart=modprobe slim-qcom-ngd-ctrl
+ExecStart=bash -c 'for f in /sys/class/remoteproc/remoteproc*; do if [[ "$(cat $f/name)" == "adsp" ]]; then echo start > $f/state; fi; done'
+
 Type=oneshot
 RemainAfterExit=yes
 Restart=on-failure
