@@ -1,79 +1,53 @@
-### Installation
+### install fedora atomic on oneplus6 / oneplus6t
 
-#### 0. Previous installations
+- **your current os and all your files will be deleted**
+- installation process is similar for oneplus6 and oneplus6t, both devices supported and tested
+- before flashing pocketblue we recommend you to flash stock rom first, then flash pocketblue on top of stock rom
+- you should have `bash` and `fastboot` installed on your computer
+- download latest `pocketblue-oneplus6-gnome-mobile-42.zip` [from here](https://github.com/onesaladleaf/pocketblue/actions/workflows/images-mipad5.yml)
+- you can download it only if you are logged into your github account
+- unarchive it
+- boot into fastboot and connect your phone to your computer via usb
+- make sure bootloader is unlocked
+- for oneplus6 run `bash flash_oneplus6_enchilada.sh`
+- for oneplus6t run `bash flash_oneplus6t_fajita.sh`
+- reboot and enjoy fedora
 
-If you previously installed the system using U-Boot's mass storage mode, you must erase the previous EFI partition. You can do it through mass storage mode:
+### usage
 
-```bash
-sudo wipefs -a /dev/disk/by-partlabel/op2
-```
+- default username: `user`
+- default password: `123456`
+- to upgrade system use `bootc upgrade` or `rpm-ostree upgrade`
+- after upgrade you should use `sudo ostree admin finalize-staged` to apply ugrade
+- this needed because shutdown process is broken, instead of cleanly stop all systemd services it causes hard reboot or crash
 
-#### 1. Download the partition images
+### known bugs
 
-Download the artifacts of the latest "[images oneplus6](https://github.com/onesaladleaf/pocketblue/actions/workflows/images-oneplus6.yml)" workflow run
+- no sound
+- toolobx and distrobox not work due to 6.15 kernel bug
+- shutdown process is broken
+- feel free to open issue and report any other bugs you find
 
-Extract the images:
+### uninstall fedora and get stock rom back using fastboot
 
-```bash
-unzip pocketblue-*.zip
-rm pocketblue-*.zip
-7z x pocketblue-*.7z
-cd artifacts
-```
+- https://wiki.lineageos.org/devices/enchilada/fw_update/
+- https://wiki.lineageos.org/devices/fajita/fw_update/
+- TODO: make ready to flash image and flashing scripts
 
-#### 2. Download U-Boot
+### unbricking using python3-edl
 
-Download U-Boot from https://github.com/fedora-remix-mobility/u-boot/releases
+- https://github.com/gmankab/guides/blob/main/unbrick/oneplus6.md
+- TODO: create repository, add more docs for this
 
-- `uboot-sdm845-oneplus-enchilada.img` for OnePlus 6
-- `uboot-sdm845-oneplus-fajita.img` for OnePlus 6T
+### files used by install script, license info, source links
 
-#### 3. Flash the images
+- `root.raw` - root partition for fedora, built by `.github/workflows/images-oneplus6.yml`
+- `boot.raw` - /boot partition, built by `.github/workflows/images-oneplus6.yml`
+- `efi.raw` - /boot/efi partition, built by `.github/workflows/images-oneplus6.yml`
+- `uboot-enchilada.img` - oneplus6 uboot image, gpl2 license, [source](https://github.com/fedora-remix-mobility/u-boot)
+- `uboot-fajita.img` - oneplus6t uboot image, gpl2 license, [source](https://github.com/fedora-remix-mobility/u-boot)
 
-Target partitions:
-
-- uboot-\*.img -> boot_\*
-- boot.raw -> system_a
-- esp.raw -> system_b
-- root.raw -> userdata
-
-```bash
-fastboot erase dtbo
-
-fastboot flash boot uboot-sdm845-oneplus-*.img --slot=all
-
-fastboot flash system_a boot.raw
-fastboot flash system_b esp.raw
-fastboot flash userdata root.raw
-
-# reboot, this might take a while
-fastboot reboot
-```
-
-Wait for your device to reboot and boot into Pocketblue. You may have to reboot again if wifi, modem or bluetooth don't work.
-
-- Default username: `user`
-- Default password: `123456`
-
-### Upgrading the system
-
-Use rpm-ostree or bootc to upgrade the system to the latest image:
-
-```bash
-sudo rpm-ostree upgrade
-# or
-sudo bootc upgrade
-```
-
-After that, you should reboot your device. However, shutdown and reboot are currently
-broken and may not work. To finish the upgrade process run the following command
-before rebooting the device:
-
-```bash
-sudo systemctl stop ostree-finalize-staged.service
-```
-
-### Enabled copr repositories
+### enabled copr repositories
 
 - [@mobility/common](https://copr.fedorainfracloud.org/coprs/g/mobility/common) - [source](https://github.com/fedora-remix-mobility/packages)
 - [onesaladleaf/pocketblue](https://copr.fedorainfracloud.org/coprs/onesaladleaf/pocketblue) - [source](https://github.com/onesaladleaf/pocketblue-rpms)
