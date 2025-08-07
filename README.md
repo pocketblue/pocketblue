@@ -9,7 +9,7 @@ This is a work-in-progress. During the installation process all data on your dev
 
 ### Installation
 
-- [oneplus6](docs/oneplus6.md)
+- [oneplus6 / oneplus6t](docs/oneplus6.md)
 - [mipad5](docs/mipad5.md)
 
 ### Toolbox using guide
