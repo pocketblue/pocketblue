@@ -21,6 +21,8 @@
 - some chargers works, some chargers not work
 - you should also try charge mipad5 from your computer or from your laptop
 - if nothing works, you can boot into twrp and do charging in twrp, or boot into fastboot and do charging in fastboot
+- shutdown process is broken, instead of cleanly stop all systemd services it causes hard reboot or crash, that's why you should use `sudo ostree admin finalize-staged` for upgrade to apply
+- fell free to open issue and report any other bugs you find
 
 ### uninstall fedora and get stock rom back
 
