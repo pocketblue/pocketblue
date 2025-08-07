@@ -5,8 +5,8 @@
 - download latest `pocketblue-mipad5-gnome-desktop-42.zip` [from here](https://github.com/onesaladleaf/pocketblue/actions/workflows/images-mipad5.yml)
 - you can download it only if you are logged into your github account
 - unarchive it
-- unlock bootloader on mipad5
 - boot into fastboot and connect mipad5 to your computer via usb
+- make sure bootloader is unlocked
 - run `bash flash_mipad5.sh`
 - reboot and enjoy fedora
 - to upgrade system use `rpm-ostree upgrade`
