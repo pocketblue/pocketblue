@@ -12,7 +12,7 @@ which fastboot
 
 fastboot getvar product 2>&1 | grep 'sdm845'
 fastboot erase dtbo
-fastboot erase op2 || echo 'failed erase op2'
+fastboot erase op2 || echo 'failed erase op2, this is not critical, just ignore it'
 fastboot flash boot     images/uboot-$device.img --slot=all
 fastboot flash system_a images/boot.raw
 fastboot flash system_b images/esp.raw
