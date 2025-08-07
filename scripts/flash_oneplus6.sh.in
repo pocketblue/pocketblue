@@ -11,11 +11,12 @@ export device=@device@
 which fastboot
 
 fastboot getvar product 2>&1 | grep 'sdm845'
-fastboot erase dtbo_ab
-fastboot flash boot_ab  images/uboot-$device.img
-fastboot flash system_a boot.raw
-fastboot flash system_b esp.raw
-fastboot flash userdata root.raw
+fastboot erase dtbo
+fastboot erase op2
+fastboot flash boot     images/uboot-$device.img --slot=all
+fastboot flash system_a images/boot.raw
+fastboot flash system_b images/esp.raw
+fastboot flash userdata images/root.raw
 
 echo 'done flashing, rebooting now'
 fastboot reboot
