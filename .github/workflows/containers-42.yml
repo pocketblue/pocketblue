@@ -5,6 +5,8 @@ on:
       - 'base/**'
       - 'devices/**'
       - 'desktops/**'
+    branches:
+      - main
   workflow_dispatch: {}
 
 jobs:

@@ -1,0 +1,29 @@
+name: containers dev
+on:
+  push:
+    paths:
+      - 'base/**'
+      - 'devices/**'
+      - 'desktops/**'
+    branches-ignore:
+      - main
+  workflow_dispatch: {}
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04-arm
+    name: test
+    steps:
+      - name: test
+        run: |
+          echo ref_name: ${{ github.ref_name }}
+          echo head_ref: ${{ github.head_ref }}
+  # containers_dev:
+  #   name: containers dev
+  #   permissions:
+  #     packages: write
+  #   secrets: inherit
+  #   uses: ./.github/workflows/helper-containers-devices-desktops.yml
+  #   with:
+  #     from_tag: '42'
+  #     push_tags: 42-dev
