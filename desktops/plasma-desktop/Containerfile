@@ -6,6 +6,11 @@ RUN dnf -y install \
         fedora-release-kinoite \
         plasma-discover-rpm-ostree \
         NetworkManager-wifi \
+        --exclude kernel-* \
+        --exclude=plasma-nm-l2tp \
+        --exclude=NetworkManager-l2tp \
+        --exclude=xl2tpd \
+        --exclude glibc-all-langpacks \
         --exclude ark \
         --exclude filelight \
         --exclude kcharselect \
