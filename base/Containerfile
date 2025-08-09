@@ -30,6 +30,7 @@ RUN dnf -y install 'dnf5-command(copr)' && \
         grubby \
         rmtfs \
         qrtr \
+        fuse \
         git \
         vim && \
     systemctl enable tqftpserv.service && \
