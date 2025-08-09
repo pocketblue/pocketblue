@@ -33,7 +33,9 @@ RUN dnf -y install \
     --exclude simple-scan \
     --exclude snapshot \
     --exclude gnome-tour \
-    --exclude malcontent-control
+    --exclude malcontent-control \
+    --exclude pipewire \
+    --exclude wireplumber
 
 RUN systemctl enable gdm.service
 
