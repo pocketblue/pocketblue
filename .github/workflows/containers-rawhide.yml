@@ -10,5 +10,6 @@ jobs:
     secrets: inherit
     uses: ./.github/workflows/helper-containers-devices-desktops.yml
     with:
-      from_tag: rawhide
+      from_tag_fedora_bootc: rawhide
+      from_tag_pocketblue: rawhide
       push_tags: rawhide

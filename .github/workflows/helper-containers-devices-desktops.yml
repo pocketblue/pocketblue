@@ -1,7 +1,10 @@
 on:
   workflow_call:
     inputs:
-      from_tag:
+      from_tag_fedora_bootc:
+        required: true
+        type: string
+      from_tag_pocketblue:
         required: true
         type: string
       push_tags:
@@ -16,7 +19,7 @@ jobs:
     uses: ./.github/workflows/helper-containers.yml
     with:
       push_tags: ${{ inputs.push_tags }}
-      from_tag: ${{ inputs.from_tag }}
+      from_tag: ${{ inputs.from_tag_fedora_bootc }}
       from_image: quay.io/fedora/fedora-bootc
       image: base
       containerfile: base/Containerfile
@@ -31,7 +34,7 @@ jobs:
     uses: ./.github/workflows/helper-containers.yml
     with:
       push_tags: ${{ inputs.push_tags }}
-      from_tag: ${{ inputs.from_tag }}
+      from_tag: ${{ inputs.from_tag_pocketblue }}
       from_image: ${{ vars.REGISTRY }}/base
       image: ${{ matrix.device }}-base
       containerfile: devices/${{ matrix.device }}/Containerfile
@@ -47,7 +50,7 @@ jobs:
     uses: ./.github/workflows/helper-containers.yml
     with:
       push_tags: ${{ inputs.push_tags }}
-      from_tag: ${{ inputs.from_tag }}
+      from_tag: ${{ inputs.from_tag_pocketblue }}
       from_image: ${{ vars.REGISTRY }}/${{ matrix.device }}-base
       image: ${{ matrix.device }}-${{ matrix.desktop }}
       containerfile: desktops/${{ matrix.desktop }}/Containerfile

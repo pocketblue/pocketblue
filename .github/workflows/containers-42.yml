@@ -17,5 +17,6 @@ jobs:
     secrets: inherit
     uses: ./.github/workflows/helper-containers-devices-desktops.yml
     with:
-      from_tag: '42'
+      from_tag_fedora_bootc: '42'
+      from_tag_pocketblue: '42'
       push_tags: 42 latest
