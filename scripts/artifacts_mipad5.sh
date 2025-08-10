@@ -12,7 +12,7 @@ curl -L https://github.com/ArKT-7/automated-nabu-lineage-installer/releases/down
 curl -L https://github.com/gmankab/sgdisk/releases/download/v1.0.10/sgdisk -o images/sgdisk
 curl -L https://github.com/gmankab/parted/releases/download/v3.6/parted -o images/parted
 
-curl -L https://gitlab.com/sm8150-mainline/u-boot/-/jobs/9720400108/artifacts/download -o uboot.zip
+curl -L https://gitlab.com/sm8150-mainline/u-boot/-/jobs/10969839675/artifacts/download -o uboot.zip
 7z x uboot.zip -o./uboot
 cp uboot/.output/u-boot.img images/uboot.img
 
