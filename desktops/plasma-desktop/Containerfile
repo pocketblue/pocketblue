@@ -2,30 +2,35 @@ ARG from
 FROM $from
 
 RUN dnf -y install \
-        @kde-desktop \
-        fedora-release-kinoite \
-        plasma-discover-rpm-ostree \
-        NetworkManager-wifi \
-        --exclude kernel-* \
-        --exclude=plasma-nm-l2tp \
-        --exclude=NetworkManager-l2tp \
-        --exclude=xl2tpd \
-        --exclude glibc-all-langpacks \
-        --exclude ark \
-        --exclude filelight \
-        --exclude kcharselect \
-        --exclude kdebugsettings \
-        --exclude khelpcenter \
-        --exclude kinfocenter \
-        --exclude kwrite \
-        --exclude plasma-systemmonitor \
-        --exclude akonadi-server \
-        --exclude akonadi-server-mysql \
-        --exclude colord-kde \
-        --exclude cups-pk-helper \
-        --exclude plasma-print-manager \
-        --exclude kde-connect \
-        --exclude plasma-workspace-wallpapers \
-        --exclude plasma-desktop-doc && \
-    systemctl enable sddm.service && \
-    dnf clean all
+    @kde-desktop \
+    fedora-release-kinoite \
+    plasma-discover-rpm-ostree \
+    NetworkManager-wifi \
+    --exclude kernel-* \
+    --exclude=plasma-nm-l2tp \
+    --exclude=NetworkManager-l2tp \
+    --exclude=xl2tpd \
+    --exclude glibc-all-langpacks \
+    --exclude ark \
+    --exclude filelight \
+    --exclude kcharselect \
+    --exclude kdebugsettings \
+    --exclude khelpcenter \
+    --exclude kinfocenter \
+    --exclude kwrite \
+    --exclude plasma-systemmonitor \
+    --exclude akonadi-server \
+    --exclude akonadi-server-mysql \
+    --exclude colord-kde \
+    --exclude cups-pk-helper \
+    --exclude plasma-print-manager \
+    --exclude kde-connect \
+    --exclude plasma-workspace-wallpapers \
+    --exclude plasma-desktop-doc
+
+RUN systemctl enable sddm.service
+
+# clenup
+RUN rm -rf /var/log/* && dnf clean all
+
+RUN bootc container lint

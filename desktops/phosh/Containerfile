@@ -1,12 +1,16 @@
 ARG from
 FROM $from
 
-RUN dnf -y install 'dnf5-command(copr)' && \
-    dnf -y copr enable samcday/phrog && \
+RUN dnf -y copr enable samcday/phrog && \
     dnf -y install \
         @phosh-desktop \
         phrog \
         gnome-software-rpm-ostree \
-        default-flatpaks && \
-    systemctl enable --force phrog.service && \
-    dnf clean all
+        default-flatpaks
+
+RUN systemctl enable --force phrog.service
+
+# clenup
+RUN rm -rf /var/log/* && dnf clean all
+
+RUN bootc container lint

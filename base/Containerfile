@@ -7,33 +7,47 @@ COPY usr/ /usr/
 # workaround (see https://github.com/ublue-os/bluefin-lts/issues/3)
 RUN mkdir -p /var/roothome
 
-RUN dnf -y install 'dnf5-command(copr)' && \
-    dnf -y install \
-        @core \
-        @hardware-support \
-        @standard \
-        @base-graphical \
-        --exclude dracut-config-rescue && \
-    dnf -y install \
-        NetworkManager-tui \
-        fedora-release-ostree-desktop \
-        fedora-release-mobility \
-        systemd-oomd-defaults \
-        systemd-resolved \
-        grub2-efi-aa64-modules \
-        grub2-efi-aa64 \
-        glibc-langpack-en \
-        udisks2-btrfs \
-        btrfs-progs \
-        tqftpserv \
-        pd-mapper \
-        grubby \
-        rmtfs \
-        qrtr \
-        fuse \
-        git \
-        vim && \
-    systemctl enable tqftpserv.service && \
-    systemctl enable rmtfs.service && \
-    dnf clean all && \
-    bootc container lint
+RUN dnf -y install 'dnf5-command(copr)'
+
+# base groups
+RUN dnf -y install \
+    @core \
+    @hardware-support \
+    @standard \
+    @base-graphical \
+    --exclude dracut-config-rescue
+
+RUN dnf -y install \
+    fedora-release-ostree-desktop \
+    fedora-release-mobility \
+    systemd-oomd-defaults \
+    systemd-resolved \
+    grub2-efi-aa64-modules \
+    grub2-efi-aa64 \
+    glibc-langpack-en \
+    udisks2-btrfs \
+    btrfs-progs \
+    fuse
+
+# qualcomm
+RUN dnf -y install \
+    tqftpserv \
+    pd-mapper \
+    rmtfs \
+    qrtr
+
+# utils
+RUN dnf -y install \
+    NetworkManager-tui \
+    git \
+    grubby \
+    vim
+
+RUN systemctl enable \
+    tqftpserv.service \
+    rmtfs.service
+
+# clenup
+RUN rm -rf /var/log/* && dnf clean all
+
+RUN bootc container lint
