@@ -4,17 +4,24 @@ FROM $from
 COPY etc/ /etc/
 COPY usr/ /usr/
 
+# kernel
 RUN mkdir -p /boot/dtb && \
     dnf -y remove \
         kernel \
         kernel-core \
         kernel-modules \
         kernel-modules-core && \
-    dnf -y install \
-        kernel \
-        xiaomi-nabu-firmware \
-        xiaomi-nabu-audio \
-        qbootctl && \
-    systemctl enable qbootctl.service && \
-    dnf clean all && \
-    bootc container lint
+    dnf -y install kernel && \
+    rm -r /boot/dtb
+
+RUN dnf -y install \
+    xiaomi-nabu-firmware \
+    xiaomi-nabu-audio \
+    qbootctl
+
+RUN systemctl enable qbootctl.service
+
+# clenup
+RUN rm -rf /var/log/* && dnf clean all
+
+RUN bootc container lint
