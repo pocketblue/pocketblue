@@ -1,12 +1,13 @@
 ARG from
 FROM $from
 
-RUN dnf -y copr enable samcday/phrog && \
-    dnf -y install \
-        @phosh-desktop \
-        phrog \
-        gnome-software-rpm-ostree \
-        default-flatpaks
+COPY etc/ /etc/
+
+RUN dnf -y install \
+    @phosh-desktop \
+    phrog \
+    gnome-software-rpm-ostree \
+    default-flatpaks
 
 RUN systemctl enable --force phrog.service
 
