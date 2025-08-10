@@ -14,8 +14,7 @@ RUN mkdir -p /boot/dtb && \
         kernel \
         xiaomi-nabu-firmware \
         xiaomi-nabu-audio \
-        qbootctl \
-        btop && \
+        qbootctl && \
     systemctl enable qbootctl.service && \
     dnf clean all && \
     bootc container lint
