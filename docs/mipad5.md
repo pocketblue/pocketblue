@@ -16,13 +16,10 @@
 - to upgrade the system use `bootc upgrade` or `rpm-ostree upgrade`
 - after that you should run `sudo ostree admin finalize-staged` to apply the ugrade
 - this is required because the shutdown process is currently broken and may cause the system to freeze or crash
+- all charging bugs are fixed now, enjoy working charging
 
 ### Known bugs
 
-- charging status is not shown in the taskbar, as a workaround you should check the charging status using btop, which is preinstalled
-- some chargers don't work
-- you should also try charging your device from your PC or laptop
-- if nothing works, you can charge the device in twrp or fastboot
 - shutdown process is broken
 - fell free to open issue and report any other bugs you find
 
