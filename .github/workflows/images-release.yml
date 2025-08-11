@@ -1,0 +1,54 @@
+name: images release
+permissions:
+  contents: write
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'tag used for release, example: 42.20250810'
+        required: true
+        type: string
+
+jobs:
+  images_build:
+    name: building ${{ matrix.device.name }}-${{ matrix.desktop }}
+    strategy:
+      fail-fast: false
+      matrix:
+        device:
+          - name: mipad5
+            esp_size: 536870912
+          - name: oneplus6
+            esp_size: 268435456
+        desktop: [gnome-desktop, gnome-mobile, phosh, plasma-desktop, plasma-mobile]
+
+    uses: ./.github/workflows/helper-images.yml
+    with:
+      device: ${{ matrix.device.name }}
+      image_name: ${{ matrix.device.name }}-${{ matrix.desktop }}
+      esp_size: ${{ matrix.device.esp_size }}
+      args_7z: -mmt=1 -md=1024m
+
+  publish_release:
+    name: publish release
+    needs: images_build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: pocketblue-*
+          merge-multiple: true
+          path: dist
+
+      - name: check sizes
+        run: |
+          du -h dist/*
+          du dist/*
+
+      - uses: svenstaro/upload-release-action@v2
+        with:
+          tag: ${{ inputs.release_tag }}
+          file: dist/pocketblue-*.7z
+          file_glob: true
+          overwrite: true
+          body: release
