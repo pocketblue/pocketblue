@@ -2,7 +2,7 @@
 
 - **your current os and all your files will be deleted**
 - you should have `bash`, `adb` and `fastboot` installed on your computer
-- download one of the latest release archives [from here](https://github.com/pocketblue/pocketblue/actions/workflows/images-mipad5.yml); you have to be logged into your github account
+- download image from [releases](https://github.com/pocketblue/pocketblue/releases/latest)
 - unarchive it
 - boot into fastboot and connect the device to your computer via usb
 - make sure bootloader is unlocked
