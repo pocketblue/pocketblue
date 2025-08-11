@@ -39,16 +39,16 @@ jobs:
           pattern: pocketblue-*
           merge-multiple: true
           path: dist
-
       - name: check sizes
         run: |
           du -h dist/*
           du dist/*
-
       - uses: svenstaro/upload-release-action@v2
         with:
           tag: ${{ inputs.release_tag }}
           file: dist/pocketblue-*.7z
           file_glob: true
           overwrite: true
-          body: release
+          body: |
+            recommended image for mipad5: [gnome-desktop](https://github.com/pocketblue/pocketblue/releases/download/${{ inputs.release_tag }}/pocketblue-mipad5-gnome-desktop-42.7z)
+            recommended image for oneplus6: [gnome-mobile](https://github.com/pocketblue/pocketblue/releases/download/${{ inputs.release_tag }}/pocketblue-oneplus6-gnome-mobile-42.7z)
