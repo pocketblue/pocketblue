@@ -20,6 +20,16 @@
 - after that you should run `sudo ostree admin finalize-staged` to apply the ugrade
 - this is required because the shutdown process is currently broken and may cause the system to freeze or crash
 
+### Rebasing to other desktops
+
+- rebasing is a best way to try a new desktop
+- before rebasing you should run `rpm-ostree reset`
+- `sudo bootc switch quay.io/pocketblue/oneplus6-gnome-mobile:42` - recommended image for oneplus6
+- `sudo bootc switch quay.io/pocketblue/oneplus6-gnome-desktop:42`
+- `sudo bootc switch quay.io/pocketblue/oneplus6-plasma-mobile:42`
+- `sudo bootc switch quay.io/pocketblue/oneplus6-plasma-desktop:42`
+- `sudo bootc switch quay.io/pocketblue/oneplus6-phosh:42`
+
 ### Known bugs
 
 - no sound

@@ -18,6 +18,16 @@
 - this is required because the shutdown process is currently broken and may cause the system to freeze or crash
 - all charging bugs are fixed now, enjoy working charging
 
+### Rebasing to other desktops
+
+- rebasing is a best way to try a new desktop
+- before rebasing you should run `rpm-ostree reset`
+- `sudo bootc switch quay.io/pocketblue/mipad5-gnome-desktop:42` - recommended image for mipad5
+- `sudo bootc switch quay.io/pocketblue/mipad5-gnome-mobile:42`
+- `sudo bootc switch quay.io/pocketblue/mipad5-plasma-desktop:42`
+- `sudo bootc switch quay.io/pocketblue/mipad5-plasma-mobile:42`
+- `sudo bootc switch quay.io/pocketblue/mipad5-phosh:42`
+
 ### Known bugs
 
 - shutdown process is broken
