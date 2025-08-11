@@ -27,6 +27,7 @@
 - `sudo bootc switch quay.io/pocketblue/mipad5-plasma-desktop:42`
 - `sudo bootc switch quay.io/pocketblue/mipad5-plasma-mobile:42`
 - `sudo bootc switch quay.io/pocketblue/mipad5-phosh:42`
+- after rebasing you should run `sudo ostree admin finalize-staged`
 
 ### Known bugs
 

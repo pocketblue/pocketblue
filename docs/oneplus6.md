@@ -29,6 +29,7 @@
 - `sudo bootc switch quay.io/pocketblue/oneplus6-plasma-mobile:42`
 - `sudo bootc switch quay.io/pocketblue/oneplus6-plasma-desktop:42`
 - `sudo bootc switch quay.io/pocketblue/oneplus6-phosh:42`
+- after rebasing you should run `sudo ostree admin finalize-staged`
 
 ### Known bugs
 
