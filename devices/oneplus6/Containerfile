@@ -49,6 +49,9 @@ RUN systemctl disable bootc-fetch-apply-updates.timer
 
 COPY fwload/usr/ /usr/
 
+COPY usbnet/etc/ /etc/
+COPY usbnet/usr/ /usr/
+
 # clenup
 RUN rm -rf /var/log/* && dnf clean all
 
