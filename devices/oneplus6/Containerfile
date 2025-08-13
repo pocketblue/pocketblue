@@ -31,6 +31,10 @@ RUN dnf -y install \
     pipewire-pulseaudio \
     alsa-ucm-mobility-sdm845
 
+# usb network
+RUN dnf -y install \
+    dnsmasq
+
 # other
 RUN dnf -y install \
     mobility-tweaks \
