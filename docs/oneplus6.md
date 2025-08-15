@@ -38,16 +38,10 @@
 - shutdown process is broken
 - feel free to open issue and report any other bugs you find
 
-### Uninstall Fedora and get stock rom back using fastboot
-
-- https://wiki.lineageos.org/devices/enchilada/fw_update/
-- https://wiki.lineageos.org/devices/fajita/fw_update/
-- TODO: make ready to flash images and flashing scripts
-
 ### Unbricking using python3-edl
 
-- https://github.com/gmankab/guides/blob/main/unbrick/oneplus6.md
-- TODO: create repository, add more docs
+- [oneplus6](https://github.com/pocketblue/oneplus6-unbrick)
+- oneplus6t: TODO
 
 ### Files used by the installation script, license info, source links
 
