@@ -10,12 +10,12 @@ RUN dnf -y install \
     nautilus \
     ptyxis \
     default-flatpaks \
-    --exclude gnome-calculator
-    --exclude gnome-calendar
-    --exclude gnome-clocks
-    --exclude gnome-console
-    --exclude gnome-contacts
-    --exclude gnome-maps
+    --exclude gnome-calculator \
+    --exclude gnome-calendar \
+    --exclude gnome-clocks \
+    --exclude gnome-console \
+    --exclude gnome-contacts \
+    --exclude gnome-maps \
     --exclude gnome-photos
 
 RUN systemctl enable --force phrog.service
