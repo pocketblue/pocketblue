@@ -37,6 +37,7 @@ adb shell parted -s /dev/block/sda -- mkpart fedora_boot ext4   -3GB -1GB
 adb shell parted -s /dev/block/sda -- mkpart esp         fat32  -1GB 100%
 adb reboot bootloader
 
+echo 'waiting for device appear in fastboot'
 fastboot getvar product 2>&1 | grep nabu
 fastboot erase dtbo_ab
 fastboot flash boot_ab     images/uboot.img
