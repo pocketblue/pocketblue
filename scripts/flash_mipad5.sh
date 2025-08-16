@@ -34,14 +34,14 @@ adb shell 'if [ -e /dev/block/sda35 ]; then parted -s /dev/block/sda rm 35; fi'
 export start=$(adb shell parted -m /dev/block/sda print free | tail -1 | cut -d: -f2)
 adb shell parted -s /dev/block/sda -- mkpart userdata    ext4 $start -3GB
 adb shell parted -s /dev/block/sda -- mkpart fedora_boot ext4   -3GB -1GB
-adb shell parted -s /dev/block/sda -- mkpart esp         fat32  -1GB 100%
+adb shell parted -s /dev/block/sda -- mkpart fedora_esp  fat32  -1GB 100%
 adb reboot bootloader
 
 echo 'waiting for device appear in fastboot'
 fastboot getvar product 2>&1 | grep nabu
 fastboot erase dtbo_ab
 fastboot flash boot_ab     images/uboot.img
-fastboot flash esp         images/esp.raw
+fastboot flash fedora_esp  images/esp.raw
 fastboot flash fedora_boot images/boot.raw
 fastboot flash userdata    images/root.raw
 
