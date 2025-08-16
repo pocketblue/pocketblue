@@ -22,6 +22,10 @@ adb shell twrp unmount /data
 adb push images/sgdisk /bin/sgdisk
 adb push images/parted /bin/parted
 adb shell sgdisk --resize-table 64 /dev/block/sda
+
+# validating that sda31 partition is userdata
+adb shell parted /dev/block/sda print | grep userdata | grep -qE '^31'
+
 adb shell 'if [ -e /dev/block/sda31 ]; then parted -s /dev/block/sda rm 31; fi'
 adb shell 'if [ -e /dev/block/sda32 ]; then parted -s /dev/block/sda rm 32; fi'
 adb shell 'if [ -e /dev/block/sda33 ]; then parted -s /dev/block/sda rm 33; fi'
