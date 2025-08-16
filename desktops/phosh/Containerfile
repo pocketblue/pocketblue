@@ -7,7 +7,16 @@ RUN dnf -y install \
     @phosh-desktop \
     phrog \
     gnome-software-rpm-ostree \
-    default-flatpaks
+    nautilus \
+    ptyxis \
+    default-flatpaks \
+    --exclude gnome-calculator
+    --exclude gnome-calendar
+    --exclude gnome-clocks
+    --exclude gnome-console
+    --exclude gnome-contacts
+    --exclude gnome-maps
+    --exclude gnome-photos
 
 RUN systemctl enable --force phrog.service
 
