@@ -47,7 +47,8 @@ jobs:
         ARGS_7Z: ${{ inputs.args_7z}}
         OUTPUT_DIR: ${{ steps.build-raw.outputs.output-directory }}
       run: |
-        sudo apt install -y p7zip
+        curl -L https://7-zip.org/a/7z2501-linux-arm64.tar.xz | tar -xJf -
+        sudo cp 7zzs /bin/7z
         bash scripts/build_image.sh
         bash scripts/artifacts_$DEVICE.sh
     - name: Upload build artifacts
