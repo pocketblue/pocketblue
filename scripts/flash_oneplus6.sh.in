@@ -10,7 +10,7 @@ echo $device | grep -E 'enchilada|fajita'
 
 which fastboot
 
-fastboot getvar product 2>&1 | grep 'sdm845'
+fastboot getvar product 2>&1 | grep sdm845
 fastboot erase dtbo_a
 fastboot erase dtbo_b
 fastboot erase op2 2> /dev/null || true
