@@ -31,12 +31,11 @@ This is a work-in-progress. During the installation process all data on your dev
 
 ### Related chats
 
-List of chats of related projects, not specific to Pocketblue:
-
-- https://matrix.to/#/#mobility:fedoraproject.org - Fedora Mobility general chat
-- https://matrix.to/#/#mobility-sdm845:fedoraproject.org - Fedora Mobility chat for oneplus6
+- https://t.me/fedoramobility - our main chat
 - https://t.me/nabulinux - mipad5 linux chat
 - https://t.me/nabulinuxru - mipad5 linux chat (ru)
 - https://t.me/pipa_mainline - mipad6 linux chat
 - https://t.me/xiaomi_pipa - mipad6 general chat
+- https://matrix.to/#/#mobility:fedoraproject.org - Fedora Mobility general chat
+- https://matrix.to/#/#mobility-sdm845:fedoraproject.org - Fedora Mobility chat for oneplus6
 
