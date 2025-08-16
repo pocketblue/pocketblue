@@ -27,6 +27,7 @@ This is a work-in-progress. During the installation process all data on your dev
 - [fedora-remix-mobility/fedora-kiwi-descriptions](https://github.com/fedora-remix-mobility/fedora-kiwi-descriptions) - KIWI image descriptions for Fedora Mobility
 - [sdm845-live-fedora](https://github.com/samcday/sdm845-live-fedora) - a compact fedora UKI that can be directly booted from the oneplus6(t) bootloader
 - [nabu-fedora-builder](https://github.com/nik012003/nabu-fedora-builder) - non-atomic fedora for mipad5
+- [pipa-fedora-builder](https://github.com/timoxa0/pipa-fedora-builder) - non-atomic fedora for mipad6
 
 ### Related chats
 
