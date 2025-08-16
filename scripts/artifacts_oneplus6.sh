@@ -5,8 +5,8 @@ set -uexo pipefail
 which 7z
 which curl
 
-curl -L https://github.com/fedora-remix-mobility/u-boot/releases/download/fedora-mobility-v0.0.1/uboot-sdm845-oneplus-enchilada.img -o images/uboot-enchilada.img
-curl -L https://github.com/fedora-remix-mobility/u-boot/releases/download/fedora-mobility-v0.0.1/uboot-sdm845-oneplus-fajita.img -o images/uboot-fajita.img
+curl -L https://github.com/fedora-remix-mobility/u-boot/releases/download/fedora-mobility-v0.0.1/uboot-sdm845-oneplus-enchilada.img -o images/uboot_enchilada.img
+curl -L https://github.com/fedora-remix-mobility/u-boot/releases/download/fedora-mobility-v0.0.1/uboot-sdm845-oneplus-fajita.img -o images/uboot_fajita.img
 
 install -Dm 0755 scripts/flash_oneplus6.sh.in flash_oneplus6_enchilada.sh
 install -Dm 0755 scripts/flash_oneplus6.sh.in flash_oneplus6t_fajita.sh
