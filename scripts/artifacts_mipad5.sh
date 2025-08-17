@@ -7,7 +7,7 @@ which git
 which curl
 which python
 
-curl -L https://github.com/ArKT-7/twrp_device_xiaomi_nabu/releases/download/mod_linux/V4-MODDED-TWRP-LINUX-20-07.img -o images/twrp.img
+curl -L https://github.com/ArKT-7/twrp_device_xiaomi_nabu/releases/download/mod_linux/V4-MODDED-TWRP-LINUX.img -o images/twrp.img
 curl -L https://github.com/ArKT-7/automated-nabu-lineage-installer/releases/download/lineage-22.1-20250207-UNOFFICIAL-nabu/dtbo.img -o images/dtbo.img
 curl -L https://github.com/gmankab/sgdisk/releases/download/v1.0.10/sgdisk -o images/sgdisk
 curl -L https://github.com/gmankab/parted/releases/download/v3.6/parted -o images/parted
