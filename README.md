@@ -34,6 +34,7 @@ This is a work-in-progress. During the installation process all data on your dev
 - https://t.me/fedoramobility - our main chat
 - https://t.me/nabulinux - mipad5 linux chat
 - https://t.me/nabulinuxru - mipad5 linux chat (ru)
+- https://t.me/XiaomiPad5Official - mipad5 roms chat
 - https://t.me/pipa_mainline - mipad6 linux chat
 - https://t.me/xiaomi_pipa - mipad6 general chat
 - https://matrix.to/#/#mobility:fedoraproject.org - Fedora Mobility general chat
