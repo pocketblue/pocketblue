@@ -3,7 +3,8 @@
 ## Installation
 
 > [!WARNING]
-> Your current OS and all your files will be deleted. Dualboot with Android is not supported.
+> Your current OS and all your files will be deleted, dualboot with Android is not supported yet.
+> Software is provided AS IS, without warranty of any kind
 
 ### Prerequisites
 
