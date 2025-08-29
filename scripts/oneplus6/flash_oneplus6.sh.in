@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -uexo pipefail
+fastboot getvar product 2>&1 | grep sdm845
 
 export device=@device@
 # export device=enchilada # for oneplus6
@@ -10,6 +11,7 @@ echo $device | grep -E 'enchilada|fajita'
 
 which fastboot
 
+echo 'waiting for device appear in fastboot'
 fastboot getvar product 2>&1 | grep sdm845
 fastboot erase dtbo_a
 fastboot erase dtbo_b
