@@ -12,6 +12,7 @@ fastboot flash   dtbo_ab images/dtbo.img
 fastboot flash   boot_ab images/twrp.img
 fastboot reboot
 
+echo 'waiting for device appear in adb'
 adb wait-for-recovery
 adb shell getprop ro.product.device | grep nabu
 adb shell twrp unmount /data
