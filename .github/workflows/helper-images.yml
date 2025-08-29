@@ -50,7 +50,7 @@ jobs:
         curl -L https://7-zip.org/a/7z2501-linux-arm64.tar.xz | tar -xJf -
         sudo cp 7zzs /bin/7z
         bash scripts/build_image.sh
-        bash scripts/artifacts_$DEVICE.sh
+        bash scripts/$DEVICE/artifacts_$DEVICE.sh
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
