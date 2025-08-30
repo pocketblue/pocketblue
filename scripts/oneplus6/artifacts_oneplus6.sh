@@ -10,9 +10,9 @@ curl -L https://github.com/fedora-remix-mobility/u-boot/releases/download/fedora
 
 install -Dm 0755 scripts/oneplus6/flash_oneplus6.sh.in flash_oneplus6_enchilada.sh
 install -Dm 0755 scripts/oneplus6/flash_oneplus6.sh.in flash_oneplus6t_fajita.sh
-install -Dm 0755 scripts/oneplus6/flash_oneplus6.cmd.in flash_oneplus6t_enchilada.cmd
+install -Dm 0755 scripts/oneplus6/flash_oneplus6.cmd.in flash_oneplus6_enchilada.cmd
 install -Dm 0755 scripts/oneplus6/flash_oneplus6.cmd.in flash_oneplus6t_fajita.cmd
-install -Dm 0755 scripts/oneplus6/flash_oneplus6.ps.bat.in flash_oneplus6t_enchilada.ps.bat
+install -Dm 0755 scripts/oneplus6/flash_oneplus6.ps.bat.in flash_oneplus6_enchilada.ps.bat
 install -Dm 0755 scripts/oneplus6/flash_oneplus6.ps.bat.in flash_oneplus6t_fajita.ps.bat
 
 sed -i 's/@device@/enchilada/g' flash_oneplus6_enchilada.*
