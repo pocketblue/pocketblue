@@ -35,8 +35,9 @@ jobs:
         run: echo "context=$(dirname ${{ inputs.containerfile }})" >> $GITHUB_OUTPUT
 
       - name: Set tag expiry
-        if: ${{ github.event.inputs.expires_after != '' }}
-        run: echo "EXPIRES_AFTER_LABEL=quay.expires-after=${{ inputs.expires_after }}" >> $GITHUB_ENV
+        id: expiry
+        if: inputs.expires_after != ''
+        run: echo "label=EXPIRES_AFTER_LABEL=quay.expires-after=${{ inputs.expires_after }}" >> $GITHUB_OUTPUT
 
       - name: Build container
         uses: redhat-actions/buildah-build@v2
@@ -46,8 +47,7 @@ jobs:
           context: ${{ steps.getcontext.outputs.context }}
           containerfiles: ${{ inputs.containerfile }}
           tags: ${{ inputs.push_tags }}
-          labels: |
-            $EXPIRES_AFTER_LABEL
+          labels: ${{ steps.expiry.outputs.label || '' }}
 
       - name: Push to registry
         uses: redhat-actions/push-to-registry@v2
