@@ -37,7 +37,7 @@ jobs:
       - name: Set tag expiry
         id: expiry
         if: inputs.expires_after != ''
-        run: echo "label=EXPIRES_AFTER_LABEL=quay.expires-after=${{ inputs.expires_after }}" >> $GITHUB_OUTPUT
+        run: echo "label=quay.expires-after=${{ inputs.expires_after }}" >> $GITHUB_OUTPUT
 
       - name: Build container
         uses: redhat-actions/buildah-build@v2
