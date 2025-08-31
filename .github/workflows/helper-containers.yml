@@ -16,6 +16,9 @@ on:
       containerfile:
         required: true
         type: string
+      expires_after:
+        required: false
+        type: string
 
 jobs:
   build:
@@ -24,20 +27,30 @@ jobs:
     permissions:
       packages: write
     steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
+      - name: Clone the repository
+        uses: actions/checkout@v4
+
       - id: getcontext
         shell: bash
         run: echo "context=$(dirname ${{ inputs.containerfile }})" >> $GITHUB_OUTPUT
-      - uses: redhat-actions/buildah-build@v2
+
+      - name: Set tag expiry
+        if: ${{ github.event.inputs.expires_after != '' }}
+        run: echo "EXPIRES_AFTER_LABEL=quay.expires-after=${{ inputs.expires_after }}" >> $GITHUB_ENV
+
+      - name: Build container
+        uses: redhat-actions/buildah-build@v2
         with:
           build-args: from=${{ inputs.from_image }}:${{ inputs.from_tag }}
           image: ${{ inputs.image }}
           context: ${{ steps.getcontext.outputs.context }}
           containerfiles: ${{ inputs.containerfile }}
           tags: ${{ inputs.push_tags }}
-      - uses: redhat-actions/push-to-registry@v2
+          labels: |
+            $EXPIRES_AFTER_LABEL
+
+      - name: Push to registry
+        uses: redhat-actions/push-to-registry@v2
         with:
           image: ${{ inputs.image }}
           tags: ${{ inputs.push_tags }}

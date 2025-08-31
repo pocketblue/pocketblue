@@ -10,6 +10,9 @@ on:
       push_tags:
         required: true
         type: string
+      expires_after:
+        required: false
+        type: string
 
 jobs:
   base:
@@ -23,6 +26,7 @@ jobs:
       from_image: quay.io/fedora/fedora-bootc
       image: base
       containerfile: base/Containerfile
+      expires_after: ${{ inputs.expires_after }}
   devices:
     needs: base
     permissions:
