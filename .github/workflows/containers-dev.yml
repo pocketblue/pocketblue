@@ -20,3 +20,4 @@ jobs:
       from_tag_fedora_bootc: '42'
       from_tag_pocketblue: 42-${{ github.ref_name }}
       push_tags: 42-${{ github.ref_name }}
+      expires_after: 3w
