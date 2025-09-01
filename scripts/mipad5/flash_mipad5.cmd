@@ -31,7 +31,7 @@ adb shell "if [ -e /dev/block/sda35 ]; then sgdisk --delete=35 /dev/block/sda; f
 adb shell "parted -m /dev/block/sda print free | tail -1 | cut -d: -f2 | tee /tmp/start" || (pause & exit)
 adb shell parted -s /dev/block/sda -- mkpart userdata    ext4  $(cat /tmp/start) -3GB || (pause & exit)
 adb shell parted -s /dev/block/sda -- mkpart fedora_boot ext4  -3GB -1GB || (pause & exit)
-adb shell parted -s /dev/block/sda -- mkpart fedora_esp  fat32 -1GB 100% || (pause & exit)
+adb shell parted -s /dev/block/sda -- mkpart fedora_esp  fat32 -1GB 100%% || (pause & exit)
 adb reboot bootloader
 
 echo 'waiting for device appear in fastboot'
