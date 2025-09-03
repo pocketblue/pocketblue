@@ -51,7 +51,7 @@ jobs:
             --format docker \
             --tls-verify=true \
             -t ${{ inputs.image }}:${{ inputs.push_tag }} \
-            ${{ inputs.expires-after && '--label quay.expires-after='inputs.expires-after || '' }} \
+            ${{ inputs.expires_after && '--label quay.expires-after='inputs.expires_after || '' }} \
             ${{ steps.getcontext.outputs.context }}
 
       - name: Run rechunker
