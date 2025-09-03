@@ -30,7 +30,7 @@ on:
 
 jobs:
   build:
-    name: ${{ inputs.image }}:${{ inputs.from_tag }}
+    name: ${{ inputs.image }}:${{ inputs.push_tag }}
     runs-on: ubuntu-24.04-arm
     permissions:
       packages: write
