@@ -76,7 +76,7 @@ jobs:
 
       - name: Push to registry
         env:
-          IMAGE: ${{ vars.REGISTY }}/${{ steps.build.outputs.image }}
+          IMAGE: ${{ vars.REGISTRY }}/${{ inputs.image }}
           TAG: ${{ inputs.push_tag }}
         run: |
           set -uexo pipefail
