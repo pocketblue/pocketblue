@@ -48,6 +48,7 @@ jobs:
       image: ${{ matrix.device }}-base
       containerfile: devices/${{ matrix.device }}/Containerfile
       latest: ${{ inputs.latest }}
+      expires_after: ${{ inputs.expires_after }}
   desktops:
     needs: devices
     permissions:
@@ -65,4 +66,5 @@ jobs:
       image: ${{ matrix.device }}-${{ matrix.desktop }}
       containerfile: desktops/${{ matrix.desktop }}/Containerfile
       latest: ${{ inputs.latest }}
+      expires_after: ${{ inputs.expires_after }}
       rechunk: true
