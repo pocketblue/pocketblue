@@ -19,4 +19,5 @@ jobs:
     with:
       from_tag_fedora_bootc: '42'
       from_tag_pocketblue: '42'
-      push_tags: 42 latest
+      push_tag: 42
+      latest: true

@@ -1,7 +1,7 @@
 on:
   workflow_call:
     inputs:
-      push_tags:
+      push_tag:
         required: true
         type: string
       from_tag:
@@ -16,9 +16,17 @@ on:
       containerfile:
         required: true
         type: string
+      latest:
+        required: false
+        type: boolean
+        default: false
       expires_after:
         required: false
         type: string
+      rechunk:
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   build:
@@ -34,26 +42,52 @@ jobs:
         shell: bash
         run: echo "context=$(dirname ${{ inputs.containerfile }})" >> $GITHUB_OUTPUT
 
-      - name: Set tag expiry
-        id: expiry
-        if: inputs.expires_after != ''
-        run: echo "label=quay.expires-after=${{ inputs.expires_after }}" >> $GITHUB_OUTPUT
-
       - name: Build container
-        uses: redhat-actions/buildah-build@v2
+        id: build
+        run: |
+          sudo buildah bud \
+            -f ${{ inputs.containerfile }} \
+            --build-arg from=${{ inputs.from_image }}:${{ inputs.from_tag }} \
+            --format docker \
+            --tls-verify=true \
+            -t ${{ inputs.image }}:${{ inputs.push_tag }} \
+            ${{ inputs.expires-after && '--label quay.expires-after='inputs.expires-after || '' }} \
+            ${{ steps.getcontext.outputs.context }}
+
+      - name: Run rechunker
+        id: rechunk
+        if: inputs.rechunk
+        uses: hhd-dev/rechunk@ded27feba22df48134eece2c66ba0fca1289ff40 # v1.2.3
         with:
-          build-args: from=${{ inputs.from_image }}:${{ inputs.from_tag }}
-          image: ${{ inputs.image }}
-          context: ${{ steps.getcontext.outputs.context }}
-          containerfiles: ${{ inputs.containerfile }}
-          tags: ${{ inputs.push_tags }}
-          labels: ${{ steps.expiry.outputs.label || '' }}
+          rechunk: "ghcr.io/hhd-dev/rechunk:v1.2.3"
+          ref: ${{ vars.REGISTRY }}/${{ inputs.image }}:${{ inputs.push_tag }}
+          skip_compression: true
+          version: ${{ inputs.push_tag }}
+          pretty: ${{ inputs.push_tag }}
+          revision: ${{ github.sha }}
+
+      - name: Login to registry
+        env:
+          REGISTRY: ${{ vars.REGISTRY }}
+          USERNAME: ${{ vars.REGISTRY_USERNAME }}
+          PASSWORD: ${{ secrets.REGISTRY_TOKEN }}
+        run: |
+          sudo podman login --username $USERNAME --password $PASSWORD $REGISTRY
 
       - name: Push to registry
-        uses: redhat-actions/push-to-registry@v2
-        with:
-          image: ${{ inputs.image }}
-          tags: ${{ inputs.push_tags }}
-          registry: ${{ vars.REGISTRY }}
-          username: ${{ vars.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_TOKEN }}
+        env:
+          IMAGE: ${{ vars.REGISTY }}/${{ steps.build.outputs.image }}
+          TAG: ${{ inputs.push_tag }}
+        run: |
+          set -uexo pipefail
+
+          if [[ ${{ inputs.rechunk }} == true ]]; then
+            RECHUNKED_IMAGE=$(sudo podman pull ${{ steps.rechunk.outputs.ref }})
+            sudo podman image tag ${RECHUNKED_IMAGE} $IMAGE:$TAG
+          fi
+          sudo podman push $IMAGE:$TAG
+
+          if [[ ${{ inputs.latest }} == true ]]; then
+            sudo podman image tag $IMAGE:$TAG $IMAGE:latest
+            sudo podman push $IMAGE:latest
+          fi
