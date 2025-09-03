@@ -84,6 +84,8 @@ jobs:
           if [[ ${{ inputs.rechunk }} == true ]]; then
             RECHUNKED_IMAGE=$(sudo podman pull ${{ steps.rechunk.outputs.ref }})
             sudo podman image tag ${RECHUNKED_IMAGE} $IMAGE:$TAG
+          else
+            sudo podman image tag localhost/${{ inputs.image }}:$TAG $IMAGE:$TAG
           fi
           sudo podman push $IMAGE:$TAG
 
