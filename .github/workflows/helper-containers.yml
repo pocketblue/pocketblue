@@ -59,11 +59,12 @@ jobs:
         if: inputs.rechunk
         uses: hhd-dev/rechunk@ded27feba22df48134eece2c66ba0fca1289ff40 # v1.2.3
         with:
-          rechunk: "ghcr.io/hhd-dev/rechunk:v1.2.3"
+          rechunk: 'ghcr.io/hhd-dev/rechunk:v1.2.3'
+          prev-ref: ${{ vars.REGISTRY }}/${{ inputs.image }}:${{ inputs.push_tag }}
           ref: localhost/${{ inputs.image }}:${{ inputs.push_tag }}
           skip_compression: true
-          version: ${{ inputs.push_tag }}
-          pretty: ${{ inputs.push_tag }}
+          version: ${{ inputs.push_tag }}.20<date>
+          pretty: ${{ inputs.push_tag }}.20<date>
           revision: ${{ github.sha }}
 
       - name: Login to registry
