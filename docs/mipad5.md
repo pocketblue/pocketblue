@@ -6,7 +6,8 @@
 - unarchive it
 - boot into fastboot and connect the device to your computer via usb
 - make sure bootloader is unlocked
-- run `bash flash_mipad5.sh`
+- if your computer runs linux, run `flash_mipad5.sh` script
+- if your computer runs windows, run `flash_mipad5.cmd` script
 - reboot and enjoy fedora
 
 ### Usage

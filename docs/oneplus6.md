@@ -8,8 +8,10 @@
 - unarchive it
 - boot into fastboot and connect your phone to your computer via usb
 - make sure bootloader is unlocked
-- for oneplus6 run `bash flash_oneplus6_enchilada.sh`
-- for oneplus6t run `bash flash_oneplus6t_fajita.sh`
+- if your computer runs linux, and your device is oneplus6, run `flash_oneplus6_enchilada.sh` script
+- if your computer runs windows, and your device is oneplus6, run `flash_oneplus6_enchilada.cmd` script
+- if your computer runs linux, and your device is oneplus6t, run `flash_oneplus6t_fajita.sh` script
+- if your computer runs windows, and your device is oneplus6t, run `flash_oneplus6t_fajita.cmd` script
 - reboot and enjoy fedora
 
 ### Usage
