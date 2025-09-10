@@ -3,7 +3,7 @@
 - **your current os and all your files will be deleted**
 - installation process is the same for oneplus6 and oneplus6t, both devices are supported and tested
 - before flashing pocketblue it is recommended to flash the stock rom and check every functionality
-- you should have `bash` and `fastboot` installed on your computer
+- you should have `fastboot` installed on your computer
 - download image from [releases](https://github.com/pocketblue/pocketblue/releases/latest)
 - unarchive it
 - boot into fastboot and connect your phone to your computer via usb

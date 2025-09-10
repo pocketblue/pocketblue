@@ -1,7 +1,7 @@
 ### Install Fedora Atomic on mipad5
 
 - **your current os, all your files, all your custom partitions will be deleted**
-- you should have `bash`, `adb` and `fastboot` installed on your computer
+- you should have `adb` and `fastboot` installed on your computer
 - download image from [releases](https://github.com/pocketblue/pocketblue/releases/latest)
 - unarchive it
 - boot into fastboot and connect the device to your computer via usb
