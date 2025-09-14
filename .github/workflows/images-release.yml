@@ -27,7 +27,7 @@ jobs:
       device: ${{ matrix.device.name }}
       image_name: ${{ matrix.device.name }}-${{ matrix.desktop }}
       esp_size: ${{ matrix.device.esp_size }}
-      args_7z: -mmt=1 -md=1024m
+      args_7z: -mmt=1 -md=1500m
 
   publish_release:
     name: publish release
