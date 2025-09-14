@@ -31,7 +31,17 @@ RUN dnf -y install \
     --exclude okular-mobile \
     --exclude qrca \
     --exclude spacebar \
-    --exclude tokodon
+    --exclude tokodon \
+    --exclude phonon-qt6-backend-vlc \
+    --exclude vlc-libs \
+    --exclude vlc-plugins-base \
+    --exclude vlc-plugin-pulseaudio \
+    --exclude vlc-plugin-gstreamer \
+    --exclude phonon-backend-vlc-common \
+    --exclude google-droid-sans-fonts \
+    --exclude google-noto-serif-fonts \
+    --exclude google-noto-sans-mono-vf-fonts \
+    --exclude google-noto-serif-vf-fonts
 
 RUN systemctl enable sddm.service
 
