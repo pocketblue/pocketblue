@@ -26,10 +26,10 @@ RUN dnf -y install \
 # audio
 RUN dnf -y install \
     alsa-utils \
-    alsa-ucm-mobility-sdm845 \
-    pulseaudio \
-    --exclude pipewire \
-    --exclude wireplumber
+    pipewire \
+    pipewire-alsa \
+    pipewire-pulseaudio \
+    alsa-ucm-mobility-sdm845
 
 # usb network
 RUN dnf -y install \
