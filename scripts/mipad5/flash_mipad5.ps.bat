@@ -47,6 +47,9 @@ if (-not (fastboot getvar product 2>&1 | Select-String nabu)) { throw 'wrong dev
 $ErrorActionPreference = "Stop"
 fastboot erase dtbo_ab
 fastboot flash boot_ab     images/uboot.img
+fastboot flash fedora_esp  images/esp.raw
+fastboot flash fedora_boot images/boot.raw
+fastboot flash userdata    images/root.raw
 
 echo 'done flashing, rebooting now'
 fastboot reboot
