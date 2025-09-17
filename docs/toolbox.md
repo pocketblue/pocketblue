@@ -1,11 +1,18 @@
-### using toolbox on arm linux
+### what is toolbox
 
-- `toolbox` preinstalled on all fedora atomic images
-- `distrobox` is a nice alternative for toolbox, can be installed with `rpm-ostee install distrobox`
+- toolbox is a tool that creates container with any linux distro
+- in toolbox containers you can install any packages from any linux distro
+- if you want to use `dnf` on fedora atomic, it's strongly recommended to use toolbox
+- preinstalled on all fedora atomic images
+
+### what is distrobox
+
+- distrobox is a nice alternative for toolbox
+- can be installed with `rpm-ostee install distrobox`
 
 ### currently broken on oneplus6
 
-only work on mipad5, for oneplus6 pocketeblue currenty provides 6.15 linux kernel which have a bug that makes toolbox and distrobox broken, so if you use oneplus6 please wait for us to update kernel
+only work on mipad5, for oneplus6 pocketeblue currently provides 6.15 linux kernel which have a bug that makes toolbox and distrobox broken, so if you use oneplus6 please wait for us to update kernel
 
 ### fedora
 
@@ -43,7 +50,7 @@ toolbox create --image quay.io/toolbx-images/alpine-toolbox
 toolbox create --image quay.io/gmanka/pmos-toolbox
 ```
 
-### arch
+### arch arm
 
 ```shell
 toolbox create --image quay.io/gmanka/arch-arm-toolbox

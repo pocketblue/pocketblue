@@ -13,14 +13,13 @@ Pocketblue is a Fedora Atomic image for mobile devices based on fedora-bootc and
 This is a work-in-progress. During the installation process all data on your device will be wiped.
 **Use at your own risk.**
 
-### Installation
+### Docs
 
-- [oneplus6 / oneplus6t](docs/oneplus6.md)
-- [mipad5](docs/mipad5.md)
-
-### Toolbox using guide
-
-- [toolbox](docs/toolbox.md)
+- [install on oneplus6 / oneplus6t](docs/oneplus6.md)
+- [install on mipad5](docs/mipad5.md)
+- [firefox mobile config packaged to flatpak](https://github.com/pocketblue/pocketblue.github.io)
+- [using toolbox](docs/toolbox.md)
+- [installing packages](docs/installing-packages.md)
 
 ### Related projects
 
