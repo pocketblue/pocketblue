@@ -1,0 +1,55 @@
+on:
+  workflow_call:
+    inputs:
+      device:
+        required: true
+        type: string
+      desktop:
+        required: true
+        type: string
+      from_tag:
+        required: true
+        type: string
+      push_tag:
+        required: true
+        type: string
+      latest:
+        required: false
+        type: boolean
+        default: false
+      expires_after:
+        required: false
+        type: string
+
+jobs:
+  device:
+    name: '${{ inputs.device }}-base'
+    permissions:
+      packages: write
+    secrets: inherit
+    uses: ./.github/workflows/helper-build-container.yml
+    with:
+      push_tag: ${{ inputs.push_tag }}
+      from_tag: ${{ inputs.from_tag }}
+      from_image: ${{ vars.REGISTRY }}/base
+      image: ${{ inputs.device }}-base
+      containerfile: devices/${{ inputs.device }}/Containerfile
+      latest: ${{ inputs.latest }}
+      expires_after: ${{ inputs.expires_after }}
+
+  desktop:
+    needs: device
+    name: '${{ inputs.device }}-${{ inputs.desktop }}'
+    permissions:
+      packages: write
+    secrets: inherit
+    uses: ./.github/workflows/helper-containers.yml
+    with:
+      push_tag: ${{ inputs.push_tag }}
+      from_tag: ${{ inputs.from_tag }}
+      from_image: ${{ vars.REGISTRY }}/${{ inputs.device }}-base
+      image: ${{ inputs.device }}-${{ inputs.desktop }}
+      containerfile: desktops/${{ inputs.desktop }}/Containerfile
+      latest: ${{ inputs.latest }}
+      expires_after: ${{ inputs.expires_after }}
+      rechunk: true
