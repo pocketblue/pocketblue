@@ -35,6 +35,5 @@ jobs:
     with:
       device: ${{ matrix.device }}
       desktop: ${{ matrix.desktop }}
-      from_tag_fedora_bootc: ${{ inputs.branch }}
-      from_tag_pocketblue: ${{ inputs.branch }}
+      from_tag: ${{ inputs.branch }}
       push_tag: ${{ inputs.branch }}
