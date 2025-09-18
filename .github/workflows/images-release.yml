@@ -33,8 +33,8 @@ jobs:
         id: get_tag
         run: |
           podman pull quay.io/pocketblue/base:42
-          export release_tag=$(podman inspect quay.io/pocketblue/base:42 --format '{{ index .Config.Labels "org.opencontainers.image.version" }}')
-          echo release_tag=$release_tag >> $GITHUB_OUTPUT
+          export full_tag=$(podman inspect quay.io/pocketblue/base:42 --format '{{ index .Config.Labels "org.opencontainers.image.version" }}')
+          echo release_tag=$(echo $full_tag | cut -d. -f1-2) >> $GITHUB_OUTPUT
       - uses: actions/download-artifact@v4
         with:
           pattern: pocketblue-*
