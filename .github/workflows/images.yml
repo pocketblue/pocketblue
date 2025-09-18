@@ -10,6 +10,8 @@ on:
           - mipad5
           - oneplus6
 
+run-name: 'images: ${{ inputs.device }}'
+
 jobs:
   images:
     name: 'images: ${{ inputs.device }}'
