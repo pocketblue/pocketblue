@@ -1,9 +1,6 @@
 on:
   workflow_call:
     inputs:
-      esp_size:
-        required: true
-        type: number
       device:
         required: true
         type: string
@@ -33,11 +30,16 @@ jobs:
         curl -L https://7-zip.org/a/7z2501-linux-arm64.tar.xz | tar -xJf -
         sudo cp 7zzs /bin/7z
 
+    - name: Get device config
+      id: conf
+      run: |
+        cat devices/${{ inputs.device }}/device.conf >> "$GITHUB_OUTPUT"
+
     - name: Build partition images
       uses: pocketblue/actions/partition-images@main
       with:
         config_file: ./config.toml
-        esp_size: ${{ inputs.esp_size }}
+        esp_size: ${{ steps.conf.outputs.esp_size }}
         rootfs: ${{ inputs.rootfs }}
         registry: ${{ vars.REGISTRY }}
         image_name: ${{ inputs.image_name }}

@@ -12,16 +12,13 @@ jobs:
       matrix:
         device:
           - name: mipad5
-            esp_size: 536870912
           - name: oneplus6
-            esp_size: 268435456
         desktop: [gnome-desktop, gnome-mobile, phosh, plasma-desktop, plasma-mobile]
 
-    uses: ./.github/workflows/helper-images.yml
+    uses: ./.github/workflows/build-image.yml
     with:
       device: ${{ matrix.device.name }}
       image_name: ${{ matrix.device.name }}-${{ matrix.desktop }}
-      esp_size: ${{ matrix.device.esp_size }}
       args_7z: -mmt=1 -md=1500m
 
   publish_release:

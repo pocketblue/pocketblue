@@ -1,0 +1,22 @@
+name: 'images'
+on:
+  workflow_dispatch:
+    inputs:
+      device:
+        type: choice
+        description: 'device name'
+        required: true
+        options:
+          - mipad5
+          - oneplus6
+
+jobs:
+  images:
+    name: 'images: ${{ inputs.device }}'
+    strategy:
+      matrix:
+        desktop: [gnome-desktop, gnome-mobile, phosh, plasma-desktop, plasma-mobile]
+    uses: ./.github/workflows/build-image.yml
+    with:
+      device: ${{ inputs.device }}
+      image_name: ${{ inputs.device }}-${{ matrix.desktop }}
