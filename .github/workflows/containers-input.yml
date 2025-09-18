@@ -24,6 +24,7 @@ jobs:
 
   derived:
     name: containers ${{ inputs.branch }}
+    needs: base
     permissions:
       packages: write
     secrets: inherit
