@@ -43,7 +43,7 @@ jobs:
     permissions:
       packages: write
     secrets: inherit
-    uses: ./.github/workflows/helper-containers.yml
+    uses: ./.github/workflows/helper-build-container.yml
     with:
       push_tag: ${{ inputs.push_tag }}
       from_tag: ${{ inputs.from_tag }}
