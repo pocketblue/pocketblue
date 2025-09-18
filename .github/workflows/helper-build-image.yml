@@ -19,6 +19,7 @@ on:
 
 jobs:
   build:
+    name: ${{ inputs.image_name }}
     runs-on: ubuntu-24.04-arm
 
     steps:
