@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         desktop: [gnome-desktop, gnome-mobile, phosh, plasma-desktop, plasma-mobile]
-    uses: ./.github/workflows/build-image.yml
+    uses: ./.github/workflows/helper-build-image.yml
     with:
       device: ${{ inputs.device }}
       image_name: ${{ inputs.device }}-${{ matrix.desktop }}

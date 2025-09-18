@@ -15,7 +15,7 @@ jobs:
           - name: oneplus6
         desktop: [gnome-desktop, gnome-mobile, phosh, plasma-desktop, plasma-mobile]
 
-    uses: ./.github/workflows/build-image.yml
+    uses: ./.github/workflows/helper-build-image.yml
     with:
       device: ${{ matrix.device.name }}
       image_name: ${{ matrix.device.name }}-${{ matrix.desktop }}
