@@ -27,7 +27,7 @@ jobs:
           # tag
           git_branch='${{ github.head_ref || github.ref_name }}'
           echo $git_branch
-          if [ '$git_branch' = 'main' ]; then
+          if [ "$git_branch" = "main" ]; then
             tag=$fedora_branch
           else
             tag=$fedora_branch-$git_branch
@@ -35,7 +35,7 @@ jobs:
           echo tag=$tag >> "$GITHUB_OUTPUT"
 
           # latest
-          if [ '$tag' = '42' ]; then
+          if [ "$tag" = "42" ]; then
             echo latest=true >> "$GITHUB_OUTPUT"
           else
             echo latest=false >> "$GITHUB_OUTPUT"
