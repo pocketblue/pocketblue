@@ -25,7 +25,7 @@ jobs:
           echo branch=$fedora_branch >> "$GITHUB_OUTPUT"
 
           # tag
-          git_branch = '${{ github.head_ref || github.ref_name }}'
+          git_branch='${{ github.head_ref || github.ref_name }}'
           if [ '$git_branch' = 'main' ]; then
             tag=$fedora_branch
           else
