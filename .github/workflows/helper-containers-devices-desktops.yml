@@ -1,0 +1,70 @@
+on:
+  workflow_call:
+    inputs:
+      from_tag_fedora_bootc:
+        required: true
+        type: string
+      from_tag_pocketblue:
+        required: true
+        type: string
+      push_tag:
+        required: true
+        type: string
+      latest:
+        required: false
+        type: boolean
+        default: false
+      expires_after:
+        required: false
+        type: string
+
+jobs:
+  base:
+    permissions:
+      packages: write
+    secrets: inherit
+    uses: ./.github/workflows/helper-containers.yml
+    with:
+      push_tag: ${{ inputs.push_tag }}
+      from_tag: ${{ inputs.from_tag_fedora_bootc }}
+      from_image: quay.io/fedora/fedora-bootc
+      image: base
+      containerfile: base/Containerfile
+      latest: ${{ inputs.latest }}
+      expires_after: ${{ inputs.expires_after }}
+  devices:
+    needs: base
+    permissions:
+      packages: write
+    secrets: inherit
+    strategy:
+      matrix:
+        device: [oneplus6, mipad5]
+    uses: ./.github/workflows/helper-containers.yml
+    with:
+      push_tag: ${{ inputs.push_tag }}
+      from_tag: ${{ inputs.from_tag_pocketblue }}
+      from_image: ${{ vars.REGISTRY }}/base
+      image: ${{ matrix.device }}-base
+      containerfile: devices/${{ matrix.device }}/Containerfile
+      latest: ${{ inputs.latest }}
+      expires_after: ${{ inputs.expires_after }}
+  desktops:
+    needs: devices
+    permissions:
+      packages: write
+    secrets: inherit
+    strategy:
+      matrix:
+        device: [oneplus6, mipad5]
+        desktop: [gnome-mobile, gnome-desktop, phosh, plasma-desktop, plasma-mobile]
+    uses: ./.github/workflows/helper-containers.yml
+    with:
+      push_tag: ${{ inputs.push_tag }}
+      from_tag: ${{ inputs.from_tag_pocketblue }}
+      from_image: ${{ vars.REGISTRY }}/${{ matrix.device }}-base
+      image: ${{ matrix.device }}-${{ matrix.desktop }}
+      containerfile: desktops/${{ matrix.desktop }}/Containerfile
+      latest: ${{ inputs.latest }}
+      expires_after: ${{ inputs.expires_after }}
+      rechunk: true

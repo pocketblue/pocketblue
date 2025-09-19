@@ -9,32 +9,13 @@ on:
         type: string
 
 jobs:
-  base:
-    name: base
+  containers:
+    name: containers ${{inputs.branch}}
     permissions:
       packages: write
     secrets: inherit
-    uses: ./.github/workflows/helper-build-container.yml
+    uses: ./.github/workflows/helper-containers-devices-desktops.yml
     with:
-      push_tag: ${{ inputs.branch }}
-      from_tag: ${{ inputs.branch }}
-      from_image: quay.io/fedora/fedora-bootc
-      image: base
-      containerfile: base/Containerfile
-
-  derived:
-    name: containers ${{ inputs.branch }}
-    needs: base
-    permissions:
-      packages: write
-    secrets: inherit
-    strategy:
-      matrix:
-        device: [oneplus6, mipad5]
-        desktop: [gnome-mobile, gnome-desktop, phosh, plasma-desktop, plasma-mobile]
-    uses: ./.github/workflows/helper-container-chain.yml
-    with:
-      device: ${{ matrix.device }}
-      desktop: ${{ matrix.desktop }}
-      from_tag: ${{ inputs.branch }}
-      push_tag: ${{ inputs.branch }}
+      from_tag_fedora_bootc: ${{inputs.branch}}
+      from_tag_pocketblue: ${{inputs.branch}}
+      push_tag: ${{inputs.branch}}
