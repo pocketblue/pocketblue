@@ -26,6 +26,7 @@ jobs:
 
           # tag
           git_branch='${{ github.head_ref || github.ref_name }}'
+          echo $git_branch
           if [ '$git_branch' = 'main' ]; then
             tag=$fedora_branch
           else
