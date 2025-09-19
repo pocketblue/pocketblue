@@ -55,10 +55,10 @@ jobs:
     permissions:
       packages: write
     secrets: inherit
-    uses: ./.github/workflows/helper-containers-devices-desktops.yml
+    uses: ./.github/workflows/helper-containers-matrix.yml
     with:
-      from_tag_fedora_bootc: ${{ needs.config.outputs.branch }}
-      from_tag_pocketblue: ${{ needs.config.outputs.tag }}
+      fedora_branch: ${{ needs.config.outputs.branch }}
+      pocketblue_tag: ${{ needs.config.outputs.tag }}
       push_tag: ${{ needs.config.outputs.tag }}
       latest: ${{ needs.config.outputs.latest == 'true' }}
       expires_after: ${{ needs.config.outputs.dev == 'true' && '3w' || '' }}

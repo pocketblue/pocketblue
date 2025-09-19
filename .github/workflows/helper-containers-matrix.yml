@@ -1,13 +1,10 @@
 on:
   workflow_call:
     inputs:
-      from_tag_fedora_bootc:
+      fedora_branch:
         required: true
         type: string
-      from_tag_pocketblue:
-        required: true
-        type: string
-      push_tag:
+      pocketblue_tag:
         required: true
         type: string
       latest:
@@ -23,10 +20,10 @@ jobs:
     permissions:
       packages: write
     secrets: inherit
-    uses: ./.github/workflows/helper-containers.yml
+    uses: ./.github/workflows/helper-build-container.yml
     with:
-      push_tag: ${{ inputs.push_tag }}
-      from_tag: ${{ inputs.from_tag_fedora_bootc }}
+      push_tag: ${{ inputs.pocketblue_tag }}
+      from_tag: ${{ inputs.fedora_branch }}
       from_image: quay.io/fedora/fedora-bootc
       image: base
       containerfile: base/Containerfile
@@ -40,10 +37,10 @@ jobs:
     strategy:
       matrix:
         device: [oneplus6, mipad5]
-    uses: ./.github/workflows/helper-containers.yml
+    uses: ./.github/workflows/helper-build-container.yml
     with:
-      push_tag: ${{ inputs.push_tag }}
-      from_tag: ${{ inputs.from_tag_pocketblue }}
+      push_tag: ${{ inputs.pocketblue_tag }}
+      from_tag: ${{ inputs.pocketblue_tag }}
       from_image: ${{ vars.REGISTRY }}/base
       image: ${{ matrix.device }}-base
       containerfile: devices/${{ matrix.device }}/Containerfile
@@ -58,10 +55,10 @@ jobs:
       matrix:
         device: [oneplus6, mipad5]
         desktop: [gnome-mobile, gnome-desktop, phosh, plasma-desktop, plasma-mobile]
-    uses: ./.github/workflows/helper-containers.yml
+    uses: ./.github/workflows/helper-build-container.yml
     with:
-      push_tag: ${{ inputs.push_tag }}
-      from_tag: ${{ inputs.from_tag_pocketblue }}
+      push_tag: ${{ inputs.pocketblue_tag }}
+      from_tag: ${{ inputs.pocketblue_tag }}
       from_image: ${{ vars.REGISTRY }}/${{ matrix.device }}-base
       image: ${{ matrix.device }}-${{ matrix.desktop }}
       containerfile: desktops/${{ matrix.desktop }}/Containerfile
