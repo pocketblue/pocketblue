@@ -1,0 +1,58 @@
+name: containers
+on:
+  workflow_dispatch:
+    inputs:
+      fedora_branch:
+        description: 'fedora branch, example: 42'
+        required: true
+        default: '42'
+        type: string
+  push:
+    paths:
+      - 'base/**'
+      - 'devices/**'
+      - 'desktops/**'
+
+jobs:
+  config:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - id: config
+        run: |
+
+          # branch
+          fedora_branch='${{ inputs.fedora_branch || 42 }}'
+          echo branch=$fedora_branch >> "$GITHUB_OUTPUT"
+
+          # tag
+          git_branch = '${{ github.head_ref || github.ref_name }}'
+          if [ '$git_branch' = 'main' ]; then
+            tag=$fedora_branch
+          else
+            tag=$fedora_branch-$git_branch
+          fi
+          echo tag=$tag >> "$GITHUB_OUTPUT"
+
+          # latest
+          if [ '$tag' = '42' ]; then
+            echo latest=true >> "$GITHUB_OUTPUT"
+          else
+            echo latest=false >> "$GITHUB_OUTPUT"
+          fi
+
+    outputs:
+      branch: ${{ steps.config.outputs.branch }}
+      tag: ${{ steps.config.outputs.tag }}
+      latest: ${{ steps.config.outputs.latest }}
+
+  containers:
+    name: containers ${{ needs.config.outputs.tag }}
+    needs: config
+    permissions:
+      packages: write
+    secrets: inherit
+    uses: ./.github/workflows/helper-containers-devices-desktops.yml
+    with:
+      from_tag_fedora_bootc: ${{ needs.config.outputs.branch }}
+      from_tag_pocketblue: ${{ needs.config.outputs.tag }}
+      push_tag: ${{ needs.config.outputs.tag }}
