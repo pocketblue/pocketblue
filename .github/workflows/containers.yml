@@ -26,7 +26,6 @@ jobs:
 
           # tag
           git_branch='${{ github.head_ref || github.ref_name }}'
-          echo $git_branch
           if [ "$git_branch" = "main" ]; then
             tag=$fedora_branch
           else
@@ -57,3 +56,4 @@ jobs:
       from_tag_fedora_bootc: ${{ needs.config.outputs.branch }}
       from_tag_pocketblue: ${{ needs.config.outputs.tag }}
       push_tag: ${{ needs.config.outputs.tag }}
+      latest: ${{ needs.config.outputs.latest }}
