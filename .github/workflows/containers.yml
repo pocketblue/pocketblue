@@ -24,14 +24,17 @@ jobs:
           fedora_branch='${{ inputs.fedora_branch || 42 }}'
           echo branch=$fedora_branch >> "$GITHUB_OUTPUT"
 
-          # tag
+          # tag, dev
           git_branch='${{ github.head_ref || github.ref_name }}'
           if [ "$git_branch" = "main" ]; then
             tag=$fedora_branch
+            dev=false
           else
             tag=$fedora_branch-$git_branch
+            dev=true
           fi
           echo tag=$tag >> "$GITHUB_OUTPUT"
+          echo dev=$dev >> "$GITHUB_OUTPUT"
 
           # latest
           if [ "$tag" = "42" ]; then
@@ -43,6 +46,7 @@ jobs:
     outputs:
       branch: ${{ steps.config.outputs.branch }}
       tag: ${{ steps.config.outputs.tag }}
+      dev: ${{ steps.config.outputs.dev }}
       latest: ${{ steps.config.outputs.latest }}
 
   containers:
@@ -56,4 +60,5 @@ jobs:
       from_tag_fedora_bootc: ${{ needs.config.outputs.branch }}
       from_tag_pocketblue: ${{ needs.config.outputs.tag }}
       push_tag: ${{ needs.config.outputs.tag }}
-      latest: ${{ needs.config.outputs.latest }}
+      latest: ${{ needs.config.outputs.latest == 'true' }}
+      expires_after: ${{ needs.config.outputs.dev == 'true' && '3w' || '' }}
