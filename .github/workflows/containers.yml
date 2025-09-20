@@ -59,6 +59,5 @@ jobs:
     with:
       fedora_branch: ${{ needs.config.outputs.branch }}
       pocketblue_tag: ${{ needs.config.outputs.tag }}
-      push_tag: ${{ needs.config.outputs.tag }}
       latest: ${{ needs.config.outputs.latest == 'true' }}
       expires_after: ${{ needs.config.outputs.dev == 'true' && '3w' || '' }}
