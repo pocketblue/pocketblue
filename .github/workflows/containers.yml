@@ -17,6 +17,8 @@ on:
       - 'devices/**'
       - 'desktops/**'
 
+run-name: 'containers: ${{ inputs.fedora_branch }}'
+
 jobs:
   config:
     runs-on: ubuntu-24.04-arm
