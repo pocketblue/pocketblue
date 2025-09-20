@@ -20,7 +20,7 @@ RUN dnf -y install \
     pipa-sound-conf \
     bootmac
 
-RUN systemctl enable qbootctl-mark-bootable.service
+RUN systemctl enable qbootctl.service
 
 # cleanup
 RUN rm -rf /var/log/* && dnf clean all
