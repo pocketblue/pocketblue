@@ -37,6 +37,8 @@ jobs:
     steps:
       - name: Clone the repository
         uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - id: getcontext
         shell: bash
