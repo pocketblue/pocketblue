@@ -1,0 +1,28 @@
+ARG from
+FROM $from
+
+COPY etc/ /etc/
+
+# kernel
+RUN mkdir -p /boot/dtb && \
+    dnf -y remove \
+        kernel \
+        kernel-core \
+        kernel-modules \
+        kernel-modules-core && \
+    dnf -y install kernel && \
+    rm -r /boot/dtb
+
+RUN dnf -y install \
+    xiaomi-pipa-firmware \
+    qbootctl \
+    pipa-dracut \
+    pipa-sound-conf \
+    bootmac
+
+RUN systemctl enable qbootctl-mark-bootable.service
+
+# cleanup
+RUN rm -rf /var/log/* && dnf clean all
+
+RUN bootc container lint
