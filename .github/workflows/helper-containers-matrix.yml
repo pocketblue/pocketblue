@@ -36,7 +36,7 @@ jobs:
     secrets: inherit
     strategy:
       matrix:
-        device: [oneplus6, mipad5]
+        device: [ mipad5, mipad6, oneplus6 ]
     uses: ./.github/workflows/helper-build-container.yml
     with:
       push_tag: ${{ inputs.pocketblue_tag }}
@@ -53,8 +53,8 @@ jobs:
     secrets: inherit
     strategy:
       matrix:
-        device: [oneplus6, mipad5]
-        desktop: [gnome-mobile, gnome-desktop, phosh, plasma-desktop, plasma-mobile]
+        device: [ mipad5, mipad6, oneplus6 ]
+        desktop: [ gnome-mobile, gnome-desktop, phosh, plasma-desktop, plasma-mobile ]
     uses: ./.github/workflows/helper-build-container.yml
     with:
       push_tag: ${{ inputs.pocketblue_tag }}

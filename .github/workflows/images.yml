@@ -8,6 +8,7 @@ on:
         required: true
         options:
           - mipad5
+          - mipad6
           - oneplus6
 
 run-name: 'images: ${{ inputs.device }}'
@@ -17,7 +18,7 @@ jobs:
     name: 'images: ${{ inputs.device }}'
     strategy:
       matrix:
-        desktop: [gnome-desktop, gnome-mobile, phosh, plasma-desktop, plasma-mobile]
+        desktop: [ gnome-desktop, gnome-mobile, phosh, plasma-desktop, plasma-mobile ]
     uses: ./.github/workflows/helper-build-image.yml
     with:
       device: ${{ inputs.device }}
