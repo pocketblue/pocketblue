@@ -10,7 +10,7 @@ RUN mkdir -p /boot/dtb && \
         kernel-core \
         kernel-modules \
         kernel-modules-core && \
-    dnf -y install --allowerasing kernel && \
+    dnf -y install --allowerasing coreutils-single kernel && \
     rm -r /boot/dtb
 
 RUN dnf -y install \
