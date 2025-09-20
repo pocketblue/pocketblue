@@ -17,8 +17,6 @@ on:
       - 'devices/**'
       - 'desktops/**'
 
-run-name: ${{ inputs.fedora_branch != '' && format('containers: {0}', inputs.fedora_branch) || '' }}
-
 jobs:
   config:
     runs-on: ubuntu-24.04-arm
