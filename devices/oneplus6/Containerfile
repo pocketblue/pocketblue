@@ -52,7 +52,7 @@ COPY fwload/usr/ /usr/
 COPY usbnet/etc/ /etc/
 COPY usbnet/usr/ /usr/
 
-# clenup
+# cleanup
 RUN rm -rf /var/log/* && dnf clean all
 
 RUN bootc container lint
