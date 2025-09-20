@@ -17,6 +17,7 @@ jobs:
   images:
     name: 'images: ${{ inputs.device }}'
     strategy:
+      fail-fast: false
       matrix:
         desktop: [ gnome-desktop, gnome-mobile, phosh, plasma-desktop, plasma-mobile ]
     uses: ./.github/workflows/helper-build-image.yml
