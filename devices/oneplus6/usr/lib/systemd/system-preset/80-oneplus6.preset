@@ -1,2 +1,4 @@
 disable alsa-restore.service
 disable alsa-state.service
+
+disable bootc-fetch-apply-updates.timer

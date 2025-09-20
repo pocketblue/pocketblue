@@ -45,7 +45,6 @@ RUN systemctl enable \
     bootmac-bluetooth.service \
     hexagonrpcd-sdsp.service \
     msm-modem-uim-selection.service
-RUN systemctl disable bootc-fetch-apply-updates.timer
 
 # firmware
 COPY fwload/usr/ /usr/
