@@ -29,6 +29,7 @@ jobs:
       containerfile: base/Containerfile
       latest: ${{ inputs.latest }}
       expires_after: ${{ inputs.expires_after }}
+
   devices:
     needs: base
     permissions:
@@ -46,12 +47,14 @@ jobs:
       containerfile: devices/${{ matrix.device }}/Containerfile
       latest: ${{ inputs.latest }}
       expires_after: ${{ inputs.expires_after }}
+
   desktops:
     needs: devices
     permissions:
       packages: write
     secrets: inherit
     strategy:
+      fail-fast: false
       matrix:
         device: [ mipad5, mipad6, oneplus6 ]
         desktop: [ gnome-mobile, gnome-desktop, phosh, plasma-desktop, plasma-mobile ]
