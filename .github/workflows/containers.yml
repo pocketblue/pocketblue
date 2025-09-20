@@ -3,10 +3,14 @@ on:
   workflow_dispatch:
     inputs:
       fedora_branch:
-        description: 'fedora branch, example: 42'
+        type: choice
+        description: 'fedora branch'
         required: true
+        options:
+          - '42'
+          - '43'
+          - 'rawhide'
         default: '42'
-        type: string
   push:
     paths:
       - 'base/**'
