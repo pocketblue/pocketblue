@@ -16,7 +16,8 @@ RUN dnf -y install \
     --exclude gnome-console \
     --exclude gnome-contacts \
     --exclude gnome-maps \
-    --exclude gnome-photos
+    --exclude gnome-photos \
+    --exclude PackageKit
 
 RUN systemctl enable --force phrog.service
 

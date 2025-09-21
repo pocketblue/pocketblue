@@ -5,7 +5,6 @@ RUN dnf -y install \
     @kde-mobile-environment \
     plasma-discover-rpm-ostree \
     NetworkManager-wifi \
-    PackageKit-Qt6 \
     --exclude PackageKit \
     --exclude ark \
     --exclude filelight \

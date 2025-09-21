@@ -6,7 +6,6 @@ RUN dnf -y install \
     fedora-release-kinoite \
     plasma-discover-rpm-ostree \
     NetworkManager-wifi \
-    PackageKit-Qt6 \
     --exclude 'kernel-*' \
     --exclude PackageKit-command-not-found \
     --exclude PackageKit \
