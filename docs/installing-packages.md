@@ -9,7 +9,7 @@
 
 ### installing packages to system
 
-- on atomic systems installing packages to system is not recommender, but you can. just use `rpm-ostree install`
+- on atomic systems installing packages to system is not recommended, but you can. just use `rpm-ostree install`
 - after using `rpm-ostree` you should run `sudo ostree admin finalize-staged` to apply changes
 - this is required because the shutdown process is currently broken and may cause the system to freeze or crash
 
