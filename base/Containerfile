@@ -61,7 +61,7 @@ RUN systemctl enable \
     tqftpserv.service \
     rmtfs.service
 
-# clenup
+# cleanup
 RUN rm -rf /var/log/* && dnf clean all
 
 RUN bootc container lint

@@ -36,7 +36,7 @@ RUN dnf -y install \
 
 RUN systemctl enable gdm.service
 
-# clenup
+# cleanup
 RUN rm -rf /var/log/* && dnf clean all
 
 RUN bootc container lint
