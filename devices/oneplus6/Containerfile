@@ -29,7 +29,9 @@ RUN dnf -y install \
     pipewire \
     pipewire-alsa \
     pipewire-pulseaudio \
-    alsa-ucm-mobility-sdm845
+    alsa-ucm-mobility-sdm845 \
+    q6voiced
+RUN systemctl enable q6voiced.service
 
 # usb network
 RUN dnf -y install \
