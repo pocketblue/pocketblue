@@ -16,6 +16,7 @@ ExecStart=modprobe wcd934x
 ExecStart=modprobe soundwire-qcom
 ExecStart=modprobe slim-qcom-ngd-ctrl
 ExecStart=modprobe snd-soc-tfa98xx
+ExecStart=modprobe q6voice
 
 # Make sure ADSP remoteproc has started.
 ExecStart=bash -c 'for f in /sys/class/remoteproc/remoteproc*; do if [[ "$(cat $f/name)" == "adsp" ]]; then echo start > $f/state; fi; done'
