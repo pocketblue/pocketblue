@@ -68,7 +68,7 @@ jobs:
       expires_after: ${{ inputs.expires_after }}
       rechunk: true
 
-  # a temporory hack because plasma-mobile image doesn't build for mipad6
+  # a temporary hack because plasma-mobile image doesn't build for mipad6
   desktops-mipad6:
     needs: devices
     permissions:
