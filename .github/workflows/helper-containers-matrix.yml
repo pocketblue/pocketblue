@@ -55,29 +55,8 @@ jobs:
     secrets: inherit
     strategy:
       matrix:
-        device: [ mipad5, oneplus6 ]
+        device: [ mipad5, mipad6, oneplus6 ]
         desktop: [ gnome-mobile, gnome-desktop, phosh, plasma-desktop, plasma-mobile ]
-    uses: ./.github/workflows/helper-build-container.yml
-    with:
-      push_tag: ${{ inputs.pocketblue_tag }}
-      from_tag: ${{ inputs.pocketblue_tag }}
-      from_image: ${{ vars.REGISTRY }}/${{ matrix.device }}-base
-      image: ${{ matrix.device }}-${{ matrix.desktop }}
-      containerfile: desktops/${{ matrix.desktop }}/Containerfile
-      latest: ${{ inputs.latest }}
-      expires_after: ${{ inputs.expires_after }}
-      rechunk: true
-
-  # a temporary hack because plasma-mobile image doesn't build for mipad6
-  desktops-mipad6:
-    needs: devices
-    permissions:
-      packages: write
-    secrets: inherit
-    strategy:
-      matrix:
-        device: [ mipad6 ]
-        desktop: [ gnome-mobile, gnome-desktop, phosh, plasma-desktop ]
     uses: ./.github/workflows/helper-build-container.yml
     with:
       push_tag: ${{ inputs.pocketblue_tag }}
