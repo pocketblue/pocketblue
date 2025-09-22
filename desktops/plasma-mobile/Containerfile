@@ -2,9 +2,6 @@ ARG from
 FROM $from
 
 RUN dnf -y install \
-    # TODO: remove coreutils-single from mipad6 kernel deps
-    # TODO: then remove --allowerasing
-    --allowerasing \
     @kde-mobile-environment \
     plasma-discover-rpm-ostree \
     NetworkManager-wifi \
