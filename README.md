@@ -20,6 +20,7 @@ This is a work-in-progress. During the installation process all data on your dev
 - [firefox mobile config packaged to flatpak](https://github.com/pocketblue/pocketblue.github.io)
 - [using toolbox](docs/toolbox.md)
 - [installing packages](docs/installing-packages.md)
+- [dualboot linux and android](https://github.com/pocketblue/dualboot/)
 
 ### Related projects
 
