@@ -71,7 +71,7 @@ jobs:
 
   devices:
     name: devices ${{ needs.config.outputs.tag }}
-    needs: base
+    needs: [ config, base ]
     permissions:
       packages: write
     secrets: inherit
