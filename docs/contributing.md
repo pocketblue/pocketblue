@@ -65,6 +65,9 @@ Finally, flash the system to your device:
 - flash boot.raw, esp.raw and root.raw using fastboot or U-Boot's mass storage mode
 - reboot and test Pocketblue!
 
+> [!CAUTION]
+> Before flashing, make sure the chosen partitions can be safely flashed without bricking the device
+
 ### Building using Github Actions in a forked repo
 
 1. create a classic github personal access token: https://github.com/settings/tokens/new?scopes=write:packages
