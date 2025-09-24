@@ -10,6 +10,15 @@ on:
           - mipad5
           - mipad6
           - oneplus6
+      fedora_branch:
+        type: choice
+        description: 'fedora branch'
+        required: true
+        options:
+          - '42'
+          - '43'
+          - 'rawhide'
+        default: '42'
 
 run-name: 'images: ${{ inputs.device }}'
 
@@ -24,3 +33,4 @@ jobs:
     with:
       device: ${{ inputs.device }}
       image_name: ${{ inputs.device }}-${{ matrix.desktop }}
+      image_tag: ${{ inputs.fedora_branch }}
