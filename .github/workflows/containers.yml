@@ -17,6 +17,8 @@ on:
       - 'devices/**'
       - 'desktops/**'
 
+run-name: "${{ github.event_name == 'workflow_dispatch' && format('containers: fedora {0}', inputs.fedora_branch) || ' ' }}"
+
 jobs:
   config:
     runs-on: ubuntu-24.04-arm
