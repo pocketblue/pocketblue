@@ -9,10 +9,6 @@ RUN dnf -y install \
     --exclude gnome-boxes \
     --exclude gnome-connections \
     --exclude gnome-text-editor \
-    --exclude yelp \
-    --exclude baobab \
-    --exclude evince \
-    --exclude evince-djvu \
     --exclude gnome-calculator \
     --exclude gnome-calendar \
     --exclude gnome-characters \
@@ -25,12 +21,19 @@ RUN dnf -y install \
     --exclude gnome-system-monitor \
     --exclude gnome-user-docs \
     --exclude gnome-weather \
-    --exclude totem \
-    --exclude loupe \
-    --exclude simple-scan \
-    --exclude snapshot \
     --exclude gnome-tour \
     --exclude malcontent-control \
+    --exclude simple-scan \
+    --exclude evince-djvu \
+    --exclude snapshot \
+    --exclude decibels \
+    --exclude showtime \
+    --exclude baobab \
+    --exclude evince \
+    --exclude papers \
+    --exclude totem \
+    --exclude loupe \
+    --exclude yelp \
     --exclude PackageKit \
     --exclude PackageKit-command-not-found
 
