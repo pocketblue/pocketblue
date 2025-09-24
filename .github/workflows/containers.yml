@@ -17,6 +17,8 @@ on:
       - 'devices/**'
       - 'desktops/**'
 
+run-name: "${{ github.event_name == 'workflow_dispatch' && format('containers: fedora {0}', inputs.fedora_branch) || ' ' }}"
+
 jobs:
   config:
     runs-on: ubuntu-24.04-arm
@@ -53,15 +55,36 @@ jobs:
       dev: ${{ steps.config.outputs.dev }}
       latest: ${{ steps.config.outputs.latest }}
 
-  containers:
-    name: containers ${{ needs.config.outputs.tag }}
+  base:
+    name: base ${{ needs.config.outputs.tag }}
     needs: config
     permissions:
       packages: write
     secrets: inherit
-    uses: ./.github/workflows/helper-containers-matrix.yml
+    uses: ./.github/workflows/helper-build-container.yml
     with:
+      image: base
+      push_tag: ${{ needs.config.outputs.tag }}
+      from_image: quay.io/fedora/fedora-bootc
+      from_tag: ${{ needs.config.outputs.branch }}
+      containerfile: base/Containerfile
+      latest: ${{ needs.config.outputs.latest == 'true' }}
+      expires_after: ${{ needs.config.outputs.dev == 'true' && '1w' || '' }}
+
+  devices:
+    name: devices ${{ needs.config.outputs.tag }}
+    needs: [ config, base ]
+    permissions:
+      packages: write
+    secrets: inherit
+    strategy:
+      fail-fast: false
+      matrix:
+        device: [ mipad5, mipad6, oneplus6 ]
+    uses: ./.github/workflows/helper-build-device.yml
+    with:
+      device: ${{ matrix.device }}
       fedora_branch: ${{ needs.config.outputs.branch }}
       pocketblue_tag: ${{ needs.config.outputs.tag }}
       latest: ${{ needs.config.outputs.latest == 'true' }}
-      expires_after: ${{ needs.config.outputs.dev == 'true' && '3w' || '' }}
+      expires_after: ${{ needs.config.outputs.dev == 'true' && '1w' || '' }}

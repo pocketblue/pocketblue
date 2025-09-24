@@ -1,6 +1,9 @@
 on:
   workflow_call:
     inputs:
+      device:
+        required: true
+        type: string
       fedora_branch:
         required: true
         type: string
@@ -16,53 +19,36 @@ on:
         type: string
 
 jobs:
-  base:
+  device-base:
+    name: '${{ inputs.device }}: base'
     permissions:
       packages: write
     secrets: inherit
-    uses: ./.github/workflows/helper-build-container.yml
-    with:
-      push_tag: ${{ inputs.pocketblue_tag }}
-      from_tag: ${{ inputs.fedora_branch }}
-      from_image: quay.io/fedora/fedora-bootc
-      image: base
-      containerfile: base/Containerfile
-      latest: ${{ inputs.latest }}
-      expires_after: ${{ inputs.expires_after }}
-
-  devices:
-    needs: base
-    permissions:
-      packages: write
-    secrets: inherit
-    strategy:
-      matrix:
-        device: [ mipad5, mipad6, oneplus6 ]
     uses: ./.github/workflows/helper-build-container.yml
     with:
       push_tag: ${{ inputs.pocketblue_tag }}
       from_tag: ${{ inputs.pocketblue_tag }}
       from_image: ${{ vars.REGISTRY }}/base
-      image: ${{ matrix.device }}-base
-      containerfile: devices/${{ matrix.device }}/Containerfile
+      image: ${{ inputs.device }}-base
+      containerfile: devices/${{ inputs.device }}/Containerfile
       latest: ${{ inputs.latest }}
       expires_after: ${{ inputs.expires_after }}
 
   desktops:
-    needs: devices
+    name: '${{ inputs.device }}: desktops'
+    needs: device-base
     permissions:
       packages: write
     secrets: inherit
     strategy:
       matrix:
-        device: [ mipad5, mipad6, oneplus6 ]
         desktop: [ gnome-mobile, gnome-desktop, phosh, plasma-desktop, plasma-mobile ]
     uses: ./.github/workflows/helper-build-container.yml
     with:
       push_tag: ${{ inputs.pocketblue_tag }}
       from_tag: ${{ inputs.pocketblue_tag }}
-      from_image: ${{ vars.REGISTRY }}/${{ matrix.device }}-base
-      image: ${{ matrix.device }}-${{ matrix.desktop }}
+      from_image: ${{ vars.REGISTRY }}/${{ inputs.device }}-base
+      image: ${{ inputs.device }}-${{ matrix.desktop }}
       containerfile: desktops/${{ matrix.desktop }}/Containerfile
       latest: ${{ inputs.latest }}
       expires_after: ${{ inputs.expires_after }}
