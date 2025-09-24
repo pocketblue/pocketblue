@@ -1,5 +1,19 @@
 # Contributing
 
+Thanks for taking the time to help our project out! Here you will find information
+that will help you contribute to Pocketblue
+
+## Table of Contents
+
+- [Table of Contents](#table-of-contents)
+- [Technical details](#technical-details)
+  - [Build process](#build-process)
+  - [Repository layout](#repository-layout)
+- [Contribution guide](#contribution-guide)
+  - [Adding a new device](#adding-a-new-device)
+  - [Building using Github Actions in a forked repo](#building-using-github-actions-in-a-forked-repo)
+  - [Testing your changes on a device running Pocketblue](#testing-your-changes-on-a-device-running-pocketblue)
+
 ## Technical details
 
 ### Build process
