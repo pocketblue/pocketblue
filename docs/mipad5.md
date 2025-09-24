@@ -30,6 +30,7 @@
 ### Known bugs
 
 - shutdown process is broken
+- sound is cracking sometimes, it can be fixed after rebooting device, or by using headphones
 - fell free to open issue and report any other bugs you find
 
 ### Uninstall fedora and get stock rom back
