@@ -14,10 +14,7 @@
 
 - default username: `user`
 - default password: `123456`
-- to upgrade the system use `bootc upgrade` or `rpm-ostree upgrade`
-- after that you should run `sudo ostree admin finalize-staged` to apply the ugrade
-- this is required because the shutdown process is currently broken and may cause the system to freeze or crash
-- all charging bugs are fixed now, enjoy working charging
+- [how to upgrade system and install packages](installing-packages.md)
 
 ### Rebasing to other desktops
 
