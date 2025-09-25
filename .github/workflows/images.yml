@@ -20,7 +20,7 @@ on:
           - 'rawhide'
         default: '42'
 
-run-name: 'images: ${{ inputs.device }}'
+run-name: 'images: ${{ inputs.device }} / fedora ${{ inputs.fedora_branch }}'
 
 jobs:
   images:
