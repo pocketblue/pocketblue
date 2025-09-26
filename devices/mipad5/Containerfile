@@ -23,7 +23,10 @@ RUN dnf -y install \
     rmtfs \
     qrtr
 
-RUN systemctl enable qbootctl.service
+RUN systemctl enable \
+    tqftpserv.service \
+    rmtfs.service \
+    qbootctl.service
 
 # cleanup
 RUN rm -rf /var/log/* && dnf clean all

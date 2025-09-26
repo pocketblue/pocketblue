@@ -49,10 +49,6 @@ RUN dnf -y install \
     default-fonts-other-sans \
     default-fonts-other-serif
 
-RUN systemctl enable \
-    tqftpserv.service \
-    rmtfs.service
-
 # cleanup
 RUN rm -rf /var/log/* && dnf clean all
 

@@ -27,6 +27,10 @@ RUN dnf -y install \
     qbootctl \
     bootmac
 
+RUN systemctl enable \
+    tqftpserv.service \
+    rmtfs.service
+
 # audio
 RUN dnf -y install \
     alsa-utils \
@@ -35,6 +39,7 @@ RUN dnf -y install \
     pipewire-pulseaudio \
     alsa-ucm-mobility-sdm845 \
     q6voiced
+
 RUN systemctl enable q6voiced.service
 
 # usb network
