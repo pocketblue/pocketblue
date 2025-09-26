@@ -23,7 +23,7 @@ adb shell sgdisk --resize-table 64 /dev/block/sda
 # validating that sda31 partition is userdata
 adb shell parted /dev/block/sda print | grep userdata | grep -qE '^31'
 
-# patitioning
+# partitioning
 adb shell "if [ -e /dev/block/sda31 ]; then sgdisk --delete=31 /dev/block/sda; fi"
 adb shell "if [ -e /dev/block/sda32 ]; then sgdisk --delete=32 /dev/block/sda; fi"
 adb shell "if [ -e /dev/block/sda33 ]; then sgdisk --delete=33 /dev/block/sda; fi"
