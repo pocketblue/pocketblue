@@ -29,13 +29,6 @@ RUN dnf -y install \
     btrfs-progs \
     fuse
 
-# qualcomm
-RUN dnf -y install \
-    tqftpserv \
-    pd-mapper \
-    rmtfs \
-    qrtr
-
 # utils
 RUN dnf -y install \
     NetworkManager-tui \

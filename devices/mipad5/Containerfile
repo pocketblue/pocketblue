@@ -17,7 +17,11 @@ RUN mkdir -p /boot/dtb && \
 RUN dnf -y install \
     xiaomi-nabu-firmware \
     xiaomi-nabu-audio \
-    qbootctl
+    qbootctl \
+    tqftpserv \
+    pd-mapper \
+    rmtfs \
+    qrtr
 
 RUN systemctl enable qbootctl.service
 

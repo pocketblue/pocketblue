@@ -20,6 +20,10 @@ RUN dnf -y install \
     libssc \
     hexagonrpc \
     pil-squasher \
+    tqftpserv \
+    pd-mapper \
+    rmtfs \
+    qrtr \
     qbootctl \
     bootmac
 
