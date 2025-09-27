@@ -8,6 +8,7 @@ COPY usr/ /usr/
 RUN mkdir /boot/dtb && \
     dnf -y remove kernel && \
     dnf -y install kernel kernel-modules-extra && \
+    cp /usr/lib/modules/6.15.0-0.rc2.15.sdm845.fc42.aarch64/dtb/qcom/sdm845-oneplus-fajita.dtb /usr/lib/modules/6.15.0-0.rc2.15.sdm845.fc42.aarch64/devicetree && \
     rm -rf /boot/dtb
 
 # firmware
