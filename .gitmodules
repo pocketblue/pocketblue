@@ -1,3 +1,0 @@
-[submodule "devices/oneplus6/fwload/firmware-oneplus-sdm845"]
-	path = devices/oneplus6/fwload/firmware-oneplus-sdm845
-	url = https://gitlab.com/sdm845-mainline/firmware-oneplus-sdm845

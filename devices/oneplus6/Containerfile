@@ -50,13 +50,7 @@ RUN systemctl enable \
     hexagonrpcd-sdsp.service \
     msm-modem-uim-selection.service
 
-# firmware
 COPY fwload/usr/ /usr/
-COPY fwload/firmware-oneplus-sdm845/usr /usr/
-COPY fwload/firmware-oneplus-sdm845/lib /usr/lib/
-RUN mkdir -p /usr/lib/firmware/updates && \
-    mv /usr/lib/firmware/postmarketos/* /usr/lib/firmware/updates && \
-    rmdir /usr/lib/firmware/postmarketos
 
 COPY usbnet/etc/ /etc/
 COPY usbnet/usr/ /usr/
