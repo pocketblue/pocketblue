@@ -21,7 +21,7 @@ RUN dnf -y install \
     bootmac
 
 RUN kver=$(rpm -q --qf '%{VERSION}-%{RELEASE}' kernel) && \
-    dracut -vf --kver $kver -o /usr/lib/modules/$kver/initramfs.img
+    dracut -vf --kver $kver /usr/lib/modules/$kver/initramfs.img
 
 RUN systemctl enable qbootctl.service bootmac-bluetooth
 
