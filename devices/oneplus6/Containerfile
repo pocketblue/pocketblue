@@ -42,6 +42,10 @@ RUN dnf -y install \
 
 RUN systemctl enable q6voiced.service
 
+RUN systemctl mask \
+    alsa-state.service \
+    alsa-restore.service
+
 # usb network
 RUN dnf -y install \
     dnsmasq
