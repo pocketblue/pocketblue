@@ -20,7 +20,10 @@ RUN dnf -y install \
     pipa-sound-conf \
     bootmac
 
-RUN systemctl enable qbootctl.service
+RUN kver=$(rpm -q --qf '%{VERSION}-%{RELEASE}' kernel) && \
+    dracut -vf --kver $kver -o /usr/lib/modules/$kver/initramfs.img
+
+RUN systemctl enable qbootctl.service bootmac-bluetooth
 
 # cleanup
 RUN rm -rf /var/log/* && dnf clean all
