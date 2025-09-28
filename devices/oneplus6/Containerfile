@@ -10,9 +10,8 @@ RUN mkdir /boot/dtb && \
     dnf -y install kernel kernel-modules-extra && \
     rm -rf /boot/dtb
 
-RUN mkdir -p /usr/lib/efi/onetwothree/1.2.3.0/EFI && \
-    echo 123 > /usr/lib/efi/onetwothree/1.2.3.0/EFI/123 && \
-    bootupctl backend generate-update-metadata -vvv
+COPY bootupd-dtb /usr/local/bin/bootupd-dtb
+RUN bootupd-dtb && rm /usr/local/bin/bootupd-dtb
 
 # firmware
 RUN dnf -y install \

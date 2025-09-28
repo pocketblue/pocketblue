@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+set -uexo pipefail
+
+### Undo generate-update-metadata
+
+updates=/usr/lib/bootupd/updates
+rm -fv ${updates}/{BIOS,EFI}.json
+cp -r ${updates}/EFI /usr/lib/ostree-boot/efi
+# prepare /usr/lib/efi/<grub2|shim>/<ver>
+if [ ! -d "/usr/lib/efi" ]; then
+    grub_ver=$(rpm -qa grub2-efi-aa64 --queryformat '%{VERSION}-%{RELEASE}')
+    mkdir -p /usr/lib/efi/grub2/${grub_ver}/EFI/fedora
+    mv ${updates}/EFI/fedora/grubaa64.efi /usr/lib/efi/grub2/${grub_ver}/EFI/fedora/
+    shim_ver=$(rpm -qa shim-aa64 --queryformat '%{VERSION}-%{RELEASE}')
+    mkdir -p /usr/lib/efi/shim/${shim_ver}/EFI
+    mv ${updates}/EFI /usr/lib/efi/shim/${shim_ver}/
+else
+	rm -rf ${updates}/EFI
+fi
+
+### install dtbs as an update
+
+kernel_version=$(rpm -qa kernel --queryformat '%{VERSION}-%{RELEASE}')
+mkdir -p /usr/lib/efi/dtb/${kernel_version}/EFI
+cp -r /usr/lib/modules/${kernel_version}.aarch64/dtb /usr/lib/efi/dtb/${kernel_version}/EFI/
+
+bootupctl backend generate-update-metadata -vvv
