@@ -21,7 +21,7 @@ fastboot reboot
 echo 'waiting for device appear in adb'
 adb wait-for-recovery
 adb shell "getprop ro.product.device | grep nabu"
-adb shell twrp unmount /data
+adb shell "until twrp unmount /data ; do sleep 1; done"
 adb push images/sgdisk /bin/sgdisk
 adb push images/parted /bin/parted
 adb shell sgdisk --resize-table 64 /dev/block/sda
