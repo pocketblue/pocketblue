@@ -34,11 +34,16 @@ Flashable disk images are built using bootc-image-builder by the images.yml work
 
 - `base/` - base image recipe and files
 - `devices/<device-name>/` - device images
-  - `devices/<device-name>/device.conf` - currently only contains one parameter - ESP size in bytes used when building disk images
+  - `devices/<device-name>/device.conf` - various device configuration options, see [device.conf](#device-conf)
 - `desktops/<desktop-name>/` - desktop images
 - `scripts/` - various scripts for building and flashing disk images
 - `docs/` - documentation
 - `config.toml` - bootc-image-builder config
+
+#### device.conf
+
+- `esp_size` - ESP size in bytes
+- `install_dtb` - boolean, whether to install device trees to ESP
 
 ## Contribution guide
 
