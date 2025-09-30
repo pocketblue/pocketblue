@@ -5,6 +5,28 @@ on:
   workflow_dispatch: {}
 
 jobs:
+  create_release:
+    name: create release
+    runs-on: ubuntu-latest
+    outputs:
+      release_id: ${{ steps.create_release.outputs.id }}
+    steps:
+      - name: get_tag
+        id: get_tag
+        run: |
+          podman pull quay.io/pocketblue/base:42
+          export full_tag=$(podman inspect quay.io/pocketblue/base:42 --format '{{ index .Config.Labels "org.opencontainers.image.version" }}')
+          echo release_tag=$(echo $full_tag | cut -d. -f1-2) >> $GITHUB_OUTPUT
+      - uses: softprops/action-gh-release@v2
+        id: create_release
+        with:
+          tag_name: ${{ steps.get_tag.outputs.release_tag }}
+          draft: true
+          body: |
+            recommended image for mipad5: [gnome-desktop](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.get_tag.outputs.release_tag }}/pocketblue-mipad5-gnome-desktop-42.7z)
+            recommended image for mipad6: [gnome-desktop](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.get_tag.outputs.release_tag }}/pocketblue-mipad6-gnome-desktop-42.7z)
+            recommended image for oneplus6: [gnome-mobile](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.get_tag.outputs.release_tag }}/pocketblue-oneplus6-gnome-mobile-42.7z)
+
   images_build:
     name: building ${{ matrix.device.name }}-${{ matrix.desktop }}
     strategy:
@@ -22,20 +44,23 @@ jobs:
       image_name: ${{ matrix.device.name }}-${{ matrix.desktop }}
       args_7z: -mmt=1 -md=1500m
 
-  publish_release:
-    name: publish release
-    needs: images_build
+  upload_images:
+    name: upload images
+    needs: 
+      - create_release
+      - images_build
     runs-on: ubuntu-latest
+    strategy: 
+      fail-fast: false
+      matrix:
+        device:
+          - name: mipad5
+          - name: mipad6
+          - name: oneplus6
     steps:
-      - name: get_tag
-        id: get_tag
-        run: |
-          podman pull quay.io/pocketblue/base:42
-          export full_tag=$(podman inspect quay.io/pocketblue/base:42 --format '{{ index .Config.Labels "org.opencontainers.image.version" }}')
-          echo release_tag=$(echo $full_tag | cut -d. -f1-2) >> $GITHUB_OUTPUT
       - uses: actions/download-artifact@v4
         with:
-          pattern: pocketblue-*
+          pattern: pocketblue-${{ matrix.device.name }}-*
           merge-multiple: true
           path: dist
       - name: check sizes
@@ -44,10 +69,7 @@ jobs:
           du dist/*
       - uses: svenstaro/upload-release-action@v2
         with:
-          tag: ${{ steps.get_tag.outputs.release_tag }}
+          release_id: ${{ needs.create_release.outputs.release_id}}
           file: dist/pocketblue-*.7z
           file_glob: true
           overwrite: true
-          body: |
-            recommended image for mipad5: [gnome-desktop](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.get_tag.outputs.release_tag }}/pocketblue-mipad5-gnome-desktop-42.7z)
-            recommended image for oneplus6: [gnome-mobile](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.get_tag.outputs.release_tag }}/pocketblue-oneplus6-gnome-mobile-42.7z)
