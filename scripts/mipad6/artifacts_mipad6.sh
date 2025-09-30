@@ -12,4 +12,4 @@ python avb/avbtool.py make_vbmeta_image --flags 2 --padding_size 4096 --output i
 
 install -Dm 0755 scripts/mipad6/flash_mipad6.sh flash_mipad6.sh
 
-7z a -mx=9 $ARGS_7Z "pocketblue-$IMAGE_NAME-$IMAGE_TAG.7z" images
+7z a -mx=9 $ARGS_7Z "pocketblue-$IMAGE_NAME-$IMAGE_TAG.7z" flash_mipad6.* images
