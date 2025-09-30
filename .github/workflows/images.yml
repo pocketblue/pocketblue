@@ -24,3 +24,4 @@ jobs:
     with:
       device: ${{ inputs.device }}
       image_name: ${{ inputs.device }}-${{ matrix.desktop }}
+      image_tag: rawhide-op6-audio
