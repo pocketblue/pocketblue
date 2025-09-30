@@ -52,6 +52,7 @@ RUN dnf -y install \
 
 # other
 RUN dnf -y install \
+    ath10k-shutdown \
     mobility-tweaks \
     buffyboard
 
