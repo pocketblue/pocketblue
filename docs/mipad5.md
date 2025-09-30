@@ -37,9 +37,9 @@
 
 - download `MIUI 14.0.8.0.TKXMIXM` archive [from here](https://miuirom.org/tablets/xiaomi-pad-5)
 - unarchive it
+- [opnional] delete extra partitions: `fastboot flash partition:0 images/gpt_both0.bin`
 - run `bash flash_all.sh`
 - reboot and enjoy stock rom
-- no need for repartitioning or any other actions
 
 ### Files used by the installation script, license info, source links
 
