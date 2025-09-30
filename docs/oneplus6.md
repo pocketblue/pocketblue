@@ -45,9 +45,9 @@
 
 ### Files used by the installation script, license info, source links
 
-- `root.raw` - root partition for fedora, built by `.github/workflows/images-oneplus6.yml`
-- `boot.raw` - /boot partition, built by `.github/workflows/images-oneplus6.yml`
-- `efi.raw` - /boot/efi partition, built by `.github/workflows/images-oneplus6.yml`
+- `root.raw` - root partition for fedora, built by `.github/workflows/images.yml`
+- `boot.raw` - /boot partition, built by `.github/workflows/images.yml`
+- `efi.raw` - /boot/efi partition, built by `.github/workflows/images.yml`
 - `uboot-enchilada.img` - oneplus6 u-boot image, gpl2 license, [source](https://github.com/fedora-remix-mobility/u-boot)
 - `uboot-fajita.img` - oneplus6t u-boot image, gpl2 license, [source](https://github.com/fedora-remix-mobility/u-boot)
 

@@ -43,9 +43,9 @@
 
 ### Files used by the installation script, license info, source links
 
-- `root.raw` - root partition for fedora, built by `.github/workflows/images-mipad5.yml`
-- `boot.raw` - /boot partition, built by `.github/workflows/images-mipad5.yml`
-- `efi.raw` - /boot/efi partition, built by `.github/workflows/images-mipad5.yml`
+- `root.raw` - root partition for fedora, built by `.github/workflows/images.yml`
+- `boot.raw` - /boot partition, built by `.github/workflows/images.yml`
+- `efi.raw` - /boot/efi partition, built by `.github/workflows/images.yml`
 - `uboot.img` - u-boot image, gpl2 license, [source](https://gitlab.com/sm8150-mainline/u-boot/-/jobs?kind=BUILD)
 - `twrp.img` - recovery, gpl3 license, [source](https://github.com/ArKT-7/twrp_device_xiaomi_nabu)
 - `dtbo.img` - device tree blob overlay image from lineage os, gpl2 or bsd‑2‑clause license, [source](https://github.com/ArKT-7/automated-nabu-lineage-installer)
