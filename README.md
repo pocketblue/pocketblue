@@ -17,6 +17,7 @@ This is a work-in-progress. During the installation process all data on your dev
 
 - [install on oneplus6 / oneplus6t](docs/oneplus6.md)
 - [install on mipad5](docs/mipad5.md)
+- [install on mipad6](docs/mipad6.md)
 - [technical details and contribution guide](docs/contributing.md)
 - [firefox mobile config packaged to flatpak](https://github.com/pocketblue/pocketblue.github.io)
 - [using toolbox](docs/toolbox.md)
