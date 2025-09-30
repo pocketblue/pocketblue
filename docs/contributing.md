@@ -9,6 +9,7 @@ that will help you contribute to Pocketblue
 - [Technical details](#technical-details)
   - [Build process](#build-process)
   - [Repository layout](#repository-layout)
+    - [device.conf](#deviceconf)
 - [Contribution guide](#contribution-guide)
   - [Adding a new device](#adding-a-new-device)
   - [Building using Github Actions in a forked repo](#building-using-github-actions-in-a-forked-repo)
@@ -34,11 +35,16 @@ Flashable disk images are built using bootc-image-builder by the images.yml work
 
 - `base/` - base image recipe and files
 - `devices/<device-name>/` - device images
-  - `devices/<device-name>/device.conf` - currently only contains one parameter - ESP size in bytes used when building disk images
+  - `devices/<device-name>/device.conf` - various device configuration options, see [device.conf](#deviceconf)
 - `desktops/<desktop-name>/` - desktop images
 - `scripts/` - various scripts for building and flashing disk images
 - `docs/` - documentation
 - `config.toml` - bootc-image-builder config
+
+#### device.conf
+
+- `esp_size` - ESP size in bytes
+- `install_dtb` - boolean, whether to install device trees to ESP
 
 ## Contribution guide
 
