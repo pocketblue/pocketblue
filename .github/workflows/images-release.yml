@@ -12,6 +12,7 @@ jobs:
       matrix:
         device:
           - name: mipad5
+          - name: mipad6
           - name: oneplus6
         desktop: [gnome-desktop, gnome-mobile, phosh, plasma-desktop, plasma-mobile]
 
