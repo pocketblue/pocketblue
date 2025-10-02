@@ -32,8 +32,7 @@ RUN dnf -y install \
 # utils
 RUN dnf -y install \
     NetworkManager-tui \
-    git \
-    vim
+    git
 
 # default fonts
 RUN dnf -y install \
