@@ -25,11 +25,9 @@
 - `sudo bootc switch quay.io/pocketblue/mipad5-plasma-desktop:42`
 - `sudo bootc switch quay.io/pocketblue/mipad5-plasma-mobile:42`
 - `sudo bootc switch quay.io/pocketblue/mipad5-phosh:42`
-- after rebasing you should run `sudo ostree admin finalize-staged`
 
 ### Known bugs
 
-- shutdown process is broken
 - sound is cracking sometimes, it can be fixed after rebooting device, or by using headphones
 - fell free to open issue and report any other bugs you find
 

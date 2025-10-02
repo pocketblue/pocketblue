@@ -49,7 +49,6 @@
 
 ### Enabled copr repositories
 
-- [@mobility/common](https://copr.fedorainfracloud.org/coprs/g/mobility/common) - [source](https://github.com/fedora-remix-mobility/packages), not required for mipad6, but required for other devices
 - [onesaladleaf/pocketblue](https://copr.fedorainfracloud.org/coprs/onesaladleaf/pocketblue) - [source](https://github.com/pocketblue/packages)
 - [tx0su/pipa-support](https://copr.fedorainfracloud.org/coprs/tx0su/pipa-support) - [source](https://github.com/timoxa0/pipa-fedora-support)
 - [@mobility/gnome-mobile](https://copr.fedorainfracloud.org/coprs/g/mobility/gnome-mobile) - only enabled in `quay.io/pocketblue/mipad6-gnome-mobile` image

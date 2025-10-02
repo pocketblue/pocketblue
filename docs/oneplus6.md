@@ -29,13 +29,11 @@
 - `sudo bootc switch quay.io/pocketblue/oneplus6-plasma-mobile:42`
 - `sudo bootc switch quay.io/pocketblue/oneplus6-plasma-desktop:42`
 - `sudo bootc switch quay.io/pocketblue/oneplus6-phosh:42`
-- after rebasing you should run `sudo ostree admin finalize-staged`
 
 ### Known bugs
 
 - no sound
 - toolobx and distrobox don't work due to a bug in linux 6.15
-- shutdown process is broken
 - feel free to open issue and report any other bugs you find
 
 ### Unbricking using python3-edl
@@ -53,7 +51,6 @@
 
 ### Enabled copr repositories
 
-- [@mobility/common](https://copr.fedorainfracloud.org/coprs/g/mobility/common) - [source](https://github.com/fedora-remix-mobility/packages)
 - [onesaladleaf/pocketblue](https://copr.fedorainfracloud.org/coprs/onesaladleaf/pocketblue) - [source](https://github.com/pocketblue/packages)
 - [onesaladleaf/sdm845](https://copr.fedorainfracloud.org/coprs/onesaladleaf/sdm845) - [forked from](https://copr.fedorainfracloud.org/coprs/g/mobility/sdm845), [source](https://github.com/fedora-remix-mobility/packages), [kernel source](https://github.com/fedora-remix-mobility/sdm845-kernel)
 - [@mobility/gnome-mobile](https://copr.fedorainfracloud.org/coprs/g/mobility/gnome-mobile) - only enabled in the `quay.io/pocketblue/oneplus6-gnome-mobile` image
