@@ -2,7 +2,6 @@ ARG from
 FROM $from
 
 COPY etc/ /etc/
-COPY usr/ /usr/
 
 # kernel
 RUN mkdir -p /boot/dtb && \
