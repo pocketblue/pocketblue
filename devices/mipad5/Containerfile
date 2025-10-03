@@ -17,9 +17,8 @@ RUN dnf -y install \
     xiaomi-nabu-firmware \
     xiaomi-nabu-audio \
     ath10k-shutdown \
-    qbootctl \
     tqftpserv \
-    pd-mapper \
+    qbootctl \
     rmtfs \
     qrtr
 
