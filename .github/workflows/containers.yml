@@ -80,7 +80,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        device: [ mipad5, mipad6, oneplus6 ]
+        device: [ xiaomi-nabu, xiaomi-pipa, oneplus-sdm845 ]
     uses: ./.github/workflows/helper-build-device.yml
     with:
       device: ${{ matrix.device }}
