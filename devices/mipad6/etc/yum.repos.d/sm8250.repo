@@ -1,0 +1,11 @@
+[sm8250]
+name=Xiaomi Pad 6 - Support Repo
+baseurl=https://download.copr.fedorainfracloud.org/results/pocketblue/sm8250/fedora-$releasever-$basearch/
+type=rpm-md
+skip_if_unavailable=True
+gpgcheck=1
+gpgkey=https://download.copr.fedorainfracloud.org/results/pocketblue/sm8250/pubkey.gpg
+repo_gpgcheck=0
+enabled=1
+enabled_metadata=1
+priority=90
