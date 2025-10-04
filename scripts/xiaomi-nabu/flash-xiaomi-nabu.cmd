@@ -6,7 +6,7 @@ where fastboot || (pause & exit)
 
 echo 'waiting for device appear in fastboot'
 fastboot getvar product 2>&1 | findstr /i nabu || (pause & exit)
-fastboot flash vbmeta_ab images/vbmeta_disabled.img || (pause & exit)
+fastboot flash vbmeta_ab images/vbmeta-disabled.img || (pause & exit)
 fastboot flash   dtbo_ab images/dtbo.img || (pause & exit)
 fastboot flash   boot_ab images/twrp.img || (pause & exit)
 fastboot reboot || (pause & exit)

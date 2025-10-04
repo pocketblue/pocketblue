@@ -9,7 +9,7 @@ echo 'waiting for device appear in fastboot'
 set -x
 
 fastboot getvar product 2>&1 | grep pipa
-fastboot flash vbmeta_ab images/vbmeta_disabled.img
+fastboot flash vbmeta_ab images/vbmeta-disabled.img
 fastboot erase   dtbo_ab
 fastboot flash   boot_ab images/kxboot.img
 fastboot flash      cust images/esp.raw
