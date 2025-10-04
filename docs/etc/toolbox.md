@@ -10,9 +10,9 @@
 - distrobox is a nice alternative for toolbox
 - can be installed with `rpm-ostee install distrobox`
 
-### currently broken on oneplus6
+### currently broken on oneplus 6 and oneplus 6t
 
-only work on mipad5, for oneplus6 pocketeblue currently provides 6.15 linux kernel which have a bug that makes toolbox and distrobox broken, so if you use oneplus6 please wait for us to update kernel
+for oneplus 6 and oneplus 6t pocketeblue currently provides 6.15 linux kernel which have a bug that makes toolbox and distrobox broken, so if you use oneplus6 please wait for us to update kernel
 
 ### fedora
 
