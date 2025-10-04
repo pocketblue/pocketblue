@@ -19,7 +19,7 @@ This is a work-in-progress. During the installation process all data on your dev
 - [install on xiaomi pad 6](docs/xiaomi-pipa.md)
 - [install on oneplus 6/6t](docs/oneplus-sdm845.md)
 - [technical details and contribution guide](docs/etc/contributing.md)
-- [installing packages](docs/installing-packages.md)
+- [installing packages](docs/etc/installing-packages.md)
 - [using toolbox](docs/etc/toolbox.md)
 - [firefox mobile config packaged to flatpak](https://github.com/pocketblue/pocketblue.github.io)
 - [dualboot linux and android](https://github.com/pocketblue/dualboot)
