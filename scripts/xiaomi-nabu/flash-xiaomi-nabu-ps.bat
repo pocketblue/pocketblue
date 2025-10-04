@@ -13,7 +13,7 @@ echo 'waiting for device appear in fastboot'
 $ErrorActionPreference = "Continue"
 if (-not (fastboot getvar product 2>&1 | Select-String nabu)) { throw 'wrong device' }
 $ErrorActionPreference = "Stop"
-fastboot flash vbmeta_ab images/vbmeta_disabled.img
+fastboot flash vbmeta_ab images/vbmeta-disabled.img
 fastboot flash   dtbo_ab images/dtbo.img
 fastboot flash   boot_ab images/twrp.img
 fastboot reboot
