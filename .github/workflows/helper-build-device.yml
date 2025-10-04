@@ -41,6 +41,7 @@ jobs:
       packages: write
     secrets: inherit
     strategy:
+      fail-fast: false
       matrix:
         desktop: [ gnome-mobile, gnome-desktop, phosh, plasma-desktop, plasma-mobile ]
     uses: ./.github/workflows/helper-build-container.yml
