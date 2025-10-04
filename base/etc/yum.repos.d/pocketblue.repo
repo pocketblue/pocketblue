@@ -1,10 +1,10 @@
-[copr:copr.fedorainfracloud.org:onesaladleaf:pocketblue]
-name=Copr repo for pocketblue owned by onesaladleaf
-baseurl=https://download.copr.fedorainfracloud.org/results/onesaladleaf/pocketblue/fedora-$releasever-$basearch/
+[copr:copr.fedorainfracloud.org:pocketblue:common]
+name=Copr repo for common owned by pocketblue
+baseurl=https://download.copr.fedorainfracloud.org/results/pocketblue/common/fedora-$releasever-$basearch/
 type=rpm-md
 skip_if_unavailable=True
 gpgcheck=1
-gpgkey=https://download.copr.fedorainfracloud.org/results/onesaladleaf/pocketblue/pubkey.gpg
+gpgkey=https://download.copr.fedorainfracloud.org/results/pocketblue/common/pubkey.gpg
 repo_gpgcheck=0
 enabled=1
 enabled_metadata=1
