@@ -69,8 +69,8 @@ jobs:
 
       - name: Login to registry
         env:
-          REGISTRY: ${{ vars.REGISTRY }}
-          USERNAME: ${{ vars.REGISTRY_USERNAME }}
+          REGISTRY: ${{ vars.REGISTRY != '' && vars.REGISTRY || format('ghcr.io/{0}', github.repository_owner) }}
+          USERNAME: ${{ vars.REGISTRY_USERNAME != '' && vars.REGISTRY_USERNAME || github.repository_owner }}
           PASSWORD: ${{ secrets.REGISTRY_TOKEN != '' && secrets.REGISTRY_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           sudo podman login --username $USERNAME --password $PASSWORD $REGISTRY
