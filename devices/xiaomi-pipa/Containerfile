@@ -10,7 +10,9 @@ RUN mkdir -p /boot/dtb && \
         kernel-core \
         kernel-modules \
         kernel-modules-core && \
-    dnf -y install kernel && \
+    dnf -y install \
+        kernel \
+        kernel-headers && \
     rm -r /boot/dtb
 
 RUN dnf -y install \
