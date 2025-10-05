@@ -42,6 +42,10 @@ jobs:
         shell: bash
         run: echo "context=$(dirname ${{ inputs.containerfile }})" >> $GITHUB_OUTPUT
 
+      - id: getregistry
+        shell: bash
+        run echo "registry=${{ vars.REGISTRY != '' && vars.REGISTRY || format('ghcr.io/{0}', github.repository_owner) }}" >> $GITHUB_OUTPUT
+
       - name: Build container
         id: build
         run: |
@@ -60,7 +64,7 @@ jobs:
         uses: hhd-dev/rechunk@ded27feba22df48134eece2c66ba0fca1289ff40 # v1.2.3
         with:
           rechunk: 'ghcr.io/hhd-dev/rechunk:v1.2.3'
-          prev-ref: ${{ vars.REGISTRY }}/${{ inputs.image }}:${{ inputs.push_tag }}
+          prev-ref: ${{ steps.config.getregistry.registry }}/${{ inputs.image }}:${{ inputs.push_tag }}
           ref: localhost/${{ inputs.image }}:${{ inputs.push_tag }}
           skip_compression: true
           version: ${{ inputs.push_tag }}.20<date>
@@ -69,7 +73,7 @@ jobs:
 
       - name: Login to registry
         env:
-          REGISTRY: ${{ vars.REGISTRY != '' && vars.REGISTRY || format('ghcr.io/{0}', github.repository_owner) }}
+          REGISTRY: ${{ steps.config.getregistry.registry }}
           USERNAME: ${{ vars.REGISTRY_USERNAME != '' && vars.REGISTRY_USERNAME || github.repository_owner }}
           PASSWORD: ${{ secrets.REGISTRY_TOKEN != '' && secrets.REGISTRY_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
@@ -77,7 +81,7 @@ jobs:
 
       - name: Push to registry
         env:
-          IMAGE: ${{ vars.REGISTRY }}/${{ inputs.image }}
+          IMAGE: ${{ steps.config.getregistry.registry }}/${{ inputs.image }}
           TAG: ${{ inputs.push_tag }}
         run: |
           set -uexo pipefail

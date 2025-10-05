@@ -19,6 +19,15 @@ on:
         type: string
 
 jobs:
+  config:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - id: config
+        run: |
+          registry_val="${{ vars.REGISTRY != '' && vars.REGISTRY || format('ghcr.io/{0}', github.repository_owner) }}"
+          echo "registry=$registry_val" >> "$GITHUB_OUTPUT"
+    outputs:
+      registry: ${{ steps.config.outputs.registry }}
   device-base:
     name: '${{ inputs.device }}: base'
     permissions:
@@ -28,7 +37,7 @@ jobs:
     with:
       push_tag: ${{ inputs.pocketblue_tag }}
       from_tag: ${{ inputs.pocketblue_tag }}
-      from_image: ${{ vars.REGISTRY }}/base
+      from_image: ${{ needs.config.outputs.registry }}/base
       image: ${{ inputs.device }}-base
       containerfile: devices/${{ inputs.device }}/Containerfile
       latest: ${{ inputs.latest }}
@@ -48,7 +57,7 @@ jobs:
     with:
       push_tag: ${{ inputs.pocketblue_tag }}
       from_tag: ${{ inputs.pocketblue_tag }}
-      from_image: ${{ vars.REGISTRY }}/${{ inputs.device }}-base
+      from_image: ${{ needs.config.outputs.registry }}/${{ inputs.device }}-base
       image: ${{ inputs.device }}-${{ matrix.desktop }}
       containerfile: desktops/${{ matrix.desktop }}/Containerfile
       latest: ${{ inputs.latest }}
