@@ -44,7 +44,7 @@ jobs:
 
       - id: getregistry
         shell: bash
-        run echo "registry=${{ vars.REGISTRY != '' && vars.REGISTRY || format('ghcr.io/{0}', github.repository_owner) }}" >> $GITHUB_OUTPUT
+        run: echo "registry=${{ vars.REGISTRY != '' && vars.REGISTRY || format('ghcr.io/{0}', github.repository_owner) }}" >> $GITHUB_OUTPUT
 
       - name: Build container
         id: build
