@@ -14,8 +14,8 @@ RUN mkdir -p /boot/dtb && \
     rm -r /boot/dtb
 
 RUN dnf -y install \
+    nothing-spacewar-firmware \
     alsa-ucm-conf-qcom-sc7280 \
-    xiaomi-nabu-audio \
     tqftpserv \
     qbootctl \
     rmtfs \

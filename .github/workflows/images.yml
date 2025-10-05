@@ -10,6 +10,7 @@ on:
           - xiaomi-nabu
           - xiaomi-pipa
           - oneplus-sdm845
+          - nothing-spacewar
       fedora_branch:
         type: choice
         description: 'fedora branch'
