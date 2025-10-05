@@ -15,7 +15,7 @@ RUN mkdir -p /boot/dtb && \
 
 RUN dnf -y install \
     xiaomi-nabu-firmware \
-    xiaomi-nabu-audio \
+    alsa-ucm-conf-sm8150 \
     ath10k-shutdown \
     tqftpserv \
     qbootctl \
