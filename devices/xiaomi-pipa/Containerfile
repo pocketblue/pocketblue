@@ -3,6 +3,8 @@ FROM $from
 
 COPY etc/ /etc/
 
+COPY var/ /var/
+
 # kernel
 RUN mkdir -p /boot/dtb && \
     dnf -y remove \
