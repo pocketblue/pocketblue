@@ -1,0 +1,32 @@
+ARG from
+FROM $from
+
+COPY etc/ /etc/
+
+# kernel
+RUN mkdir -p /boot/dtb && \
+    dnf -y remove \
+        kernel \
+        kernel-core \
+        kernel-modules \
+        kernel-modules-core && \
+    dnf -y install kernel && \
+    rm -r /boot/dtb
+
+RUN dnf -y install \
+    alsa-ucm-conf-qcom-sc7280 \
+    xiaomi-nabu-audio \
+    tqftpserv \
+    qbootctl \
+    rmtfs \
+    qrtr
+
+RUN systemctl enable \
+    tqftpserv.service \
+    qbootctl.service \
+    rmtfs.service
+
+# cleanup
+RUN rm -rf /var/log/* && dnf clean all
+
+RUN bootc container lint
