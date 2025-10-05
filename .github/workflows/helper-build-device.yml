@@ -28,7 +28,7 @@ jobs:
     with:
       push_tag: ${{ inputs.pocketblue_tag }}
       from_tag: ${{ inputs.pocketblue_tag }}
-      from_image: ${{ vars.REGISTRY }}/base
+      from_image: ${{ vars.REGISTRY != '' && vars.REGISTRY || format('ghcr.io/{0}', github.repository_owner) }}/base
       image: ${{ inputs.device }}-base
       containerfile: devices/${{ inputs.device }}/Containerfile
       latest: ${{ inputs.latest }}
@@ -48,7 +48,7 @@ jobs:
     with:
       push_tag: ${{ inputs.pocketblue_tag }}
       from_tag: ${{ inputs.pocketblue_tag }}
-      from_image: ${{ vars.REGISTRY }}/${{ inputs.device }}-base
+      from_image: ${{ vars.REGISTRY != '' && vars.REGISTRY || format('ghcr.io/{0}', github.repository_owner) }}/${{ inputs.device }}-base
       image: ${{ inputs.device }}-${{ matrix.desktop }}
       containerfile: desktops/${{ matrix.desktop }}/Containerfile
       latest: ${{ inputs.latest }}
