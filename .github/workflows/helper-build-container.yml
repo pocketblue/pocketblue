@@ -71,7 +71,7 @@ jobs:
         env:
           REGISTRY: ${{ vars.REGISTRY }}
           USERNAME: ${{ vars.REGISTRY_USERNAME }}
-          PASSWORD: ${{ secrets.REGISTRY_TOKEN }}
+          PASSWORD: ${{ secrets.REGISTRY_TOKEN != '' && secrets.REGISTRY_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           sudo podman login --username $USERNAME --password $PASSWORD $REGISTRY
 
