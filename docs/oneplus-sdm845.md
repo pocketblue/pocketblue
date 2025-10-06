@@ -32,7 +32,6 @@
 
 ### Known bugs
 
-- no sound
 - toolobx and distrobox don't work due to a bug in linux 6.15
 - feel free to open issue and report any other bugs you find
 
