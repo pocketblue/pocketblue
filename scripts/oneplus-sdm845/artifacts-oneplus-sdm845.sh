@@ -12,8 +12,6 @@ install -Dm 0755 scripts/oneplus-sdm845/flash-oneplus-sdm845.sh.in     flash-one
 install -Dm 0755 scripts/oneplus-sdm845/flash-oneplus-sdm845.sh.in     flash-oneplus6t-fajita.sh
 install -Dm 0755 scripts/oneplus-sdm845/flash-oneplus-sdm845.cmd.in    flash-oneplus6-enchilada.cmd
 install -Dm 0755 scripts/oneplus-sdm845/flash-oneplus-sdm845.cmd.in    flash-oneplus6t-fajita.cmd
-install -Dm 0755 scripts/oneplus-sdm845/flash-oneplus-sdm845-ps.bat.in flash-oneplus6-enchilada-ps.bat
-install -Dm 0755 scripts/oneplus-sdm845/flash-oneplus-sdm845-ps.bat.in flash-oneplus6t-fajita-ps.bat
 
 sed -i 's/@device@/enchilada/g' flash-oneplus6-enchilada.*
 sed -i 's/@device@/fajita/g'    flash-oneplus6t-fajita.*

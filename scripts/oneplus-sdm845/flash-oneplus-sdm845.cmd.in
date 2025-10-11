@@ -12,9 +12,9 @@ fastboot getvar product 2>&1 | findstr /i sdm845 || (pause & exit)
 fastboot erase dtbo_a || (pause & exit)
 fastboot erase dtbo_b || (pause & exit)
 fastboot flash boot     images/uboot-%device%.img --slot=all || (pause & exit)
-fastboot flash system_a images/boot.raw || (pause & exit)
-fastboot flash system_b images/esp.raw  || (pause & exit)
-fastboot flash userdata images/root.raw || (pause & exit)
+fastboot flash system_a images/fedora_boot.raw || (pause & exit)
+fastboot flash system_b images/fedora_esp.raw  || (pause & exit)
+fastboot flash userdata images/fedora_rootfs.raw || (pause & exit)
 
 echo 'done flashing, rebooting now'
 fastboot reboot

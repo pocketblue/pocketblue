@@ -1,14 +1,19 @@
-#!/usr/bin/env bash
+@(set "0=%~f0"^)#) & powershell -nop -c iex([io.file]::ReadAllText($env:0)) & exit /b
+$ErrorActionPreference = "Stop"
 
-set -uexo pipefail
+trap {
+  Write-Host $_.Exception.Message
+  Read-Host
+}
 
-which fastboot
+Get-Command fastboot
 
-set +x
 echo 'waiting for device appear in fastboot'
-set -x
 
-fastboot getvar product 2>&1 | grep pipa
+$ErrorActionPreference = "Continue"
+if (-not (fastboot getvar product 2>&1 | Select-String pipa)) { throw 'wrong device' }
+$ErrorActionPreference = "Stop"
+
 fastboot erase dtbo_ab
 fastboot flash vbmeta_ab images/vbmeta-disabled.img
 fastboot flash   boot_ab images/kxboot.img
@@ -16,8 +21,6 @@ fastboot flash      cust images/fedora_esp.raw
 fastboot flash     super images/fedora_boot.raw
 fastboot flash  userdata images/fedora_rootfs.raw
 
-set +x
 echo 'done flashing, rebooting device now'
-set -x
-
 fastboot reboot
+Read-Host
