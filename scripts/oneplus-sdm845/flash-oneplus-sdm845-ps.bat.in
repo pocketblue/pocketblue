@@ -19,9 +19,10 @@ $ErrorActionPreference = "Stop"
 fastboot erase dtbo_a
 fastboot erase dtbo_b
 fastboot flash boot     images/uboot-$device.img --slot=all
-fastboot flash system_a images/boot.raw
-fastboot flash system_b images/esp.raw
-fastboot flash userdata images/root.raw
+fastboot flash system_a images/fedor_boot.raw
+fastboot flash system_b images/fedora_esp.raw
+fastboot flash userdata images/fedora_rootfs.raw
 
-echo 'success'
+echo 'done flashing, rebooting now'
+fastboot reboot
 Read-Host
