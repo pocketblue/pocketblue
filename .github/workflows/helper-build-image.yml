@@ -40,7 +40,6 @@ jobs:
       uses: pocketblue/actions/partition-images@main
       with:
         config_file: ./config.toml
-        esp_size: ${{ steps.conf.outputs.esp_size }}
         rootfs: ${{ inputs.rootfs }}
         install_dtb: ${{ steps.conf.outputs.install_dtb }}
         registry: ${{ vars.REGISTRY }}
