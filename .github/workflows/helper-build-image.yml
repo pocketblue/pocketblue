@@ -53,7 +53,7 @@ jobs:
         IMAGE_TAG: ${{ inputs.image_tag }}
         ARGS_7Z: ${{ inputs.args_7z}}
       run: |
-        bash scripts/$DEVICE/artifacts-$DEVICE.sh
+        bash device/$DEVICE/scripts/artifacts.sh
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
