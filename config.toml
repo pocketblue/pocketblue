@@ -6,3 +6,6 @@ groups = ["wheel"]
 [[customizations.filesystem]]
 mountpoint = "/boot"
 size = 209715200
+
+[customizations.kernel]
+append = "ostree.prepare-root.composefs=0"
