@@ -2,20 +2,30 @@ name: images release
 permissions:
   contents: write
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      fedora_branch:
+        type: choice
+        description: fedora branch
+        required: true
+        options:
+          - '42'
+          - '43'
+          - 'rawhide'
+        default: '42'
 
 jobs:
   create_release:
+    runs-on: ubuntu-24.04-arm
     name: create release
-    runs-on: ubuntu-latest
     outputs:
       release_id: ${{ steps.create_release.outputs.id }}
     steps:
       - name: get_tag
         id: get_tag
         run: |
-          podman pull quay.io/pocketblue/base:42
-          export full_tag=$(podman inspect quay.io/pocketblue/base:42 --format '{{ index .Config.Labels "org.opencontainers.image.version" }}')
+          podman pull 'quay.io/pocketblue/base:${{ inputs.fedora_branch }}'
+          export full_tag=$(podman inspect 'quay.io/pocketblue/base:${{ inputs.fedora_branch }}' --format '{{ index .Config.Labels "org.opencontainers.image.version" }}')
           echo release_tag=$(echo $full_tag | cut -d. -f1-2) >> $GITHUB_OUTPUT
       - uses: softprops/action-gh-release@v2
         id: create_release
@@ -23,53 +33,38 @@ jobs:
           tag_name: ${{ steps.get_tag.outputs.release_tag }}
           draft: true
           body: |
-            recommended image for xiaomi pad 5: [gnome-desktop](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.get_tag.outputs.release_tag }}/pocketblue-xiaomi-nabu-gnome-desktop-42.7z)
-            recommended image for xiaomi pad 6: [gnome-desktop](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.get_tag.outputs.release_tag }}/pocketblue-xiaomi-pipa-gnome-desktop-42.7z)
-            recommended image for oneplus 6 and oneplus 6t: [gnome-mobile](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.get_tag.outputs.release_tag }}/pocketblue-oneplus-sdm845-gnome-mobile-42.7z)
+            recommended image for xiaomi pad 5: [gnome-desktop](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.get_tag.outputs.release_tag }}/pocketblue-xiaomi-nabu-gnome-desktop-${{ inputs.fedora_branch }}.7z)
+            recommended image for xiaomi pad 6: [gnome-desktop](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.get_tag.outputs.release_tag }}/pocketblue-xiaomi-pipa-gnome-desktop-${{ inputs.fedora_branch }}.7z)
+            recommended image for oneplus 6 and oneplus 6t: [gnome-mobile](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.get_tag.outputs.release_tag }}/pocketblue-oneplus-sdm845-gnome-mobile-${{ inputs.fedora_branch }}.7z)
 
   images_build:
-    name: building ${{ matrix.device.name }}-${{ matrix.desktop }}
+    needs: create_release
+    runs-on: ubuntu-24.04-arm
     strategy:
       fail-fast: false
       matrix:
-        device:
-          - name: xiaomi-nabu
-          - name: xiaomi-pipa
-          - name: oneplus-sdm845
-        desktop: [gnome-desktop, gnome-mobile, phosh, plasma-desktop, plasma-mobile]
-
-    uses: ./.github/workflows/helper-build-image.yml
-    with:
-      device: ${{ matrix.device.name }}
-      image_name: ${{ matrix.device.name }}-${{ matrix.desktop }}
-      args_7z: -mmt=1 -md=1500m
-
-  upload_images:
-    name: upload images
-    needs:
-      - create_release
-      - images_build
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        device:
-          - name: xiaomi-nabu
-          - name: xiaomi-pipa
-          - name: oneplus-sdm845
+        device: [xiaomi-nabu, xiaomi-pipa, oneplus-sdm845]
+        desktop: [gnome-desktop, gnome-mobile, plasma-desktop, plasma-mobile, phosh]
+    name: ${{ matrix.device }}-${{ matrix.desktop }}:${{ inputs.fedora_branch }}
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v4
+      - uses: pocketblue/actions/images@main
         with:
-          pattern: pocketblue-${{ matrix.device.name }}-*
-          merge-multiple: true
-          path: dist
-      - name: check sizes
+          device: ${{ matrix.device }}
+          registry: ${{ vars.REGISTRY }}
+          image_name: ${{ matrix.device }}-${{ matrix.desktop }}
+          image_tag: ${{ inputs.fedora_branch }}
+          args_7z: -mmt=1 -md=1500m
+      - name: check size
         run: |
-          du -h dist/*
-          du dist/*
+          du 'pocketblue-${{ matrix.device }}-${{ matrix.desktop }}-${{ inputs.fedora_branch }}.7z' -h
+          du 'pocketblue-${{ matrix.device }}-${{ matrix.desktop }}-${{ inputs.fedora_branch }}.7z'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pocketblue-${{ matrix.device }}-${{ matrix.desktop }}-${{ inputs.fedora_branch }}
+          path: pocketblue-${{ matrix.device }}-${{ matrix.desktop }}-${{ inputs.fedora_branch }}.7z
+          compression-level: 0
       - uses: svenstaro/upload-release-action@v2
         with:
           release_id: ${{ needs.create_release.outputs.release_id}}
-          file: dist/pocketblue-*.7z
-          file_glob: true
-          overwrite: true
+          file: pocketblue-${{ matrix.device }}-${{ matrix.desktop }}-${{ inputs.fedora_branch }}.7z
