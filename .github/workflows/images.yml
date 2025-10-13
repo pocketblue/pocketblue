@@ -1,4 +1,5 @@
 name: images
+run-name: 'images: ${{ inputs.device }} / fedora ${{ inputs.fedora_branch }}'
 on:
   workflow_dispatch:
     inputs:
@@ -13,25 +14,31 @@ on:
           - nothing-spacewar
       fedora_branch:
         type: choice
-        description: 'fedora branch'
+        description: fedora branch
         required: true
         options:
           - '42'
           - '43'
           - 'rawhide'
         default: '42'
-
-run-name: 'images: ${{ inputs.device }} / fedora ${{ inputs.fedora_branch }}'
-
 jobs:
   images:
-    name: 'images: ${{ inputs.device }}'
+    runs-on: ubuntu-24.04-arm
     strategy:
       fail-fast: false
       matrix:
-        desktop: [ gnome-desktop, gnome-mobile, phosh, plasma-desktop, plasma-mobile ]
-    uses: ./.github/workflows/helper-build-image.yml
-    with:
-      device: ${{ inputs.device }}
-      image_name: ${{ inputs.device }}-${{ matrix.desktop }}
-      image_tag: ${{ inputs.fedora_branch }}
+        desktop: [gnome-desktop, gnome-mobile, plasma-desktop, plasma-mobile, phosh]
+    name: ${{ inputs.device }}-${{ matrix.desktop }}:${{ inputs.fedora_branch }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pocketblue/actions/images@main
+        with:
+          device: ${{ inputs.device }}
+          registry: ${{ vars.REGISTRY }}
+          image_name: ${{ inputs.device }}-${{ matrix.desktop }}
+          image_tag: ${{ inputs.fedora_branch }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pocketblue-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.image_tag }}
+          path: pocketblue-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.image_tag }}.7z
+          compression-level: 0
