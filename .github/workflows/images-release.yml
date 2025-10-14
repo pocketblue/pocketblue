@@ -21,21 +21,21 @@ jobs:
     outputs:
       release_id: ${{ steps.create_release.outputs.id }}
     steps:
-      - name: get_tag
-        id: get_tag
+      - name: version
+        id: version
         run: |
           podman pull 'quay.io/pocketblue/base:${{ inputs.fedora_branch }}'
-          export full_tag=$(podman inspect 'quay.io/pocketblue/base:${{ inputs.fedora_branch }}' --format '{{ index .Config.Labels "org.opencontainers.image.version" }}')
-          echo release_tag=$(echo $full_tag | cut -d. -f1-2) >> $GITHUB_OUTPUT
+          export full_version=$(podman inspect 'quay.io/pocketblue/base:${{ inputs.fedora_branch }}' --format '{{ index .Config.Labels "org.opencontainers.image.version" }}')
+          echo version=$(echo $full_version | cut -d. -f1-2) >> $GITHUB_OUTPUT
       - uses: softprops/action-gh-release@v2
         id: create_release
         with:
-          tag_name: ${{ steps.get_tag.outputs.release_tag }}
+          tag_name: ${{ steps.version.outputs.version }}
           draft: true
           body: |
-            recommended image for xiaomi pad 5: [gnome-desktop](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.get_tag.outputs.release_tag }}/pocketblue-xiaomi-nabu-gnome-desktop-${{ inputs.fedora_branch }}.7z)
-            recommended image for xiaomi pad 6: [gnome-desktop](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.get_tag.outputs.release_tag }}/pocketblue-xiaomi-pipa-gnome-desktop-${{ inputs.fedora_branch }}.7z)
-            recommended image for oneplus 6 and oneplus 6t: [gnome-mobile](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.get_tag.outputs.release_tag }}/pocketblue-oneplus-sdm845-gnome-mobile-${{ inputs.fedora_branch }}.7z)
+            recommended image for xiaomi pad 5: [gnome-desktop](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-xiaomi-nabu-gnome-desktop-${{ inputs.fedora_branch }}.7z)
+            recommended image for xiaomi pad 6: [gnome-desktop](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-xiaomi-pipa-gnome-desktop-${{ inputs.fedora_branch }}.7z)
+            recommended image for oneplus 6 and oneplus 6t: [gnome-mobile](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-oneplus-sdm845-gnome-mobile-${{ inputs.fedora_branch }}.7z)
 
   images_build:
     needs: create_release
