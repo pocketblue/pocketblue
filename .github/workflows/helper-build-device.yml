@@ -4,53 +4,39 @@ on:
       device:
         required: true
         type: string
-      fedora_branch:
+      from_tag:
         required: true
         type: string
-      pocketblue_tag:
+      registry:
         required: true
-        type: string
-      latest:
-        required: false
-        type: boolean
-        default: false
-      expires_after:
-        required: false
         type: string
 
 jobs:
-  device-base:
-    name: '${{ inputs.device }}: base'
+  device:
     permissions:
       packages: write
     secrets: inherit
     uses: ./.github/workflows/helper-build-container.yml
     with:
-      push_tag: ${{ inputs.pocketblue_tag }}
-      from_tag: ${{ inputs.pocketblue_tag }}
-      from_image: ${{ vars.REGISTRY != '' && vars.REGISTRY || format('ghcr.io/{0}', github.repository_owner) }}/base
-      image: ${{ inputs.device }}-base
-      containerfile: devices/${{ inputs.device }}/Containerfile
-      latest: ${{ inputs.latest }}
-      expires_after: ${{ inputs.expires_after }}
+      from_tag: ${{ inputs.from_tag }}
+      from_image: ${{ inputs.registry }}/base
+      target_image: ${{ inputs.device }}-base
+      context: devices/${{ inputs.device }}
+      rechunk: false
 
   desktops:
-    name: '${{ inputs.device }}: desktops'
-    needs: device-base
+    needs: device
     permissions:
       packages: write
     secrets: inherit
     strategy:
       fail-fast: false
       matrix:
-        desktop: [ gnome-mobile, gnome-desktop, phosh, plasma-desktop, plasma-mobile ]
+        desktop: [gnome-desktop, gnome-mobile, plasma-desktop, plasma-mobile, phosh]
     uses: ./.github/workflows/helper-build-container.yml
     with:
-      push_tag: ${{ inputs.pocketblue_tag }}
-      from_tag: ${{ inputs.pocketblue_tag }}
-      from_image: ${{ vars.REGISTRY != '' && vars.REGISTRY || format('ghcr.io/{0}', github.repository_owner) }}/${{ inputs.device }}-base
-      image: ${{ inputs.device }}-${{ matrix.desktop }}
-      containerfile: desktops/${{ matrix.desktop }}/Containerfile
-      latest: ${{ inputs.latest }}
-      expires_after: ${{ inputs.expires_after }}
+      from_tag: ${{ inputs.from_tag }}
+      from_image: ${{ inputs.registry }}/${{ inputs.device }}-base
+      target_image: ${{ inputs.device }}-${{ matrix.desktop }}
+      context: desktops/${{ matrix.desktop }}
       rechunk: true

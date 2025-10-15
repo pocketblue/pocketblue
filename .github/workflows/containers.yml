@@ -17,74 +17,32 @@ on:
       - 'devices/**'
       - 'desktops/**'
 
-run-name: "${{ github.event_name == 'workflow_dispatch' && format('containers: fedora {0}', inputs.fedora_branch) || ' ' }}"
+run-name: "containers: fedora ${{ inputs.fedora_branch || 42 }} ${{ github.event_name == 'push' && format(' | {0}', github.event.head_commit.message) || '' }}"
 
 jobs:
-  config:
-    runs-on: ubuntu-24.04-arm
-    steps:
-      - id: config
-        run: |
-
-          # branch
-          fedora_branch='${{ inputs.fedora_branch || 42 }}'
-          echo branch=$fedora_branch >> "$GITHUB_OUTPUT"
-
-          # tag, dev
-          git_branch='${{ github.head_ref || github.ref_name }}'
-          if [ "$git_branch" = "main" ]; then
-            tag=$fedora_branch
-            dev=false
-          else
-            tag=$fedora_branch-$git_branch
-            dev=true
-          fi
-          echo tag=$tag >> "$GITHUB_OUTPUT"
-          echo dev=$dev >> "$GITHUB_OUTPUT"
-
-          # latest
-          if [ "$tag" = "42" ]; then
-            echo latest=true >> "$GITHUB_OUTPUT"
-          else
-            echo latest=false >> "$GITHUB_OUTPUT"
-          fi
-
-    outputs:
-      branch: ${{ steps.config.outputs.branch }}
-      tag: ${{ steps.config.outputs.tag }}
-      dev: ${{ steps.config.outputs.dev }}
-      latest: ${{ steps.config.outputs.latest }}
-
   base:
-    name: base ${{ needs.config.outputs.tag }}
-    needs: config
+    secrets: inherit
     permissions:
       packages: write
-    secrets: inherit
     uses: ./.github/workflows/helper-build-container.yml
     with:
-      image: base
-      push_tag: ${{ needs.config.outputs.tag }}
+      from_tag: ${{ inputs.fedora_branch || 42 }}
       from_image: quay.io/fedora/fedora-bootc
-      from_tag: ${{ needs.config.outputs.branch }}
-      containerfile: base/Containerfile
-      latest: ${{ needs.config.outputs.latest == 'true' }}
-      expires_after: ${{ needs.config.outputs.dev == 'true' && '1w' || '' }}
+      target_image: base
+      context: base
+      rechunk: false
 
   devices:
-    name: devices ${{ needs.config.outputs.tag }}
-    needs: [ config, base ]
+    needs: base
     permissions:
       packages: write
     secrets: inherit
     strategy:
       fail-fast: false
       matrix:
-        device: [ xiaomi-nabu, xiaomi-pipa, oneplus-sdm845, nothing-spacewar ]
-    uses: ./.github/workflows/helper-build-device.yml
+        device: [xiaomi-nabu, xiaomi-pipa, oneplus-sdm845, nothing-spacewar]
+    uses: ./.github/workflows/helper-device-and-desktops.yml
     with:
       device: ${{ matrix.device }}
-      fedora_branch: ${{ needs.config.outputs.branch }}
-      pocketblue_tag: ${{ needs.config.outputs.tag }}
-      latest: ${{ needs.config.outputs.latest == 'true' }}
-      expires_after: ${{ needs.config.outputs.dev == 'true' && '1w' || '' }}
+      from_tag: ${{ needs.base.outputs.target_tag }}
+      registry: ${{ needs.base.outputs.registry }}

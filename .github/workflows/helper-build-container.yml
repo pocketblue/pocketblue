@@ -1,100 +1,76 @@
 on:
   workflow_call:
     inputs:
-      push_tag:
-        required: true
-        type: string
       from_tag:
         required: true
         type: string
       from_image:
         required: true
         type: string
-      image:
+      target_image:
         required: true
         type: string
-      containerfile:
+      context:
         required: true
-        type: string
-      latest:
-        required: false
-        type: boolean
-        default: false
-      expires_after:
-        required: false
         type: string
       rechunk:
-        required: false
+        required: true
         type: boolean
-        default: false
+    outputs:
+      target_tag:
+        value: ${{ jobs.build.outputs.target_tag }}
+      registry:
+        value: ${{ jobs.build.outputs.registry }}
 
 jobs:
   build:
-    name: ${{ inputs.image }}:${{ inputs.push_tag }}
+    name: ${{ inputs.target_image }}
     runs-on: ubuntu-24.04-arm
     permissions:
       packages: write
+    outputs:
+      target_tag: ${{ steps.config.outputs.target_tag }}
+      registry: ${{ steps.config.outputs.registry }}
     steps:
-      - name: Clone the repository
-        uses: actions/checkout@v4
-
-      - id: getcontext
-        shell: bash
-        run: echo "context=$(dirname ${{ inputs.containerfile }})" >> $GITHUB_OUTPUT
-
-      - id: getregistry
-        shell: bash
-        run: echo "registry=${{ vars.REGISTRY != '' && vars.REGISTRY || format('ghcr.io/{0}', github.repository_owner) }}" >> $GITHUB_OUTPUT
-
-      - name: Build container
+      - uses: actions/checkout@v4
+      - name: config
+        id: config
+        uses: pocketblue/actions/container-config@main
+        with:
+          from_tag: ${{ inputs.from_tag }}
+          vars_registry: ${{ vars.REGISTRY }}
+      - name: build
         id: build
         run: |
           sudo buildah bud \
-            -f ${{ inputs.containerfile }} \
-            --build-arg from=${{ inputs.from_image }}:${{ inputs.from_tag }} \
-            --format docker \
-            --tls-verify=true \
-            -t ${{ inputs.image }}:${{ inputs.push_tag }} \
-            ${{ inputs.expires_after && format('--label quay.expires-after={0}', inputs.expires_after) || '' }} \
-            ${{ steps.getcontext.outputs.context }}
-
-      - name: Run rechunker
-        id: rechunk
+            --build-arg 'from=${{ inputs.from_image }}:${{ inputs.from_tag }}' \
+            -t '${{ inputs.target_image }}:${{ steps.config.outputs.target_tag }}' \
+            ${{ steps.config.outputs.expires && '--label quay.expires-after=1w' || '' }} \
+            ${{ inputs.context }}
+      - name: version
+        id: version
+        if: inputs.rechunk
+        shell: bash
+        run: |
+          export full_version=$(sudo podman inspect '${{ inputs.from_image }}:${{ inputs.from_tag }}' --format '{{ index .Config.Labels "org.opencontainers.image.version" }}')
+          echo version=$(echo $full_version | cut -d. -f1-2) >> $GITHUB_OUTPUT
+      - id: rechunk
         if: inputs.rechunk
         uses: hhd-dev/rechunk@ded27feba22df48134eece2c66ba0fca1289ff40 # v1.2.3
         with:
           rechunk: 'ghcr.io/hhd-dev/rechunk:v1.2.3'
-          prev-ref: ${{ steps.getregistry.outputs.registry }}/${{ inputs.image }}:${{ inputs.push_tag }}
-          ref: localhost/${{ inputs.image }}:${{ inputs.push_tag }}
-          skip_compression: true
-          version: ${{ inputs.push_tag }}.20<date>
-          pretty: ${{ inputs.push_tag }}.20<date>
+          prev-ref: ${{ steps.config.outputs.registry }}/${{ inputs.target_image }}:${{ steps.config.outputs.target_tag }}
+          ref: localhost/${{ inputs.target_image }}:${{ steps.config.outputs.target_tag }}
+          version: ${{ steps.version.outputs.version }}
+          pretty: ${{ steps.version.outputs.version }}
           revision: ${{ github.sha }}
-
-      - name: Login to registry
+          skip_compression: true
+      - uses: pocketblue/actions/container-push@main
         env:
-          REGISTRY: ${{ steps.getregistry.outputs.registry }}
-          USERNAME: ${{ vars.REGISTRY_USERNAME != '' && vars.REGISTRY_USERNAME || github.repository_owner }}
-          PASSWORD: ${{ secrets.REGISTRY_TOKEN != '' && secrets.REGISTRY_TOKEN || secrets.GITHUB_TOKEN }}
-        run: |
-          sudo podman login --username $USERNAME --password $PASSWORD $REGISTRY
-
-      - name: Push to registry
-        env:
-          IMAGE: ${{ steps.getregistry.outputs.registry }}/${{ inputs.image }}
-          TAG: ${{ inputs.push_tag }}
-        run: |
-          set -uexo pipefail
-
-          if [[ ${{ inputs.rechunk }} == true ]]; then
-            RECHUNKED_IMAGE=$(sudo podman pull ${{ steps.rechunk.outputs.ref }})
-            sudo podman image tag ${RECHUNKED_IMAGE} $IMAGE:$TAG
-          else
-            sudo podman image tag localhost/${{ inputs.image }}:$TAG $IMAGE:$TAG
-          fi
-          sudo podman push $IMAGE:$TAG
-
-          if [[ ${{ inputs.latest }} == true ]]; then
-            sudo podman image tag $IMAGE:$TAG $IMAGE:latest
-            sudo podman push $IMAGE:latest
-          fi
+          latest: ${{ steps.config.outputs.latest }}
+          rechunk_ref: ${{ steps.rechunk.outputs.ref || '' }}
+          username: ${{ vars.REGISTRY_USERNAME != '' && vars.REGISTRY_USERNAME || github.repository_owner }}
+          password: ${{ secrets.REGISTRY_TOKEN != '' && secrets.REGISTRY_TOKEN || secrets.GITHUB_TOKEN }}
+          registry: ${{ steps.config.outputs.registry }}
+          image: ${{ inputs.target_image }}
+          tag: ${{ steps.config.outputs.target_tag }}
