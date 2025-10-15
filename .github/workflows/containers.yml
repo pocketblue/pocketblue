@@ -41,7 +41,7 @@ jobs:
       fail-fast: false
       matrix:
         device: [xiaomi-nabu, xiaomi-pipa, oneplus-sdm845, nothing-spacewar]
-    uses: ./.github/workflows/helper-device-and-desktops.yml
+    uses: ./.github/workflows/helper-build-device.yml
     with:
       device: ${{ matrix.device }}
       from_tag: ${{ needs.base.outputs.target_tag }}
