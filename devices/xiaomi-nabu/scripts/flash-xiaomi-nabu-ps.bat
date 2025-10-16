@@ -17,8 +17,8 @@ $ErrorActionPreference = "Stop"
 fastboot erase dtbo_ab
 fastboot flash vbmeta_ab images/vbmeta-disabled.img
 fastboot flash   boot_ab images/uboot.img
-fastboot flash      cust images/fedora_esp.raw
-fastboot flash     super images/fedora_boot.raw
+fastboot flash   rawdump images/fedora_esp.raw
+fastboot flash      cust images/fedora_boot.raw
 fastboot flash  userdata images/fedora_rootfs.raw
 
 echo 'done flashing, rebooting now'
