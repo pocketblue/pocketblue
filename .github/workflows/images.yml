@@ -39,6 +39,6 @@ jobs:
           image_tag: ${{ inputs.fedora_branch }}
       - uses: actions/upload-artifact@v4
         with:
-          name: pocketblue-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.image_tag }}
-          path: pocketblue-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.image_tag }}.7z
+          name: pocketblue-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.fedora_branch }}
+          path: pocketblue-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.fedora_branch }}.7z
           compression-level: 0
