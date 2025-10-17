@@ -35,6 +35,43 @@
 - toolobx and distrobox don't work due to a bug in linux 6.15
 - feel free to open issue and report any other bugs you find
 
+### Incorrect battery percentage
+
+Sometimes the battery percentage may be reported incorrectly, particularly if
+you have a replacement battery. This may be fixed by modifying the device tree blob:
+
+```bash
+# uncomment to select the device model:
+# export MODEL=enchilada # OnePlus 6
+# export MODEL=fajita    # OnePlus 6T
+
+# prepare the dtb file
+cd
+sudo cp /boot/efi/dtb/qcom/sdm845-oneplus-$MODEL.dtb tmp.dtb
+sudo chown user:user tmp.dtb
+
+# create and enter a container
+toolbox create fedora
+toolbox enter fedora
+podman exec -it fedora bash
+
+# modify the dtb
+dnf install dtc
+cd /home/user
+dtc tmp.dtb -o tmp.dts
+sed -i 's/bq27441/bq27541/' tmp.dts
+sed -i 's/bq27411/bq27541/' tmp.dts
+dtc tmp.dts -o tmp.dtb
+
+# exit the container
+exit
+
+# install the modified dtb file
+sudo cp tmp.dtb /boot/efi/dtb/qcom/sdm845-oneplus-$MODEL.dtb
+
+reboot
+```
+
 ### Unbricking using python3-edl
 
 - [oneplus 6](https://github.com/pocketblue/oneplus6-unbrick)
