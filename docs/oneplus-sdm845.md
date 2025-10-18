@@ -18,7 +18,7 @@
 
 - default username: `user`
 - default password: `123456`
-- [how to upgrade system and install packages](installing-packages.md)
+- [how to upgrade system and install packages](etc/installing-packages.md)
 
 ### Rebasing to other desktops
 
