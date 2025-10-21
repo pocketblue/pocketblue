@@ -14,6 +14,7 @@ RUN mkdir -p /boot/dtb && \
     rm -r /boot/dtb
 
 RUN dnf -y install \
+    xiaomi-nabu-configs \
     xiaomi-nabu-firmware \
     alsa-ucm-conf-sm8150 \
     ath10k-shutdown \
