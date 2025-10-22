@@ -43,7 +43,7 @@ Flashable disk images are built using bootc-image-builder by the images.yml work
 
 #### device.conf
 
-- `esp_size` - ESP size in bytes
+- `esp_size` - ESP size
 - `install_dtb` - boolean, whether to install device trees to ESP
 
 ## Contribution guide
