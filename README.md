@@ -6,7 +6,7 @@
 
 # Fedora Pocketblue Remix
 
-Pocketblue is a Fedora Atomic image for mobile devices based on fedora-bootc and Fedora Mobility
+Pocketblue is a project which provides Fedora Atomic images for mobile devices
 
 ### Disclaimer
 
