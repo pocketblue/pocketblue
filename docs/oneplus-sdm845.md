@@ -12,6 +12,7 @@
 - if your computer runs windows, and your device is oneplus 6, run `flash-oneplus6-enchilada.cmd` script
 - if your computer runs linux, and your device is oneplus 6t, run `flash-oneplus6t-fajita.sh` script
 - if your computer runs windows, and your device is oneplus 6t, run `flash-oneplus6t-fajita.cmd` script
+- alternatively, a [manual installation](#manual-installation) is available
 - reboot and enjoy fedora
 
 ### Usage
@@ -19,6 +20,28 @@
 - default username: `user`
 - default password: `123456`
 - [how to upgrade system and install packages](etc/installing-packages.md)
+
+### Manual installation
+
+- recommended way to install pocketblue is using an installation script, but manual installation is also an option
+- erase dtbo, this required for system to boot
+  - `fastboot erase dtbo_a`
+  - `fastboot erase dtbo_b`
+- flash uboot, the uefi implementation needed to load grub
+  - `fastboot flash boot images/uboot-enchilada.img --slot=all` - for oneplus 6
+  - `fastboot flash boot images/uboot-fajita.img --slot=all` - for oneplus 6t
+- flash `fedora_boot.raw` to `system_a` partition
+  - `fastboot flash system_a images/fedora_boot.raw`
+  - `fedora_boot.raw` - partition image with kernels, deploymets, bls
+  - `system_a` - android system partition
+- flash `fedora_esp.raw` to `system_b` partition
+  - `fastboot flash system_b images/fedora_esp.raw`
+  - `fedora_esp.raw` - esp partition image
+  - `system_b` - android system partition
+- flash `fedora_rootfs.raw` to `userdata` partition, this will wipe your android data
+  - `fastboot flash  userdata images/fedora_rootfs.raw`
+  - `fedora_rootfs.raw` - fedora root partition image
+  - `userdata` - partition used by android to store your data
 
 ### Rebasing to other desktops
 
