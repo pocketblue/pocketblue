@@ -31,7 +31,7 @@ jobs:
     name: ${{ inputs.device }}-${{ matrix.desktop }}:${{ inputs.fedora_branch }}
     steps:
       - uses: actions/checkout@v4
-      - uses: pocketblue/actions/images@main
+      - uses: pocketblue/actions/images@better-artifacts
         with:
           device: ${{ inputs.device }}
           registry: ${{ vars.REGISTRY }}
