@@ -8,6 +8,8 @@ which curl
 curl -L https://github.com/fedora-remix-mobility/u-boot/releases/download/fedora-mobility-v0.0.1/uboot-sdm845-oneplus-enchilada.img -o images/uboot-enchilada.img
 curl -L https://github.com/fedora-remix-mobility/u-boot/releases/download/fedora-mobility-v0.0.1/uboot-sdm845-oneplus-fajita.img -o images/uboot-fajita.img
 
+sha256sum -c $(dirname "$0")/checksums
+
 install -Dm 0755 devices/oneplus-sdm845/scripts/flash-oneplus-sdm845.sh.in     flash-oneplus6-enchilada.sh
 install -Dm 0755 devices/oneplus-sdm845/scripts/flash-oneplus-sdm845.sh.in     flash-oneplus6t-fajita.sh
 install -Dm 0755 devices/oneplus-sdm845/scripts/flash-oneplus-sdm845.cmd.in    flash-oneplus6-enchilada.cmd

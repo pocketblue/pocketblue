@@ -8,7 +8,11 @@ which curl
 which python
 
 curl -L https://gitlab.com/sm8150-mainline/u-boot/-/jobs/10969839675/artifacts/download -o uboot.zip
+
+sha256sum -c $(dirname "$0")/checksums
+
 7z x uboot.zip -o./uboot
+
 cp uboot/.output/u-boot.img images/uboot.img
 git clone --depth=1 https://android.googlesource.com/platform/external/avb
 python avb/avbtool.py make_vbmeta_image --flags 2 --padding_size 4096 --output images/vbmeta-disabled.img
