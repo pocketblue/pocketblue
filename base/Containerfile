@@ -8,8 +8,8 @@ COPY usr/ /usr/
 RUN mkdir -p /var/roothome
 
 # make /usr/local and /opt directories mutable
-RUN rmdir /usr/local && \
-    rmdir /opt && \
+RUN rm -rf /usr/local && \
+    rm -rf /opt && \
     ln -s /var/usrlocal /usr/local && \
     ln -s /var/opt /opt
 
