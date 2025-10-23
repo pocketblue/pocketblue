@@ -6,7 +6,9 @@
 - unarchive it
 - boot into fastboot and connect the device to your computer via usb
 - make sure bootloader is unlocked
-- run `flash-xiaomi-pipa.sh` script
+- if your computer runs linux, run `flash-xiaomi-pipa.sh` script
+- if your computer runs windows, run `flash-xiaomi-pipa.cmd` script
+- alternatively, a [manual installation](#manual-installation) is available
 - if installation is stuck on the 'Rebooting' for more than 5 minutes, reboot the device manually by holding power+volume down
 - enjoy fedora
 
@@ -15,6 +17,28 @@
 - default username: `user`
 - default password: `123456`
 - [how to upgrade system and install packages](etc/installing-packages.md)
+
+### Manual installation
+
+- recommended way to install pocketblue is using an installation script, but manual installation is also an option
+- erase dtbo, this required for system to boot
+  - `fastboot erase dtbo_ab`
+- flash `vbmeta-disabled.img`, this disables verified boot and also required for system to boot
+  - `fastboot flash vbmeta_ab images/vbmeta-disabled.img`
+- flash `kxboot.img`, kexec-based bootloader
+  - `fastboot flash boot_ab images/kxboot.img`
+- flash `fedora_esp.raw` to `rawdump` partition
+  - `fastboot flash rawdump images/fedora_esp.raw`
+  - `fedora_esp.raw` - esp partition image
+  - `rawdump` - partition meant to dump crash data on qualcomm devices
+- flash `fedora_boot.raw` to `cust` partition
+  - `fastboot flash cust images/fedora_boot.raw`
+  - `fedora_boot.raw` - partition image with kernels, deploymets, bls
+  - `cust` - partition that miui uses for region-specific configuration and preloads
+- flash `fedora_rootfs.raw` to `userdata` partition, this will wipe your android data
+  - `fastboot flash  userdata images/fedora_rootfs.raw`
+  - `fedora_rootfs.raw` - fedora root partition image
+  - `userdata` - partition used by android to store your data
 
 ### Rebasing to other desktops
 
