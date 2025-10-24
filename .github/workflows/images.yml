@@ -12,6 +12,7 @@ on:
           - xiaomi-pipa
           - oneplus-sdm845
           - nothing-spacewar
+          - xunlong-orangepi3
       fedora_branch:
         type: choice
         description: fedora branch
