@@ -21,7 +21,7 @@ jobs:
       from_tag: ${{ inputs.from_tag }}
       from_image: ${{ inputs.registry }}/base
       target_image: ${{ inputs.device }}-base
-      context: devices/${{ inputs.device }}
+      context: devices/${{ inputs.device }}/container
       rechunk: false
 
   desktops:
