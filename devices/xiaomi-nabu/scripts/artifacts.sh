@@ -4,15 +4,14 @@ set -uexo pipefail
 
 which 7z
 which git
-which curl
 which python
 
-curl -L https://gitlab.com/sm8150-mainline/u-boot/-/jobs/10969839675/artifacts/download -o uboot.zip
+mv $OUT_PATH/uboot.zip ./
 7z x uboot.zip -o./uboot
-cp uboot/.output/u-boot.img images/uboot.img
-git clone --depth=1 https://android.googlesource.com/platform/external/avb
-python avb/avbtool.py make_vbmeta_image --flags 2 --padding_size 4096 --output images/vbmeta-disabled.img
-install -Dm 0755 devices/xiaomi-nabu/scripts/flash-xiaomi-nabu.sh flash-xiaomi-nabu.sh
-install -Dm 0755 devices/xiaomi-nabu/scripts/flash-xiaomi-nabu.cmd flash-xiaomi-nabu.cmd
+cp uboot/.output/u-boot.img $OUT_PATH/images/uboot.img
 
-7z a -mx=9 $ARGS_7Z "pocketblue-$IMAGE_NAME-$IMAGE_TAG.7z" flash-xiaomi-nabu* images
+git clone --depth=1 https://android.googlesource.com/platform/external/avb
+python avb/avbtool.py make_vbmeta_image --flags 2 --padding_size 4096 --output $OUT_PATH/images/vbmeta-disabled.img
+
+install -Dm 0755 $DEVICE_PATH/scripts/flash-xiaomi-nabu.sh $OUT_PATH/flash-xiaomi-nabu.sh
+install -Dm 0755 $DEVICE_PATH/scripts/flash-xiaomi-nabu.cmd $OUT_PATH/flash-xiaomi-nabu.cmd
