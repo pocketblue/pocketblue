@@ -14,7 +14,7 @@ on:
   push:
     paths:
       - 'base/**'
-      - 'devices/**'
+      - 'devices/*/container/**'
       - 'desktops/**'
 
 run-name: "containers: fedora ${{ inputs.fedora_branch || 42 }} ${{ github.event_name == 'push' && format(' | {0}', github.event.head_commit.message) || '' }}"
