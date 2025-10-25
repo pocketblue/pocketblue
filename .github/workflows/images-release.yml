@@ -43,7 +43,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        device: [xiaomi-nabu, xiaomi-pipa, oneplus-sdm845]
+        device: [oneplus-sdm845, xiaomi-nabu, xiaomi-pipa]
         desktop: [gnome-desktop, gnome-mobile, plasma-desktop, plasma-mobile, phosh]
     name: ${{ matrix.device }}-${{ matrix.desktop }}:${{ inputs.fedora_branch }}
     steps:

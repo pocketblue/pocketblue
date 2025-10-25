@@ -8,16 +8,18 @@ on:
         description: 'device name'
         required: true
         options:
+          - nothing-spacewar
+          - oneplus-sdm845
           - xiaomi-nabu
           - xiaomi-pipa
-          - oneplus-sdm845
-          - nothing-spacewar
+          - xunlong-orangepi3
       fedora_branch:
         type: choice
         description: fedora branch
         required: true
         options:
           - '42'
+          - '42-orangepi3'
           - '43'
           - 'rawhide'
         default: '42'
@@ -31,7 +33,7 @@ jobs:
     name: ${{ inputs.device }}-${{ matrix.desktop }}:${{ inputs.fedora_branch }}
     steps:
       - uses: actions/checkout@v4
-      - uses: pocketblue/actions/images@main
+      - uses: pocketblue/actions/images@whole-image
         with:
           device: ${{ inputs.device }}
           registry: ${{ vars.REGISTRY }}
