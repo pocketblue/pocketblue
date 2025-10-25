@@ -55,6 +55,6 @@ RUN dnf -y install \
     default-fonts-other-serif
 
 # cleanup
-RUN rm -rf /var/log/* && dnf clean all
+RUN dnf clean all && rm -rf /var/log/*
 
 RUN bootc container lint --no-truncate
