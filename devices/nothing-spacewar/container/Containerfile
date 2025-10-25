@@ -29,4 +29,4 @@ RUN systemctl enable \
 # cleanup
 RUN rm -rf /var/log/* && dnf clean all
 
-RUN bootc container lint
+RUN bootc container lint --no-truncate

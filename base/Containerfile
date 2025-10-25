@@ -57,4 +57,4 @@ RUN dnf -y install \
 # cleanup
 RUN rm -rf /var/log/* && dnf clean all
 
-RUN bootc container lint
+RUN bootc container lint --no-truncate
