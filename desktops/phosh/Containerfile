@@ -22,6 +22,6 @@ RUN dnf -y install \
 RUN systemctl enable --force phrog.service
 
 # cleanup
-RUN rm -rf /var/log/* && dnf clean all
+RUN dnf clean all && rm -rf /var/log/*
 
-RUN bootc container lint
+RUN bootc container lint --no-truncate
