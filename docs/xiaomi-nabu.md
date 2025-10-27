@@ -38,6 +38,8 @@
   - `fastboot flash  userdata images/fedora_rootfs.raw`
   - `fedora_rootfs.raw` - fedora root partition image
   - `userdata` - partition used by android to store your data
+- all done, now you can reboot to system
+  - `fastboot reboot`
 
 ### Rebasing to other desktops
 
