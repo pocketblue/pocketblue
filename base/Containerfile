@@ -37,6 +37,7 @@ RUN dnf -y install \
 
 # utils
 RUN dnf -y install \
+    NetworkManager-wifi \
     NetworkManager-tui \
     git
 
