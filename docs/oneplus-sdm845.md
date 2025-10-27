@@ -39,7 +39,7 @@
   - `fedora_esp.raw` - esp partition image
   - `system_b` - android system partition
 - flash `fedora_rootfs.raw` to `userdata` partition, this will wipe your android data
-  - `fastboot flash  userdata images/fedora_rootfs.raw`
+  - `fastboot flash userdata images/fedora_rootfs.raw`
   - `fedora_rootfs.raw` - fedora root partition image
   - `userdata` - partition used by android to store your data
 - all done, now you can reboot to system
