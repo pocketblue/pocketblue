@@ -1,0 +1,45 @@
+name: anaconda
+run-name: 'anaconda: ${{ inputs.device }} / fedora ${{ inputs.fedora_branch }}'
+on:
+  workflow_dispatch:
+    inputs:
+      device:
+        type: choice
+        description: 'device name'
+        required: true
+        options:
+          # - xiaomi-nabu
+          # - xiaomi-pipa
+          - oneplus-sdm845
+          # - nothing-spacewar
+      fedora_branch:
+        type: choice
+        description: fedora branch
+        required: true
+        options:
+          - '42'
+          # - '43'
+          # - 'rawhide'
+        default: '42'
+jobs:
+  images:
+    runs-on: ubuntu-24.04-arm
+    strategy:
+      fail-fast: false
+      matrix:
+        #desktop: [gnome-desktop, gnome-mobile, plasma-desktop, plasma-mobile, phosh]
+        desktop: [phosh]
+    name: ${{ inputs.device }}-${{ matrix.desktop }}:${{ inputs.fedora_branch }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pocketblue/actions/anaconda-image@anaconda
+        with:
+          device: ${{ inputs.device }}
+          registry: ${{ vars.REGISTRY }}
+          image_name: ${{ inputs.device }}-${{ matrix.desktop }}
+          image_tag: ${{ inputs.fedora_branch }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pocketblue-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.fedora_branch }}
+          path: pocketblue-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.fedora_branch }}.7z
+          compression-level: 0
