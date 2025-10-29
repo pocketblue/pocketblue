@@ -1,8 +1,6 @@
 ARG from
 FROM $from
 
-COPY etc/ /etc/
-
 RUN dnf -y install \
     @phosh-desktop \
     phrog \
