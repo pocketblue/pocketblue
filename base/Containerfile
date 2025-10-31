@@ -57,6 +57,9 @@ RUN dnf -y install \
     default-fonts-other-sans \
     default-fonts-other-serif
 
+# os-release file
+RUN sed -i "s/^PRETTY_NAME=.*/PRETTY_NAME=\"Fedora Linux $target_tag\"/" /usr/lib/os-release
+
 # cleanup
 RUN dnf clean all && rm -rf /var/log/*
 
