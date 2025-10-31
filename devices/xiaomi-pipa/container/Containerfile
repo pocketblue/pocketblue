@@ -4,20 +4,7 @@ FROM $from
 ARG target_tag
 
 COPY etc/ /etc/
-
 COPY var/ /var/
-
-# kernel
-RUN mkdir -p /boot/dtb && \
-    dnf -y remove \
-        kernel \
-        kernel-core \
-        kernel-modules \
-        kernel-modules-core && \
-    dnf -y install \
-        kernel \
-        kernel-headers && \
-    rm -r /boot/dtb
 
 RUN dnf -y install \
     xiaomi-pipa-firmware \
@@ -26,10 +13,23 @@ RUN dnf -y install \
     pipa-sound-conf \
     bootmac
 
-RUN kver=$(rpm -q --qf '%{VERSION}-%{RELEASE}' kernel) && \
-    dracut -vf --kver $kver /usr/lib/modules/$kver/initramfs.img
+# kernel
+RUN mkdir -p /boot/dtb && \
+    dnf -y remove \
+        kernel \
+        kernel-core \
+        kernel-modules \
+        kernel-modules-core && \
+    rm -rf /usr/lib/modules/* && \
+    dnf -y install \
+        kernel \
+        kernel-headers && \
+    rm -r /boot/dtb
 
-RUN systemctl enable qbootctl.service bootmac-bluetooth
+# services
+RUN systemctl enable \
+    qbootctl.service \
+    bootmac-bluetooth
 
 # cleanup
 RUN dnf clean all && rm -rf /var/log/*
