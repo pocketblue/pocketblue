@@ -1,6 +1,8 @@
 ARG from
 FROM $from
 
+ARG target_tag
+
 COPY etc/ /etc/
 
 RUN dnf -y install \

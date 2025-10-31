@@ -1,6 +1,8 @@
 ARG from
 FROM $from
 
+ARG target_tag
+
 RUN dnf -y install \
     @kde-desktop \
     fedora-release-kinoite \
