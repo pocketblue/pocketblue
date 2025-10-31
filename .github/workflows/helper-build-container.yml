@@ -44,6 +44,7 @@ jobs:
         run: |
           sudo buildah bud \
             --build-arg 'from=${{ inputs.from_image }}:${{ inputs.from_tag }}' \
+            --build-arg 'target_tag=${{ steps.config.outputs.target_tag }}' \
             -t '${{ inputs.target_image }}:${{ steps.config.outputs.target_tag }}' \
             ${{ steps.config.outputs.expires && '--label quay.expires-after=1w' || '' }} \
             ${{ inputs.context }}

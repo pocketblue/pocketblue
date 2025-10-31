@@ -1,6 +1,8 @@
 ARG from
 FROM $from
 
+ARG target_tag
+
 RUN dnf -y install \
     @kde-desktop \
     fedora-release-kinoite \
@@ -43,6 +45,9 @@ RUN dnf -y install \
     --exclude kwebkitpart
 
 RUN systemctl enable sddm.service
+
+# os-release file
+RUN sed -i "s/^PRETTY_NAME=.*/PRETTY_NAME=\"Fedora Linux $target_tag (plasma-desktop)\"/" /usr/lib/os-release
 
 # cleanup
 RUN dnf clean all && rm -rf /var/log/*

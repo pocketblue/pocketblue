@@ -1,6 +1,8 @@
 ARG from
 FROM $from
 
+ARG target_tag
+
 COPY etc/ /etc/
 
 RUN dnf -y install \
@@ -41,6 +43,9 @@ RUN dnf -y install \
     --exclude PackageKit-command-not-found
 
 RUN systemctl enable gdm.service
+
+# os-release file
+RUN sed -i "s/^PRETTY_NAME=.*/PRETTY_NAME=\"Fedora Linux $target_tag (gnome-mobile)\"/" /usr/lib/os-release
 
 # cleanup
 RUN dnf clean all && rm -rf /var/log/*

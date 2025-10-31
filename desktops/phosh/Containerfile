@@ -1,6 +1,8 @@
 ARG from
 FROM $from
 
+ARG target_tag
+
 RUN dnf -y install \
     @phosh-desktop \
     phrog \
@@ -18,6 +20,9 @@ RUN dnf -y install \
     --exclude PackageKit
 
 RUN systemctl enable --force phrog.service
+
+# os-release file
+RUN sed -i "s/^PRETTY_NAME=.*/PRETTY_NAME=\"Fedora Linux $target_tag (phosh)\"/" /usr/lib/os-release
 
 # cleanup
 RUN dnf clean all && rm -rf /var/log/*

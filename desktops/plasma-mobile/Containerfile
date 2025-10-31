@@ -1,6 +1,8 @@
 ARG from
 FROM $from
 
+ARG target_tag
+
 RUN dnf -y install \
     @kde-mobile-environment \
     plasma-discover-rpm-ostree \
@@ -43,6 +45,9 @@ RUN dnf -y install \
     --exclude google-noto-serif-vf-fonts
 
 RUN systemctl enable sddm.service
+
+# os-release file
+RUN sed -i "s/^PRETTY_NAME=.*/PRETTY_NAME=\"Fedora Linux $target_tag (plasma-mobile)\"/" /usr/lib/os-release
 
 # cleanup
 RUN dnf clean all && rm -rf /var/log/*
