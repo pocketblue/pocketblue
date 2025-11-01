@@ -5,6 +5,14 @@ ARG target_tag
 
 COPY etc/ /etc/
 
+RUN dnf -y install \
+    nothing-spacewar-firmware \
+    alsa-ucm-conf-qcom-sc7280 \
+    tqftpserv \
+    qbootctl \
+    rmtfs \
+    qrtr
+
 # kernel
 RUN mkdir -p /boot/dtb && \
     dnf -y remove \
@@ -15,14 +23,7 @@ RUN mkdir -p /boot/dtb && \
     dnf -y install kernel && \
     rm -r /boot/dtb
 
-RUN dnf -y install \
-    nothing-spacewar-firmware \
-    alsa-ucm-conf-qcom-sc7280 \
-    tqftpserv \
-    qbootctl \
-    rmtfs \
-    qrtr
-
+# services
 RUN systemctl enable \
     tqftpserv.service \
     qbootctl.service \
