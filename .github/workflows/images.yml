@@ -12,7 +12,7 @@ on:
           - oneplus-sdm845
           - xiaomi-nabu
           - xiaomi-pipa
-          - xunlong-orangepi3
+          - xunlong-orangepi3-lts
       fedora_branch:
         type: choice
         description: fedora branch
