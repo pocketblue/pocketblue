@@ -8,16 +8,18 @@ on:
         description: 'device name'
         required: true
         options:
+          - nothing-spacewar
+          - oneplus-sdm845
           - xiaomi-nabu
           - xiaomi-pipa
-          - oneplus-sdm845
-          - nothing-spacewar
+          - xunlong-orangepi3-lts
       fedora_branch:
         type: choice
         description: fedora branch
         required: true
         options:
           - '42'
+          - '42-orangepi3'
           - '43'
           - 'rawhide'
         default: '42'

@@ -40,7 +40,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        device: [xiaomi-nabu, xiaomi-pipa, oneplus-sdm845, nothing-spacewar]
+        device: [nothing-spacewar, oneplus-sdm845, xiaomi-nabu, xiaomi-pipa, xunlong-orangepi3-lts]
     uses: ./.github/workflows/helper-build-device.yml
     with:
       device: ${{ matrix.device }}
