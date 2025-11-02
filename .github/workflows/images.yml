@@ -19,7 +19,6 @@ on:
         required: true
         options:
           - '42'
-          - '42-orangepi3'
           - '43'
           - 'rawhide'
         default: '42'
