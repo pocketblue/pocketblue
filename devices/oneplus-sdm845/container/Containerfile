@@ -63,7 +63,7 @@ RUN mkdir /boot/dtb && \
         kernel-modules \
         kernel-modules-core && \
     rm -rf /usr/lib/modules/* && \
-    dnf -y install kernel-0:6.16.7-3.sdm845.fc42.aarch64 && \
+    dnf -y install kernel-0:6.16.7-4.sdm845.fc42.aarch64 && \
     rm -rf /boot/dtb
 
 # cleanup
