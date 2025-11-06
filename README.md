@@ -13,31 +13,37 @@ Pocketblue is a project which provides Fedora Atomic images for mobile devices
 This is a work-in-progress. During the installation process all data on your device will be wiped.
 **Use at your own risk.**
 
-### Docs
+### Supported devices
 
-- [install on xiaomi pad 5](https://pocketblue.github.io/install/xiaomi-nabu)
-- [install on xiaomi pad 6](https://pocketblue.github.io/install/xiaomi-pipa)
-- [install on oneplus 6/6t](https://pocketblue.github.io/install/oneplus-sdm845)
-- [technical details and contribution guide](https://pocketblue.github.io/etc/contributing)
-- [installing packages](https://pocketblue.github.io/etc/installing-packages)
-- [using toolbox](https://pocketblue.github.io/etc/toolbox)
-- [firefox mobile config packaged to flatpak](https://pocketblue.github.io/etc/flatpaks)
+- [Xiaomi Pad 5](https://pocketblue.github.io/devices/xiaomi-nabu)
+- [Xiaomi Pad 6](https://pocketblue.github.io/devices/xiaomi-pipa)
+- [OnePlus 6/6T](https://pocketblue.github.io/devices/oneplus-sdm845)
+
+### Useful information
+
+- [Technical details and contribution guide](https://pocketblue.github.io/contributing)
+- [Installing packages](https://pocketblue.github.io/tips-and-tricks/installing-packages)
+- [Using toolbox](https://pocketblue.github.io/tips-and-tricks/toolbox)
+- [Firefox mobile config packaged as flatpak](https://pocketblue.github.io/tips-and-tricks/flatpaks)
 
 ### Related projects
 
 - [fedora-remix-mobility/fedora-kiwi-descriptions](https://github.com/fedora-remix-mobility/fedora-kiwi-descriptions) - KIWI image descriptions for Fedora Mobility
-- [samcday/sdm845-live-fedora](https://github.com/samcday/sdm845-live-fedora) - a compact fedora UKI that can be directly booted from the oneplus6(t) bootloader
-- [timoxa0/pipa-fedora-builder](https://github.com/timoxa0/pipa-fedora-builder) - non-atomic fedora for xiaomi pad 6
-- [nik012003/nabu-fedora-builder](https://github.com/nik012003/nabu-fedora-builder) - non-atomic fedora for xiaomi pad 5
-- [jhuang6451/nabu_fedora](https://github.com/jhuang6451/nabu_fedora) - yet another non-atomic fedora for xiaomi pad 5
+- [samcday/sdm845-live-fedora](https://github.com/samcday/sdm845-live-fedora) - a compact Fedora UKI that can be directly booted from the OnePlus 6(T) bootloader
+- [timoxa0/pipa-fedora-builder](https://github.com/timoxa0/pipa-fedora-builder) - non-atomic Fedora for Xiaomi Pad 6
+- [nik012003/nabu-fedora-builder](https://github.com/nik012003/nabu-fedora-builder) - non-atomic Fedora for Xiaomi Pad 5
+- [jhuang6451/nabu_fedora](https://github.com/jhuang6451/nabu_fedora) - yet another non-atomic Fedora for Xiaomi Pad 5
 
-### Related chats
+### Chats
 
-- https://t.me/fedoramobility - our main chat
-- https://t.me/nabulinux - xiaomi pad 5 linux chat
-- https://t.me/nabulinuxru - xiaomi pad 5 linux chat (ru)
-- https://t.me/XiaomiPad5Official - xiaomi pad 5 roms chat
-- https://t.me/pipa_mainline - xiaomi pad 6 linux chat
-- https://t.me/xiaomi_pipa - xiaomi pad 6 general chat
-- https://matrix.to/#/#mobility:fedoraproject.org - Fedora Mobility general chat
-- https://matrix.to/#/#mobility-sdm845:fedoraproject.org - Fedora Mobility chat for oneplus6
+You can find our main chat in Telegram: [t.me/fedoramobility](https://t.me/fedoramobility)
+
+Other related chats:
+
+- [matrix.to/#/#mobility:fedoraproject.org](https://matrix.to/#/#mobility:fedoraproject.org) - Fedora Mobility general chat
+- [matrix.to/#/#mobility-sdm845:fedoraproject.org](https://matrix.to/#/#mobility-sdm845:fedoraproject.org) - Fedora Mobility chat for sdm845 devices
+- [t.me/nabulinux](https://t.me/nabulinux) - Xiaomi Pad 5 Linux chat
+- [t.me/nabulinuxru](https://t.me/nabulinuxru) - Xiaomi Pad 5 Linux chat (ru)
+- [t.me/XiaomiPad5Official](https://t.me/XiaomiPad5Official) - Xiaomi Pad 5 ROMs chat
+- [t.me/pipa_mainline](https://t.me/pipa_mainline) - Xiaomi Pad 6 Linux chat
+- [t.me/xiaomi_pipa](https://t.me/xiaomi_pipa) - Xiaomi Pad 6 general chat
