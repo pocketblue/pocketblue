@@ -15,14 +15,13 @@ This is a work-in-progress. During the installation process all data on your dev
 
 ### Docs
 
-- [install on xiaomi pad 5](docs/xiaomi-nabu.md)
-- [install on xiaomi pad 6](docs/xiaomi-pipa.md)
-- [install on oneplus 6/6t](docs/oneplus-sdm845.md)
-- [technical details and contribution guide](docs/etc/contributing.md)
-- [installing packages](docs/etc/installing-packages.md)
-- [using toolbox](docs/etc/toolbox.md)
-- [firefox mobile config packaged to flatpak](https://github.com/pocketblue/pocketblue.github.io)
-- [dualboot linux and android](https://github.com/pocketblue/dualboot)
+- [install on xiaomi pad 5](https://pocketblue.github.io/install/xiaomi-nabu)
+- [install on xiaomi pad 6](https://pocketblue.github.io/install/xiaomi-pipa)
+- [install on oneplus 6/6t](https://pocketblue.github.io/install/oneplus-sdm845)
+- [technical details and contribution guide](https://pocketblue.github.io/etc/contributing)
+- [installing packages](https://pocketblue.github.io/etc/installing-packages)
+- [using toolbox](https://pocketblue.github.io/etc/toolbox)
+- [firefox mobile config packaged to flatpak](https://pocketblue.github.io/etc/flatpaks)
 
 ### Related projects
 
