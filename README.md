@@ -1,6 +1,6 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/icons/fedora_remix_dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="docs/icons/fedora_remix_light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/pocketblue/wiki/6b25a1818db2893398d7393fff65e25ccc177f0c/docs/assets/fedora_remix_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/pocketblue/wiki/6b25a1818db2893398d7393fff65e25ccc177f0c/docs/assets/fedora_remix_light.svg">
   <img src="assets/logo-light.svg" height="100">
 </picture>
 
