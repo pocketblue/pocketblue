@@ -17,6 +17,14 @@ RUN dnf -y install \
     --exclude gnome-contacts \
     --exclude gnome-maps \
     --exclude gnome-photos \
+    --exclude gnome-tour \
+    --exclude malcontent-control \
+    --exclude pavucontrol \
+    --exclude showtime \
+    --exclude epiphany \
+    --exclude chatty \
+    --exclude calls \
+    --exclude totem \
     --exclude PackageKit
 
 RUN systemctl enable --force phrog.service
