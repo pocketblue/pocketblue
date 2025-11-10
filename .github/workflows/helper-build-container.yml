@@ -1,13 +1,19 @@
 on:
   workflow_call:
     inputs:
-      from_tag:
-        required: true
-        type: string
       from_image:
         required: true
         type: string
+      from_tag:
+        required: true
+        type: string
       target_image:
+        required: true
+        type: string
+      target_tag:
+        required: true
+        type: string
+      target_registry:
         required: true
         type: string
       context:
@@ -16,11 +22,10 @@ on:
       rechunk:
         required: true
         type: boolean
-    outputs:
-      target_tag:
-        value: ${{ jobs.build.outputs.target_tag }}
-      registry:
-        value: ${{ jobs.build.outputs.registry }}
+      expires:
+        required: false
+        type: string
+        default: ''
 
 jobs:
   build:
@@ -28,25 +33,16 @@ jobs:
     runs-on: ubuntu-24.04-arm
     permissions:
       packages: write
-    outputs:
-      target_tag: ${{ steps.config.outputs.target_tag }}
-      registry: ${{ steps.config.outputs.registry }}
     steps:
       - uses: actions/checkout@v4
-      - name: config
-        id: config
-        uses: pocketblue/actions/container-config@main
-        with:
-          from_tag: ${{ inputs.from_tag }}
-          vars_registry: ${{ vars.REGISTRY }}
       - name: build
         id: build
         run: |
           sudo buildah bud \
             --build-arg 'from=${{ inputs.from_image }}:${{ inputs.from_tag }}' \
-            --build-arg 'target_tag=${{ steps.config.outputs.target_tag }}' \
-            -t '${{ inputs.target_image }}:${{ steps.config.outputs.target_tag }}' \
-            ${{ steps.config.outputs.expires && '--label quay.expires-after=1w' || '' }} \
+            --build-arg 'target_tag=${{ inputs.target_tag }}' \
+            -t '${{ inputs.target_image }}:${{ inputs.target_tag }}' \
+            ${{ inputs.expires && '--label quay.expires-after=1w' || '' }} \
             ${{ inputs.context }}
       - name: version
         id: version
@@ -60,18 +56,18 @@ jobs:
         uses: hhd-dev/rechunk@ded27feba22df48134eece2c66ba0fca1289ff40 # v1.2.3
         with:
           rechunk: 'ghcr.io/hhd-dev/rechunk:v1.2.3'
-          prev-ref: ${{ steps.config.outputs.registry }}/${{ inputs.target_image }}:${{ steps.config.outputs.target_tag }}
-          ref: localhost/${{ inputs.target_image }}:${{ steps.config.outputs.target_tag }}
+          prev-ref: ${{ inputs.target_registry }}/${{ inputs.target_image }}:${{ inputs.target_tag }}
+          ref: localhost/${{ inputs.target_image }}:${{ inputs.target_tag }}
           version: ${{ steps.version.outputs.version }}
           pretty: ${{ steps.version.outputs.version }}
           revision: ${{ github.sha }}
           skip_compression: true
       - uses: pocketblue/actions/container-push@main
         env:
-          latest: ${{ steps.config.outputs.latest }}
+          latest: ${{ inputs.latest }}
           rechunk_ref: ${{ steps.rechunk.outputs.ref || '' }}
           username: ${{ vars.REGISTRY_USERNAME != '' && vars.REGISTRY_USERNAME || github.repository_owner }}
           password: ${{ secrets.REGISTRY_TOKEN != '' && secrets.REGISTRY_TOKEN || secrets.GITHUB_TOKEN }}
-          registry: ${{ steps.config.outputs.registry }}
+          registry: ${{ inputs.target_registry }}
           image: ${{ inputs.target_image }}
-          tag: ${{ steps.config.outputs.target_tag }}
+          tag: ${{ inputs.target_tag }}

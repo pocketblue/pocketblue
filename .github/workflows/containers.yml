@@ -25,20 +25,39 @@ on:
 run-name: "containers: fedora ${{ inputs.fedora_branch || 42 }} ${{ github.event_name == 'push' && format(' | {0}', github.event.head_commit.message) || '' }}"
 
 jobs:
+  config:
+    runs-on: ubuntu-24.04-arm
+    outputs:
+      target_tag: ${{ steps.config.outputs.target_tag }}
+      expires: ${{ steps.config.outputs.expires }}
+      latest: ${{ steps.config.outputs.latest }}
+      registry: ${{ steps.config.outputs.registry }}
+    steps:
+      - name: config
+        id: config
+        uses: pocketblue/actions/container-config@main
+        with:
+          from_tag: ${{ inputs.fedora_branch || 42 }}
+          vars_registry: ${{ vars.REGISTRY }}
+
   base:
+    needs: config
     secrets: inherit
     permissions:
       packages: write
     uses: ./.github/workflows/helper-build-container.yml
     with:
-      from_tag: ${{ inputs.fedora_branch || 42 }}
       from_image: quay.io/fedora/fedora-bootc
+      from_tag: ${{ inputs.fedora_branch || 42 }}
       target_image: base
+      target_tag: ${{ needs.config.outputs.target_tag }}
+      target_registry: ${{ needs.config.outputs.registry }}
       context: base
       rechunk: false
+      expires: ${{ needs.config.outputs.expires }}
 
   devices:
-    needs: base
+    needs: [config, base]
     permissions:
       packages: write
     secrets: inherit
@@ -49,5 +68,7 @@ jobs:
     uses: ./.github/workflows/helper-build-device.yml
     with:
       device: ${{ matrix.device }}
-      from_tag: ${{ needs.base.outputs.target_tag }}
-      registry: ${{ needs.base.outputs.registry }}
+      from_tag: ${{ needs.config.outputs.target_tag }}
+      target_tag: ${{ needs.config.outputs.target_tag }}
+      registry: ${{ needs.config.outputs.registry }}
+      expires: ${{ needs.config.outputs.expires }}
