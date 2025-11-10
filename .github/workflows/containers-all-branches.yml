@@ -13,6 +13,6 @@ jobs:
       fail-fast: false
       matrix:
         fedora_branch: ['42', '43', 'rawhide']
-    uses: ./.github/workflows/containers-one-branch.yml
+    uses: ./.github/workflows/containers.yml
     with:
       fedora_branch: ${{ matrix.fedora_branch }}
