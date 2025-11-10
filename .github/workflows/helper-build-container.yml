@@ -1,10 +1,19 @@
 on:
   workflow_call:
     inputs:
+      # container's base image
+      from_registry:
+        required: true
+        type: string
       from_image:
         required: true
         type: string
       from_tag:
+        required: true
+        type: string
+
+      # image to build
+      target_registry:
         required: true
         type: string
       target_image:
@@ -13,15 +22,16 @@ on:
       target_tag:
         required: true
         type: string
-      target_registry:
-        required: true
-        type: string
+
       context:
         required: true
         type: string
+
+      # misc parameters
       rechunk:
-        required: true
+        required: false
         type: boolean
+        default: false
       expires:
         required: false
         type: string
@@ -39,7 +49,7 @@ jobs:
         id: build
         run: |
           sudo buildah bud \
-            --build-arg 'from=${{ inputs.from_image }}:${{ inputs.from_tag }}' \
+            --build-arg 'from=${{ inputs.from_registry }}/${{ inputs.from_image }}:${{ inputs.from_tag }}' \
             --build-arg 'target_tag=${{ inputs.target_tag }}' \
             -t '${{ inputs.target_image }}:${{ inputs.target_tag }}' \
             ${{ inputs.expires && '--label quay.expires-after=1w' || '' }} \
@@ -49,7 +59,11 @@ jobs:
         if: inputs.rechunk
         shell: bash
         run: |
-          export full_version=$(sudo podman inspect '${{ inputs.from_image }}:${{ inputs.from_tag }}' --format '{{ index .Config.Labels "org.opencontainers.image.version" }}')
+          export full_version=$(
+            sudo podman inspect \
+              '${{ inputs.from_registry }}/${{ inputs.from_image }}:${{ inputs.from_tag }}' \
+              --format '{{ index .Config.Labels "org.opencontainers.image.version" }}'
+          )
           echo version=$(echo $full_version | cut -d. -f1-2) >> $GITHUB_OUTPUT
       - id: rechunk
         if: inputs.rechunk

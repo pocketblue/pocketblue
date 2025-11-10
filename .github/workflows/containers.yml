@@ -47,11 +47,12 @@ jobs:
       packages: write
     uses: ./.github/workflows/helper-build-container.yml
     with:
-      from_image: quay.io/fedora/fedora-bootc
+      from_registry: quay.io/fedora
+      from_image: fedora-bootc
       from_tag: ${{ inputs.fedora_branch || 42 }}
+      target_registry: ${{ needs.config.outputs.registry }}
       target_image: base
       target_tag: ${{ needs.config.outputs.target_tag }}
-      target_registry: ${{ needs.config.outputs.registry }}
       context: base
       rechunk: false
       expires: ${{ needs.config.outputs.expires }}
