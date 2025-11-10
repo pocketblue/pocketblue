@@ -1,5 +1,10 @@
 name: containers
 on:
+  workflow_call:
+    inputs:
+      fedora_branch:
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       fedora_branch:
