@@ -48,7 +48,7 @@ jobs:
       expires: ${{ steps.config.outputs.expires }}
       latest: ${{ steps.config.outputs.latest }}
       registry: ${{ steps.config.outputs.registry }}
-      devices: ${{ steps.devices.outputs.devices }}
+      devices: ${{ steps.config.outputs.devices }}
     steps:
       - name: config
         id: config
@@ -56,26 +56,13 @@ jobs:
         with:
           from_tag: ${{ inputs.fedora_branch || 42 }}
           vars_registry: ${{ vars.REGISTRY }}
-      - name: build device list
-        id: devices
-        uses: actions/github-script@v8
-        with:
-          script: |
-            const device = process.env.DEVICE;
-            const all_devices = [
-              'nothing-spacewar',
-              'oneplus-sdm845',
-              'xiaomi-nabu',
-              'xiaomi-pipa',
-              'xunlong-orangepi3-lts',
-            ];
-
-            core.setOutput(
-              'devices',
-              JSON.stringify(device == 'all' ? all_devices : [device])
-            );
-        env:
-          DEVICE: ${{ inputs.device }}
+          device: ${{ inputs.device || '' }}
+          device_list: |
+            nothing-spacewar
+            oneplus-sdm845
+            xiaomi-nabu
+            xiaomi-pipa
+            xunlong-orangepi3-lts
 
   base:
     needs: config
