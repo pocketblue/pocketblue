@@ -16,38 +16,84 @@ on:
           - '43'
           - 'rawhide'
         default: '42'
+      device:
+        type: choice
+        description: 'device'
+        required: true
+        options:
+          - 'all'
+          - 'nothing-spacewar'
+          - 'oneplus-sdm845'
+          - 'xiaomi-nabu'
+          - 'xiaomi-pipa'
+          - 'xunlong-orangepi3-lts'
+        default: 'all'
   push:
     paths:
       - 'base/**'
       - 'devices/*/container/**'
       - 'desktops/**'
 
-run-name: "containers: fedora ${{ inputs.fedora_branch || 42 }} ${{ github.event_name == 'push' && format(' | {0}', github.event.head_commit.message) || '' }}"
+run-name: >
+  containers:
+  fedora ${{ inputs.fedora_branch || 42 }}
+  ${{ inputs.device && inputs.device != 'all' && format(' | {0}', inputs.device) || '' }}
+  ${{ github.event_name == 'push' && format(' | {0}', github.event.head_commit.message) || '' }}
 
 jobs:
+  config:
+    runs-on: ubuntu-24.04-arm
+    outputs:
+      target_tag: ${{ steps.config.outputs.target_tag }}
+      expires: ${{ steps.config.outputs.expires }}
+      latest: ${{ steps.config.outputs.latest }}
+      registry: ${{ steps.config.outputs.registry }}
+      devices: ${{ steps.config.outputs.devices }}
+    steps:
+      - name: config
+        id: config
+        uses: pocketblue/actions/container-config@main
+        with:
+          from_tag: ${{ inputs.fedora_branch || 42 }}
+          vars_registry: ${{ vars.REGISTRY }}
+          device: ${{ inputs.device || '' }}
+          device_list: |
+            nothing-spacewar
+            oneplus-sdm845
+            xiaomi-nabu
+            xiaomi-pipa
+            xunlong-orangepi3-lts
+
   base:
+    needs: config
     secrets: inherit
     permissions:
       packages: write
     uses: ./.github/workflows/helper-build-container.yml
     with:
+      from_registry: quay.io/fedora
+      from_image: fedora-bootc
       from_tag: ${{ inputs.fedora_branch || 42 }}
-      from_image: quay.io/fedora/fedora-bootc
+      target_registry: ${{ needs.config.outputs.registry }}
       target_image: base
+      target_tag: ${{ needs.config.outputs.target_tag }}
       context: base
       rechunk: false
+      expires: ${{ needs.config.outputs.expires }}
 
   devices:
-    needs: base
+    needs: [config, base]
     permissions:
       packages: write
     secrets: inherit
     strategy:
       fail-fast: false
       matrix:
-        device: [nothing-spacewar, oneplus-sdm845, xiaomi-nabu, xiaomi-pipa, xunlong-orangepi3-lts]
+        device: ${{ fromJson(needs.config.outputs.devices) }}
     uses: ./.github/workflows/helper-build-device.yml
     with:
       device: ${{ matrix.device }}
-      from_tag: ${{ needs.base.outputs.target_tag }}
-      registry: ${{ needs.base.outputs.registry }}
+      from_tag: ${{ needs.config.outputs.target_tag }}
+      target_tag: ${{ needs.config.outputs.target_tag }}
+      registry: ${{ needs.config.outputs.registry }}
+      expires: ${{ needs.config.outputs.expires }}
