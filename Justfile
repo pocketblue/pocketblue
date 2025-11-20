@@ -1,6 +1,7 @@
 branch := "42"
 tag := branch
 base_image := "quay.io/fedora/fedora-bootc:" + branch
+arch := "arm64"
 
 build from target context expires="false":
     #!/usr/bin/env bash
@@ -11,7 +12,7 @@ build from target context expires="false":
     [[ "{{target}}" != "$target_tag" ]] || false
 
     sudo buildah bud \
-        --arch=arm64 \
+        --arch="{{arch}}" \
         --build-arg "from={{from}}" \
         --build-arg "target_tag=${target_tag}" \
         -t "{{target}}" \
@@ -26,7 +27,7 @@ build-base \
 
 build-device \
     device \
-    from=("base:" + tag) \
+    from=("localhost/base:" + tag) \
     target=(device + "-base:" + tag) \
     expires="false": \
     (build from target "devices"/device/"container" expires)
@@ -34,7 +35,7 @@ build-device \
 build-desktop \
     device \
     desktop \
-    from=(device + "-base:" + tag) \
+    from=("localhost/" + device + "-base:" + tag) \
     target=(device + "-" + desktop + ":" + tag) \
     expires="false": \
     (build from target "desktops"/desktop expires)
