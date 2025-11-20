@@ -2,8 +2,9 @@ branch := "42"
 tag := branch
 base_image := "quay.io/fedora/fedora-bootc:" + branch
 arch := "arm64"
+expires_after := ""
 
-build from target context expires="false":
+build from target context:
     #!/usr/bin/env bash
     set -euxo pipefail
 
@@ -16,26 +17,23 @@ build from target context expires="false":
         --build-arg "from={{from}}" \
         --build-arg "target_tag=${target_tag}" \
         -t "{{target}}" \
-        {{ if expires == "true" { "--label quay.expires-after=1w" } else { "" } }} \
+        {{ if expires_after != "" { "--label quay.expires-after=" + expires_after } else { "" } }} \
         "{{context}}"
 
 build-base \
     from=base_image \
-    target=("base:" + tag) \
-    expires="false": \
-    (build from target "base" expires)
+    target=("base:" + tag): \
+    (build from target "base")
 
 build-device \
     device \
     from=("localhost/base:" + tag) \
-    target=(device + "-base:" + tag) \
-    expires="false": \
-    (build from target "devices"/device/"container" expires)
+    target=(device + "-base:" + tag): \
+    (build from target "devices"/device/"container")
 
 build-desktop \
     device \
     desktop \
     from=("localhost/" + device + "-base:" + tag) \
-    target=(device + "-" + desktop + ":" + tag) \
-    expires="false": \
-    (build from target "desktops"/desktop expires)
+    target=(device + "-" + desktop + ":" + tag): \
+    (build from target "desktops"/desktop)
