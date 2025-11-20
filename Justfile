@@ -37,3 +37,10 @@ build-desktop \
     from=("localhost/" + device + "-base:" + tag) \
     target=(device + "-" + desktop + ":" + tag): \
     (build from target "desktops"/desktop)
+
+rechunk image target:
+    sudo podman run --rm --privileged -v /var/lib/containers:/var/lib/containers \
+        {{base_image}} \
+        /usr/libexec/bootc-base-imagectl rechunk \
+        {{image}} \
+        {{target}}
