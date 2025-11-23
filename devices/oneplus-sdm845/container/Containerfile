@@ -63,7 +63,7 @@ RUN mkdir /boot/dtb && \
         kernel-modules \
         kernel-modules-core && \
     rm -rf /usr/lib/modules/* && \
-    dnf -y install kernel && \
+    dnf -y install kernel kernel-modules-extra && \
     rm -rf /boot/dtb
 
 # cleanup
