@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+set -uexo pipefail
+
+cp -arfT files/etc /etc
+
+# packages
+dnf -y install \
+    nothing-spacewar-firmware \
+    alsa-ucm-conf-qcom-sc7280 \
+    tqftpserv \
+    qbootctl \
+    rmtfs \
+    qrtr
+
+# kernel
+mkdir -p /boot/dtb
+dnf -y remove \
+    kernel \
+    kernel-core \
+    kernel-modules \
+    kernel-modules-core
+dnf -y install kernel
+rm -r /boot/dtb
+
+# services
+systemctl enable \
+    tqftpserv.service \
+    qbootctl.service \
+    rmtfs.service

@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+
+set -uexo pipefail
+
+dnf -y install \
+    plasma-mobile \
+    plasma-mobile-sounds \
+    plasma-settings \
+    qmlkonsole \
+    sddm-themes
+
+dnf -y install default-flatpaks
+
+dnf -y remove \
+    firefox \
+    firefox-langpacks
+
+dnf -y remove \
+    ark \
+    filelight \
+    kcharselect \
+    kdebugsettings \
+    kde-connect \
+    khelpcenter \
+    kinfocenter \
+    kwrite \
+    plasma-systemmonitor \
+    akonadi-server \
+    akonadi-server-mysql \
+    colord-kde \
+    plasma-print-manager \
+    plasma-workspace-wallpapers \
+    plasma-desktop-doc \
+    phonon-qt6-backend-vlc \
+    vlc-libs \
+    vlc-plugins-base \
+    vlc-plugin-pulseaudio \
+    vlc-plugin-gstreamer \
+    phonon-backend-vlc-common \
+    google-droid-sans-fonts \
+    google-noto-serif-fonts \
+    google-noto-sans-mono-vf-fonts \
+    google-noto-serif-vf-fonts
+
+systemctl enable sddm.service

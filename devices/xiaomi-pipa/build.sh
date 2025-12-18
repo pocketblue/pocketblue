@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+set -uexo pipefail
+
+# Files
+
+cp -arfT files/etc /etc
+cp -arfT files/var /var
+
+# Packages
+
+dnf -y install \
+    xiaomi-pipa-firmware \
+    qbootctl \
+    pipa-dracut \
+    pipa-sound-conf \
+    bootmac
+
+# Services
+
+systemctl enable qbootctl.service bootmac-bluetooth
+
+# Kernel
+
+mkdir -p /boot/dtb
+dnf -y remove \
+    kernel \
+    kernel-core \
+    kernel-modules \
+    kernel-modules-core
+dnf -y install \
+    kernel \
+    kernel-headers
+rm -r /boot/dtb

@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+set -uexo pipefail
+
+cp -arfT etc /etc
+
+dnf -y remove gnome-shell mutter gnome-settings-daemon
+dnf -y install gnome-shell mutter gnome-settings-daemon
+
+dnf -y install \
+    default-flatpaks\
+    gnome-shell-extension-nekotorch
+
+dnf -y remove \
+    firefox \
+    firefox-langpacks
+
+dnf -y remove \
+    gnome-classic-session \
+    gnome-system-monitor \
+    gnome-user-docs \
+    gnome-tour \
+    malcontent-control \
+    yelp
+
+systemctl enable gdm.service

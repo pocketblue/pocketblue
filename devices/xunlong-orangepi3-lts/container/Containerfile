@@ -1,9 +1,0 @@
-ARG from
-FROM $from
-
-ARG target_tag
-
-# cleanup
-RUN dnf clean all && rm -rf /var/log/*
-
-RUN bootc container lint --no-truncate
