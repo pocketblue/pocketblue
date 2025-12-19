@@ -15,7 +15,7 @@ ln -s /var/usrlocal /usr/local
 ln -s /var/opt /opt
 
 # development tools
-dnf -y install git
+dnf -y install git just buildah
 
 # only keep the EN langpack to decrease image size
 dnf -y swap glibc-all-langpacks glibc-langpack-en
