@@ -30,8 +30,10 @@ on:
         default: 'all'
   push:
     paths:
-      - 'base/**'
-      - 'devices/*/container/**'
+      - 'common/**'
+      - 'devices/**'
+      - '!devices/*/build-aux/**'
+      - '!devices/*/flash-scripts/**'
       - 'desktops/**'
 
 run-name: >
@@ -64,36 +66,22 @@ jobs:
             xiaomi-pipa
             xunlong-orangepi3-lts
 
-  base:
+  build:
     needs: config
     secrets: inherit
     permissions:
       packages: write
-    uses: ./.github/workflows/helper-build-container.yml
-    with:
-      from_registry: quay.io/fedora
-      from_image: fedora-bootc
-      from_tag: ${{ inputs.fedora_branch || 42 }}
-      target_registry: ${{ needs.config.outputs.registry }}
-      target_image: base
-      target_tag: ${{ needs.config.outputs.target_tag }}
-      context: base
-      rechunk: false
-      expires: ${{ needs.config.outputs.expires }}
-
-  devices:
-    needs: [config, base]
-    permissions:
-      packages: write
-    secrets: inherit
     strategy:
       fail-fast: false
       matrix:
         device: ${{ fromJson(needs.config.outputs.devices) }}
-    uses: ./.github/workflows/helper-build-device.yml
+        desktop: [gnome-desktop, gnome-mobile, plasma-desktop, plasma-mobile, phosh]
+    uses: ./.github/workflows/helper-build-container.yml
     with:
-      device: ${{ matrix.device }}
-      from_tag: ${{ needs.config.outputs.target_tag }}
-      target_tag: ${{ needs.config.outputs.target_tag }}
+      fedora_branch: ${{ inputs.fedora_branch || 42 }}
       registry: ${{ needs.config.outputs.registry }}
+      device: ${{ matrix.device }}
+      desktop: ${{ matrix.desktop }}
+      tag: ${{ needs.config.outputs.target_tag }}
+      rechunk: true
       expires: ${{ needs.config.outputs.expires }}
