@@ -1,5 +1,5 @@
 silverblue := "quay.io/fedora/fedora-silverblue"
-kinoite := "quay.io/fedora/fedora-silverblue"
+kinoite := "quay.io/fedora/fedora-kinoite"
 base_atomic := "quay.io/fedora-ostree-desktops/base-atomic"
 
 branch := "43"
