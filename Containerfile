@@ -18,22 +18,26 @@ COPY desktops/$desktop /desktop
 
 FROM $base
 
+ARG desktop
 ARG target_tag
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     pushd /ctx/common && \
-    ./build.sh && \
-    popd
+    ./build && \
+    popd && \
+    /ctx/common/cleanup
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     pushd /ctx/device && \
-    ./build.sh && \
-    popd
+    ./build && \
+    popd && \
+    /ctx/common/cleanup
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     pushd /ctx/desktop && \
-    ./build.sh && \
-    popd
+    ./build && \
+    popd && \
+    /ctx/common/cleanup
 
 # os-release file
 RUN sed -i "s/^PRETTY_NAME=.*/PRETTY_NAME=\"Fedora Linux $target_tag ($desktop)\"/" /usr/lib/os-release
