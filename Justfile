@@ -24,6 +24,8 @@ base := if desktop == "gnome-desktop" {
 
 base_bootc := "quay.io/fedora/fedora-bootc:" + branch
 
+registry := "localhost"
+
 expires_after := ""
 rechunk_suffix := ""
 arch := "arm64"
@@ -35,7 +37,7 @@ build:
         --build-arg "device={{device}}" \
         --build-arg "desktop={{desktop}}" \
         --build-arg "target_tag={{tag}}" \
-        -t "{{device}}-{{desktop}}:{{tag}}{{rechunk_suffix}}" \
+        -t "{{registry}}/{{device}}-{{desktop}}:{{tag}}{{rechunk_suffix}}" \
         {{ if expires_after != "" { "--label quay.expires-after=" + expires_after } else { "" } }} \
         "."
 
