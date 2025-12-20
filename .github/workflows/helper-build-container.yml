@@ -21,6 +21,10 @@ on:
         type: string
 
       # misc parameters
+      latest:
+        required: false
+        type: string
+        default: ''
       expires:
         required: false
         type: string
@@ -59,13 +63,11 @@ jobs:
 
       - name: Push
         id: push
+        uses: pocketblue/actions/container-push@silverbase
         env:
-          # latest: ${{ inputs.latest }}
+          latest: ${{ inputs.latest }}
           username: ${{ vars.REGISTRY_USERNAME != '' && vars.REGISTRY_USERNAME || github.repository_owner }}
           password: ${{ secrets.REGISTRY_TOKEN != '' && secrets.REGISTRY_TOKEN || secrets.GITHUB_TOKEN }}
           registry: ${{ inputs.registry }}
-          image_name: ${{ inputs.device }}-${{ inputs.desktop }}
+          name: ${{ inputs.device }}-${{ inputs.desktop }}
           tag: ${{ inputs.tag }}
-        run: |
-          sudo podman login --username $username --password $password $registry
-          sudo podman push $registry/$image_name:$tag

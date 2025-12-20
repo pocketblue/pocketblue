@@ -83,4 +83,5 @@ jobs:
       device: ${{ matrix.device }}
       desktop: ${{ matrix.desktop }}
       tag: ${{ needs.config.outputs.target_tag }}
+      latest: ${{ needs.config.outputs.latest }}
       expires: ${{ needs.config.outputs.expires }}
