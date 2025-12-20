@@ -40,6 +40,7 @@ jobs:
           registry: ${{ vars.REGISTRY }}
           image_name: ${{ inputs.device }}-${{ matrix.desktop }}
           image_tag: ${{ inputs.fedora_branch }}
+          args_7z: -mmt=1 -md=1500m
       - uses: actions/upload-artifact@v4
         with:
           name: pocketblue-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.fedora_branch }}
