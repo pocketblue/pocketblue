@@ -8,8 +8,9 @@ cp -arfT usr /usr
 # workaround (see https://github.com/ublue-os/bluefin-lts/issues/3)
 mkdir -p /var/roothome
 
-# development tools
+# setup development tools
 dnf -y install git just buildah
+systemctl enable sshd.service
 
 # only keep the EN langpack to decrease image size
 dnf -y swap glibc-all-langpacks glibc-langpack-en
