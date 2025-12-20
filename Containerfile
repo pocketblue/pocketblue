@@ -42,7 +42,7 @@ RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
 # os-release file
 RUN sed -i "s/^PRETTY_NAME=.*/PRETTY_NAME=\"Fedora Linux $target_tag ($desktop)\"/" /usr/lib/os-release
 
-# cleanup
-RUN dnf clean all && rm -rf /var/log/*
+RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
+    /ctx/common/finalize
 
 RUN bootc container lint --no-truncate
