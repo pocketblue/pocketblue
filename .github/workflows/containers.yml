@@ -26,7 +26,6 @@ on:
           - 'oneplus-sdm845'
           - 'xiaomi-nabu'
           - 'xiaomi-pipa'
-          - 'xunlong-orangepi3-lts'
         default: 'all'
   push:
     paths:
@@ -64,7 +63,6 @@ jobs:
             oneplus-sdm845
             xiaomi-nabu
             xiaomi-pipa
-            xunlong-orangepi3-lts
 
   build:
     needs: config
