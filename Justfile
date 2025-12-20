@@ -41,12 +41,14 @@ build:
         {{ if expires_after != "" { "--label quay.expires-after=" + expires_after } else { "" } }} \
         "."
 
-rechunk image target:
+rechunk \
+    image=(registry / device + "-" + desktop + ":" + tag + rechunk_suffix) \
+    target=(registry / device + "-" + desktop + ":" + tag):
     sudo podman run --rm --privileged -v /var/lib/containers:/var/lib/containers \
         {{base_bootc}} \
         /usr/libexec/bootc-base-imagectl rechunk \
         {{image}} \
         {{target}}
 
-rebase local_image:
+rebase local_image=(registry / device + "-" + desktop + ":" + tag):
     sudo rpm-ostree rebase ostree-unverified-image:containers-storage:{{local_image}}
