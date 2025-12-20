@@ -21,6 +21,8 @@ on:
           - '42'
           - '43'
           - 'rawhide'
+          - '42-silverbase'
+          - '43-silverbase'
         default: '42'
 jobs:
   images:
