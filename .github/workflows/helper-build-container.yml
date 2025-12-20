@@ -21,10 +21,6 @@ on:
         type: string
 
       # misc parameters
-      rechunk:
-        required: false
-        type: boolean
-        default: false
       expires:
         required: false
         type: string
@@ -50,16 +46,15 @@ jobs:
             desktop=${{ inputs.desktop }} \
             registry=${{ inputs.registry }} \
             ${{ inputs.expires && 'expires_after=1w' || '' }} \
-            ${{ inputs.rechunk && 'rechunk_suffix=-ch' || '' }}
+            rechunk_suffix=-build
 
       - name: Rechunk
         id: rechunk
-        if: inputs.rechunk
         run: |
           just \
             branch=${{ inputs.fedora_branch }} \
             rechunk \
-            ${{ inputs.registry }}/${{ inputs.device }}-${{ inputs.desktop }}:${{ inputs.tag }}-ch \
+            ${{ inputs.registry }}/${{ inputs.device }}-${{ inputs.desktop }}:${{ inputs.tag }}-build \
             ${{ inputs.registry }}/${{ inputs.device }}-${{ inputs.desktop }}:${{ inputs.tag }}
 
       - name: Push
