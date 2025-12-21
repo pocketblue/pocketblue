@@ -43,23 +43,4 @@ dnf -y remove \
     google-noto-sans-mono-vf-fonts \
     google-noto-serif-vf-fonts
 
-dnf -y remove \
-    kjournald \
-    kwalletmanager5 \
-    clinfo \
-    freerdp \
-    aha \
-    antiword \
-    bolt \
-    cryfs \
-    gdb \
-    gdb-headless \
-    brltty \
-    open-vm-tools \
-    open-vm-tools-desktop \
-    cldr-emoji-annotation \
-    cldr-emoji-annotation-dtd \
-    ibus-typing-booster \
-    mariadb*
-
 systemctl enable sddm.service
