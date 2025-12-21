@@ -63,7 +63,7 @@ jobs:
 
       - name: Push
         id: push
-        uses: pocketblue/actions/container-push@silverbase
+        uses: pocketblue/actions/container-push@main
         env:
           latest: ${{ inputs.latest }}
           username: ${{ vars.REGISTRY_USERNAME != '' && vars.REGISTRY_USERNAME || github.repository_owner }}
