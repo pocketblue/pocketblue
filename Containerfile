@@ -22,21 +22,18 @@ ARG desktop
 ARG target_tag
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
-    pushd /ctx/common && \
+    cd /ctx/common && \
     ./build && \
-    popd && \
     /ctx/common/cleanup
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
-    pushd /ctx/device && \
+    cd /ctx/device && \
     ./build && \
-    popd && \
     /ctx/common/cleanup
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
-    pushd /ctx/desktop && \
+    cd /ctx/desktop && \
     ./build && \
-    popd && \
     /ctx/common/cleanup
 
 # os-release file
