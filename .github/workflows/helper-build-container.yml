@@ -2,36 +2,29 @@ on:
   workflow_call:
     inputs:
       # container's base image
-      from_registry:
-        required: true
-        type: string
-      from_image:
-        required: true
-        type: string
-      from_tag:
+      fedora_branch:
         required: true
         type: string
 
       # image to build
-      target_registry:
+      registry:
         required: true
         type: string
-      target_image:
+      device:
         required: true
         type: string
-      target_tag:
+      desktop:
         required: true
         type: string
-
-      context:
+      tag:
         required: true
         type: string
 
       # misc parameters
-      rechunk:
+      latest:
         required: false
-        type: boolean
-        default: false
+        type: string
+        default: ''
       expires:
         required: false
         type: string
@@ -39,49 +32,42 @@ on:
 
 jobs:
   build:
-    name: ${{ inputs.target_image }}
+    name: ${{ inputs.device }}-${{ inputs.desktop }}
     runs-on: ubuntu-24.04-arm
     permissions:
       packages: write
     steps:
       - uses: actions/checkout@v4
-      - name: build
+      - uses: extractions/setup-just@v3
+
+      - name: Build
         id: build
         run: |
-          sudo buildah bud \
-            --build-arg 'from=${{ inputs.from_registry }}/${{ inputs.from_image }}:${{ inputs.from_tag }}' \
-            --build-arg 'target_tag=${{ inputs.target_tag }}' \
-            -t '${{ inputs.target_image }}:${{ inputs.target_tag }}' \
-            ${{ inputs.expires && '--label quay.expires-after=1w' || '' }} \
-            ${{ inputs.context }}
-      - name: version
-        id: version
-        if: inputs.rechunk
-        shell: bash
+          just \
+            branch=${{ inputs.fedora_branch }} \
+            tag=${{ inputs.tag }} \
+            device=${{ inputs.device }} \
+            desktop=${{ inputs.desktop }} \
+            registry=${{ inputs.registry }} \
+            ${{ inputs.expires && 'expires_after=1w' || '' }} \
+            rechunk_suffix=-build
+
+      - name: Rechunk
+        id: rechunk
         run: |
-          export full_version=$(
-            sudo podman inspect \
-              '${{ inputs.from_registry }}/${{ inputs.from_image }}:${{ inputs.from_tag }}' \
-              --format '{{ index .Config.Labels "org.opencontainers.image.version" }}'
-          )
-          echo version=$(echo $full_version | cut -d. -f1-2) >> $GITHUB_OUTPUT
-      - id: rechunk
-        if: inputs.rechunk
-        uses: hhd-dev/rechunk@ded27feba22df48134eece2c66ba0fca1289ff40 # v1.2.3
-        with:
-          rechunk: 'ghcr.io/hhd-dev/rechunk:v1.2.3'
-          prev-ref: ${{ inputs.target_registry }}/${{ inputs.target_image }}:${{ inputs.target_tag }}
-          ref: localhost/${{ inputs.target_image }}:${{ inputs.target_tag }}
-          version: ${{ steps.version.outputs.version }}
-          pretty: ${{ steps.version.outputs.version }}
-          revision: ${{ github.sha }}
-          skip_compression: true
-      - uses: pocketblue/actions/container-push@main
+          just \
+            branch=${{ inputs.fedora_branch }} \
+            rechunk \
+            ${{ inputs.registry }}/${{ inputs.device }}-${{ inputs.desktop }}:${{ inputs.tag }}-build \
+            ${{ inputs.registry }}/${{ inputs.device }}-${{ inputs.desktop }}:${{ inputs.tag }}
+
+      - name: Push
+        id: push
+        uses: pocketblue/actions/container-push@main
         env:
           latest: ${{ inputs.latest }}
-          rechunk_ref: ${{ steps.rechunk.outputs.ref || '' }}
           username: ${{ vars.REGISTRY_USERNAME != '' && vars.REGISTRY_USERNAME || github.repository_owner }}
           password: ${{ secrets.REGISTRY_TOKEN != '' && secrets.REGISTRY_TOKEN || secrets.GITHUB_TOKEN }}
-          registry: ${{ inputs.target_registry }}
-          image: ${{ inputs.target_image }}
-          tag: ${{ inputs.target_tag }}
+          registry: ${{ inputs.registry }}
+          name: ${{ inputs.device }}-${{ inputs.desktop }}
+          tag: ${{ inputs.tag }}
