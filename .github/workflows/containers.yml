@@ -29,6 +29,7 @@ on:
         default: 'all'
   push:
     paths:
+      - 'Containerfile'
       - 'common/**'
       - 'devices/**'
       - '!devices/*/build-aux/**'
