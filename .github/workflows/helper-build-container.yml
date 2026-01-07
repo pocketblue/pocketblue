@@ -50,16 +50,21 @@ jobs:
             desktop=${{ inputs.desktop }} \
             registry=${{ inputs.registry }} \
             ${{ inputs.expires && 'expires_after=1w' || '' }} \
-            rechunk_suffix=-build
+            rechunk_suffix=-build \
+            build
 
       - name: Rechunk
         id: rechunk
         run: |
           just \
             branch=${{ inputs.fedora_branch }} \
-            rechunk \
-            ${{ inputs.registry }}/${{ inputs.device }}-${{ inputs.desktop }}:${{ inputs.tag }}-build \
-            ${{ inputs.registry }}/${{ inputs.device }}-${{ inputs.desktop }}:${{ inputs.tag }}
+            tag=${{ inputs.tag }} \
+            device=${{ inputs.device }} \
+            desktop=${{ inputs.desktop }} \
+            registry=${{ inputs.registry }} \
+            ${{ inputs.expires && 'expires_after=1w' || '' }} \
+            rechunk_suffix=-build \
+            rechunk
 
       - name: Push
         id: push
