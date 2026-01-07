@@ -30,6 +30,16 @@ on:
         type: string
         default: ''
 
+env:
+  JUST_ARGS: >
+    branch=${{ inputs.fedora_branch }}
+    tag=${{ inputs.tag }}
+    device=${{ inputs.device }}
+    desktop=${{ inputs.desktop }}
+    registry=${{ inputs.registry }}
+    ${{ inputs.expires && 'expires_after=1w' || '' }}
+    rechunk_suffix=-build
+
 jobs:
   build:
     name: ${{ inputs.device }}-${{ inputs.desktop }}
@@ -42,29 +52,12 @@ jobs:
 
       - name: Build
         id: build
-        run: |
-          just \
-            branch=${{ inputs.fedora_branch }} \
-            tag=${{ inputs.tag }} \
-            device=${{ inputs.device }} \
-            desktop=${{ inputs.desktop }} \
-            registry=${{ inputs.registry }} \
-            ${{ inputs.expires && 'expires_after=1w' || '' }} \
-            rechunk_suffix=-build \
-            build
+        run: just $JUST_ARGS build
 
       - name: Rechunk
         id: rechunk
         run: |
-          just \
-            branch=${{ inputs.fedora_branch }} \
-            tag=${{ inputs.tag }} \
-            device=${{ inputs.device }} \
-            desktop=${{ inputs.desktop }} \
-            registry=${{ inputs.registry }} \
-            ${{ inputs.expires && 'expires_after=1w' || '' }} \
-            rechunk_suffix=-build \
-            rechunk
+          just $JUST_ARGS rechunk
 
       - name: Push
         id: push
