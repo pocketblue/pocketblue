@@ -47,7 +47,7 @@ jobs:
         desktop: [gnome-desktop, gnome-mobile, plasma-desktop, plasma-mobile, phosh]
     name: ${{ matrix.device }}-${{ matrix.desktop }}:${{ inputs.fedora_branch }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: pocketblue/actions/images@main
         with:
           device: ${{ matrix.device }}
