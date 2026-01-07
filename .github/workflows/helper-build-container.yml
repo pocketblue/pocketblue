@@ -30,6 +30,16 @@ on:
         type: string
         default: ''
 
+env:
+  JUST_ARGS: >
+    branch=${{ inputs.fedora_branch }}
+    tag=${{ inputs.tag }}
+    device=${{ inputs.device }}
+    desktop=${{ inputs.desktop }}
+    registry=${{ inputs.registry }}
+    ${{ inputs.expires && 'expires_after=1w' || '' }}
+    rechunk_suffix=-build
+
 jobs:
   build:
     name: ${{ inputs.device }}-${{ inputs.desktop }}
@@ -37,29 +47,17 @@ jobs:
     permissions:
       packages: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: extractions/setup-just@v3
 
       - name: Build
         id: build
-        run: |
-          just \
-            branch=${{ inputs.fedora_branch }} \
-            tag=${{ inputs.tag }} \
-            device=${{ inputs.device }} \
-            desktop=${{ inputs.desktop }} \
-            registry=${{ inputs.registry }} \
-            ${{ inputs.expires && 'expires_after=1w' || '' }} \
-            rechunk_suffix=-build
+        run: just $JUST_ARGS build
 
       - name: Rechunk
         id: rechunk
         run: |
-          just \
-            branch=${{ inputs.fedora_branch }} \
-            rechunk \
-            ${{ inputs.registry }}/${{ inputs.device }}-${{ inputs.desktop }}:${{ inputs.tag }}-build \
-            ${{ inputs.registry }}/${{ inputs.device }}-${{ inputs.desktop }}:${{ inputs.tag }}
+          just $JUST_ARGS rechunk
 
       - name: Push
         id: push
