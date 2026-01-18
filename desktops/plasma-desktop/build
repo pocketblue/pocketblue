@@ -34,5 +34,3 @@ dnf -y remove \
     google-noto-serif-fonts \
     google-noto-sans-mono-vf-fonts \
     google-noto-serif-vf-fonts
-
-systemctl enable sddm.service

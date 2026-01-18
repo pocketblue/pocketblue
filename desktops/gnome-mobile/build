@@ -22,5 +22,3 @@ dnf -y remove \
     gnome-tour \
     malcontent-control \
     yelp
-
-systemctl enable gdm.service
