@@ -7,8 +7,6 @@ set -uexo pipefail
 cp -arfT files/etc /etc
 cp -arfT files/usr /usr
 
-cp -arfT files/fwload/usr /usr
-
 cp -arfT files/usbnet/etc /etc
 cp -arfT files/usbnet/usr /usr
 
@@ -21,7 +19,7 @@ dnf -y install \
     qbootctl \
     rmtfs \
     qcom-firmware \
-    pil-squasher \
+    sdm845-fwload \
     pd-mapper \
     libssc \
     qrtr
@@ -72,3 +70,9 @@ dnf -y remove \
 rm -rf /usr/lib/modules/*
 dnf -y install kernel kernel-modules-extra
 rm -rf /boot/dtb
+
+# sdm845-fwload
+
+# fwload files overwrite some of the system files
+cp -arfT files/fwload/etc /etc
+cp -arfT files/fwload/usr /usr
