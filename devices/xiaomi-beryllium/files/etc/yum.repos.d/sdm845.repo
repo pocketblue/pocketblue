@@ -1,0 +1,11 @@
+[copr:copr.fedorainfracloud.org:pocketblue:sdm845]
+name=Copr repo for sdm845 owned by pocketblue
+baseurl=https://download.copr.fedorainfracloud.org/results/pocketblue/sdm845/fedora-$releasever-$basearch/
+type=rpm-md
+skip_if_unavailable=True
+gpgcheck=1
+gpgkey=https://download.copr.fedorainfracloud.org/results/pocketblue/sdm845/pubkey.gpg
+repo_gpgcheck=0
+enabled=1
+enabled_metadata=1
+priority=98

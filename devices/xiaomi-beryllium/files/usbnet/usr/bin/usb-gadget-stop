@@ -1,0 +1,8 @@
+#!/bin/bash
+set -ueo pipefail
+
+if [[ -n "${DEBUG:-}" ]]; then
+    set -x
+fi
+
+[[ -e /sys/kernel/config/usb_gadget/usb-gadget/UDC ]] && echo > /sys/kernel/config/usb_gadget/usb-gadget/UDC
