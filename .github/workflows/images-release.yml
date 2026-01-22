@@ -43,28 +43,41 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        device: [oneplus-sdm845, xiaomi-nabu, xiaomi-pipa]
+        device:
+          - name: oneplus-sdm845
+            tag: ${{ inputs.fedora_branch }}
+            build_aux: 'build-aux'
+          - name: xiaomi-nabu
+            tag: ${{ inputs.fedora_branch }}
+            build_aux: 'build-aux'
+          - name: xiaomi-nabu
+            tag: ${{ inputs.fedora_branch }}-samsung
+            build_aux: 'build-aux.samsung'
+          - name: xiaomi-pipa
+            tag: ${{ inputs.fedora_branch }}
+            build_aux: 'build-aux'
         desktop: [gnome-desktop, gnome-mobile, plasma-desktop, plasma-mobile, phosh]
-    name: ${{ matrix.device }}-${{ matrix.desktop }}:${{ inputs.fedora_branch }}
+    name: ${{ matrix.device.name }}-${{ matrix.desktop }}:${{ matrix.device.tag }}
     steps:
       - uses: actions/checkout@v6
       - uses: pocketblue/actions/images@main
         with:
-          device: ${{ matrix.device }}
+          device: ${{ matrix.device.name }}
           registry: ${{ vars.REGISTRY }}
-          image_name: ${{ matrix.device }}-${{ matrix.desktop }}
-          image_tag: ${{ inputs.fedora_branch }}
+          image_name: ${{ matrix.device.name }}-${{ matrix.desktop }}
+          image_tag: ${{ matrix.device.tag }}
           args_7z: -mmt=1 -md=1500m
+          build_aux: ${{ matrix.device.build_aux }}
       - name: check size
         run: |
-          du 'pocketblue-${{ matrix.device }}-${{ matrix.desktop }}-${{ inputs.fedora_branch }}.7z' -h
-          du 'pocketblue-${{ matrix.device }}-${{ matrix.desktop }}-${{ inputs.fedora_branch }}.7z'
+          du 'pocketblue-${{ matrix.device.name }}-${{ matrix.desktop }}-${{ matrix.device.tag }}.7z' -h
+          du 'pocketblue-${{ matrix.device.name }}-${{ matrix.desktop }}-${{ matrix.device.tag }}.7z'
       - uses: actions/upload-artifact@v4
         with:
-          name: pocketblue-${{ matrix.device }}-${{ matrix.desktop }}-${{ inputs.fedora_branch }}
-          path: pocketblue-${{ matrix.device }}-${{ matrix.desktop }}-${{ inputs.fedora_branch }}.7z
+          name: pocketblue-${{ matrix.device.name }}-${{ matrix.desktop }}-${{ matrix.device.tag }}
+          path: pocketblue-${{ matrix.device.name }}-${{ matrix.desktop }}-${{ matrix.device.tag }}.7z
           compression-level: 0
       - uses: svenstaro/upload-release-action@v2
         with:
           release_id: ${{ needs.create_release.outputs.release_id}}
-          file: pocketblue-${{ matrix.device }}-${{ matrix.desktop }}-${{ inputs.fedora_branch }}.7z
+          file: pocketblue-${{ matrix.device.name }}-${{ matrix.desktop }}-${{ matrix.device.tag }}.7z

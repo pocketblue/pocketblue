@@ -5,6 +5,16 @@ on:
       fedora_branch:
         required: true
         type: string
+      device:
+        type: string
+        required: false
+      target_tag_override:
+        type: string
+        required: false
+      xiaomi_nabu_samsung_ufs:
+        type: boolean
+        description: build with Samsung UFS support
+        required: true
   workflow_dispatch:
     inputs:
       fedora_branch:
@@ -27,6 +37,15 @@ on:
           - 'xiaomi-nabu'
           - 'xiaomi-pipa'
         default: 'all'
+      target_tag_override:
+        type: string
+        description: 'set the tag of the resulting images'
+        required: false
+      xiaomi_nabu_samsung_ufs:
+        type: boolean
+        description: build with Samsung UFS support
+        required: true
+        default: false
   push:
     paths:
       - 'Containerfile'
@@ -81,6 +100,7 @@ jobs:
       registry: ${{ needs.config.outputs.registry }}
       device: ${{ matrix.device }}
       desktop: ${{ matrix.desktop }}
-      tag: ${{ needs.config.outputs.target_tag }}
+      tag: ${{ inputs.target_tag_override && inputs.target_tag_override || needs.config.outputs.target_tag }}
       latest: ${{ needs.config.outputs.latest }}
       expires: ${{ needs.config.outputs.expires }}
+      xiaomi_nabu_samsung_ufs: ${{ inputs.xiaomi_nabu_samsung_ufs }}

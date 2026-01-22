@@ -5,7 +5,7 @@ on:
     - cron: '0 12 * * *'
 
 jobs:
-  branch:
+  main:
     secrets: inherit
     permissions:
       packages: write
@@ -16,3 +16,18 @@ jobs:
     uses: ./.github/workflows/containers.yml
     with:
       fedora_branch: ${{ matrix.fedora_branch }}
+      xiaomi_nabu_samsung_ufs: false
+  nabu_samsung:
+    secrets: inherit
+    permissions:
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        fedora_branch: ['42', '43', 'rawhide']
+    uses: ./.github/workflows/containers.yml
+    with:
+      fedora_branch: ${{ matrix.fedora_branch }}
+      device: xiaomi-nabu
+      target_tag_override: ${{ matrix.fedora_branch }}-samsung
+      xiaomi_nabu_samsung_ufs: true

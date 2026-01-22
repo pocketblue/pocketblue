@@ -1,5 +1,5 @@
 name: images
-run-name: 'images: ${{ inputs.device }} / fedora ${{ inputs.fedora_branch }}'
+run-name: 'images: ${{ inputs.device }} / fedora ${{ inputs.tag }}'
 on:
   workflow_dispatch:
     inputs:
@@ -13,15 +13,16 @@ on:
           - xiaomi-nabu
           - xiaomi-pipa
           - xunlong-orangepi3-lts
-      fedora_branch:
-        type: choice
-        description: fedora branch
+      tag:
+        type: string
+        description: image tag
         required: true
-        options:
-          - '42'
-          - '43'
-          - 'rawhide'
         default: '43'
+      nabu_samsung_ufs:
+        type: boolean
+        description: build with Samsung UFS support (xiaomi-nabu only)
+        required: true
+        default: false
 jobs:
   images:
     runs-on: ubuntu-24.04-arm
@@ -29,17 +30,18 @@ jobs:
       fail-fast: false
       matrix:
         desktop: [gnome-desktop, gnome-mobile, plasma-desktop, plasma-mobile, phosh]
-    name: ${{ inputs.device }}-${{ matrix.desktop }}:${{ inputs.fedora_branch }}
+    name: ${{ inputs.device }}-${{ matrix.desktop }}:${{ inputs.tag }}
     steps:
       - uses: actions/checkout@v6
-      - uses: pocketblue/actions/images@main
+      - uses: pocketblue/actions/images@build-aux-arg
         with:
           device: ${{ inputs.device }}
           registry: ${{ vars.REGISTRY }}
           image_name: ${{ inputs.device }}-${{ matrix.desktop }}
-          image_tag: ${{ inputs.fedora_branch }}
+          image_tag: ${{ inputs.tag }}
+          build_aux: ${{ inputs.device == 'xiaomi-nabu' && inputs.nabu_samsung_ufs && 'build-aux.samsung' || 'build-aux' }}
       - uses: actions/upload-artifact@v4
         with:
-          name: pocketblue-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.fedora_branch }}
-          path: pocketblue-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.fedora_branch }}.7z
+          name: pocketblue-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.tag }}
+          path: pocketblue-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.tag }}.7z
           compression-level: 0
