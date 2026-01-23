@@ -10,9 +10,9 @@ on:
         options:
           - nothing-spacewar
           - oneplus-sdm845
+          - xiaomi-beryllium
           - xiaomi-nabu
           - xiaomi-pipa
-          - xunlong-orangepi3-lts
       fedora_branch:
         type: choice
         description: fedora branch

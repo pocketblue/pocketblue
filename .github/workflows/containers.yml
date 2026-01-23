@@ -24,6 +24,7 @@ on:
           - 'all'
           - 'nothing-spacewar'
           - 'oneplus-sdm845'
+          - 'xiaomi-beryllium'
           - 'xiaomi-nabu'
           - 'xiaomi-pipa'
         default: 'all'
@@ -62,6 +63,7 @@ jobs:
           device_list: |
             nothing-spacewar
             oneplus-sdm845
+            xiaomi-beryllium
             xiaomi-nabu
             xiaomi-pipa
 
