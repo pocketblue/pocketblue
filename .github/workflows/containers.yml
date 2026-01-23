@@ -13,7 +13,6 @@ on:
         required: false
       xiaomi_nabu_samsung_ufs:
         type: boolean
-        description: build with Samsung UFS support
         required: true
   workflow_dispatch:
     inputs:
@@ -39,11 +38,11 @@ on:
         default: 'all'
       target_tag_override:
         type: string
-        description: 'set the tag of the resulting images'
+        description: 'override target tag'
         required: false
       xiaomi_nabu_samsung_ufs:
         type: boolean
-        description: build with Samsung UFS support
+        description: 'ARG: xiaomi_nabu_samsung_ufs'
         required: true
         default: false
   push:
