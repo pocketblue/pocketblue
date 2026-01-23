@@ -1,0 +1,5 @@
+aloha.zip https://github.com/Project-Aloha/mu_aloha_platforms/releases/download/2412.74/uefi-images-hana-sm8150.zip 7ddc39aac2c92cf3ce341256baad34f34e50cc99af7cca55dd3b27971d724024
+images/twrp.img https://github.com/ArKT-7/twrp_device_xiaomi_nabu/releases/download/mod_linux/V4-MODDED-TWRP-LINUX.img 7b7f9b9110aa577306dff7725eb64b93434a6917c0a9f785ef6064632a8ed936
+images/dtbo.img https://github.com/ArKT-7/automated-nabu-lineage-installer/releases/download/lineage-22.1-20250207-UNOFFICIAL-nabu/dtbo.img cbc1c63e87fffea5bc96d22d4c4eae5df492c692c1ec235192e7e32fd75d9eb8
+sgdisk https://github.com/gmankab/sgdisk/releases/download/v1.0.10/sgdisk aeb927e91b389a898722e0614a16939c76f8fb1bf9bff6826b1caebcad275fb5
+parted https://github.com/gmankab/parted/releases/download/v3.6/parted 2136e3443cbe68750d7a3ecde39791fd2eea77d2f23da131bdb49b49543e1ba0

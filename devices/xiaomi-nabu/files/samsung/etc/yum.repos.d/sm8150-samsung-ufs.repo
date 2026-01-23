@@ -1,0 +1,11 @@
+[copr:copr.fedorainfracloud.org:pocketblue:sm8150-samsung-ufs]
+name=Copr repo for sm8150-samsung-ufs owned by pocketblue
+baseurl=https://download.copr.fedorainfracloud.org/results/pocketblue/sm8150-samsung-ufs/fedora-$releasever-$basearch/
+type=rpm-md
+skip_if_unavailable=True
+gpgcheck=1
+gpgkey=https://download.copr.fedorainfracloud.org/results/pocketblue/sm8150-samsung-ufs/pubkey.gpg
+repo_gpgcheck=0
+enabled=1
+enabled_metadata=1
+priority=50
