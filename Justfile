@@ -30,25 +30,24 @@ expires_after := ""
 rechunk_suffix := ""
 arch := "arm64"
 
-build:
+build *ARGS:
     sudo buildah bud \
         --arch="{{arch}}" \
         --build-arg "base={{base}}:{{branch}}" \
         --build-arg "device={{device}}" \
         --build-arg "desktop={{desktop}}" \
         --build-arg "target_tag={{tag}}" \
+        {{ARGS}} \
         -t "{{registry}}/{{device}}-{{desktop}}:{{tag}}{{rechunk_suffix}}" \
         {{ if expires_after != "" { "--label quay.expires-after=" + expires_after } else { "" } }} \
         "."
 
-rechunk \
-    image=(registry / device + "-" + desktop + ":" + tag + rechunk_suffix) \
-    target=(registry / device + "-" + desktop + ":" + tag):
-    sudo podman run --rm --privileged -v /var/lib/containers:/var/lib/containers \
+rechunk *ARGS:
+    sudo podman run --rm --privileged -v /var/lib/containers:/var/lib/containers {{ARGS}} \
         {{base_bootc}} \
         /usr/libexec/bootc-base-imagectl rechunk \
-        {{image}} \
-        {{target}}
+        {{registry}}/{{device}}-{{desktop}}:{{tag}}{{rechunk_suffix}} \
+        {{registry}}/{{device}}-{{desktop}}:{{tag}}
 
 rebase local_image=(registry / device + "-" + desktop + ":" + tag):
     sudo rpm-ostree rebase ostree-unverified-image:containers-storage:{{local_image}}

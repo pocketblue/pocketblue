@@ -21,6 +21,9 @@ FROM $base
 ARG desktop
 ARG target_tag
 
+# device-specific args
+ARG xiaomi_nabu_samsung_ufs=false
+
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     cd /ctx/common && \
     ./build && \
