@@ -103,4 +103,4 @@ jobs:
       tag: ${{ inputs.target_tag_override && inputs.target_tag_override || needs.config.outputs.target_tag }}
       latest: ${{ needs.config.outputs.latest }}
       expires: ${{ needs.config.outputs.expires }}
-      xiaomi_nabu_samsung_ufs: ${{ inputs.xiaomi_nabu_samsung_ufs }}
+      xiaomi_nabu_samsung_ufs: ${{ inputs.xiaomi_nabu_samsung_ufs || false }}
