@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+set -uexo pipefail
+
+export panel=@panel@ # ebbg/tianma
+echo $panel | grep -E 'ebbg|tianma'
+
+which fastboot
+
+echo 'waiting for device to appear in fastboot'
+fastboot getvar product 2>&1 | grep beryllium
+
+fastboot erase dtbo
+fastboot flash boot     images/u-boot-$panel.img
+fastboot flash cust     images/fedora_esp.raw
+fastboot flash system   images/fedora_boot.raw
+fastboot flash userdata images/fedora_rootfs.raw
+
+echo 'rebooting (this may take a while, DO NOT DISCONNECT THE DEVICE)'
+fastboot reboot
