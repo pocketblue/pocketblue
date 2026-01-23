@@ -1,0 +1,13 @@
+[Unit]
+Description=MSM Modem UIM Slot Selection
+Before=ModemManager.service
+After=rmtfs.service
+Requires=rmtfs.service
+
+[Service]
+Type=notify
+ExecStart=/usr/libexec/msm-modem-uim-selection
+
+[Install]
+WantedBy=multi-user.target
+RequiredBy=ModemManager.service

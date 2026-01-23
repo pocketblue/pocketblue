@@ -1,0 +1,11 @@
+[copr:copr.fedorainfracloud.org:onesaladleaf:test]
+name=Copr repo for test owned by onesaladleaf
+baseurl=https://download.copr.fedorainfracloud.org/results/onesaladleaf/test/fedora-$releasever-$basearch/
+type=rpm-md
+skip_if_unavailable=True
+gpgcheck=1
+gpgkey=https://download.copr.fedorainfracloud.org/results/onesaladleaf/test/pubkey.gpg
+repo_gpgcheck=0
+enabled=1
+enabled_metadata=1
+priority=5
