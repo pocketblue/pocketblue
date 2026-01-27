@@ -1,0 +1,11 @@
+[copr:copr.fedorainfracloud.org:pocketblue:sc7280]
+name=Copr repo for sc7280 owned by pocketblue
+baseurl=https://download.copr.fedorainfracloud.org/results/pocketblue/sc7280/fedora-$releasever-$basearch/
+type=rpm-md
+skip_if_unavailable=True
+gpgcheck=1
+gpgkey=https://download.copr.fedorainfracloud.org/results/pocketblue/sc7280/pubkey.gpg
+repo_gpgcheck=0
+enabled=1
+enabled_metadata=1
+priority=90
