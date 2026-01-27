@@ -36,6 +36,7 @@ on:
           - 'xiaomi-beryllium'
           - 'xiaomi-nabu'
           - 'xiaomi-pipa'
+          - 'xunlong-orangepi3-lts'
         default: 'all'
       target_tag_override:
         type: string
@@ -84,6 +85,7 @@ jobs:
             xiaomi-beryllium
             xiaomi-nabu
             xiaomi-pipa
+            xunlong-orangepi3-lts
 
   build:
     needs: config
