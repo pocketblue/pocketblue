@@ -1,0 +1,11 @@
+[copr:copr.fedorainfracloud.org:ergolyam:rpms-orangepi3-lts]
+name=Copr repo for rpms-orangepi3-lts owned by ergolyam
+baseurl=https://download.copr.fedorainfracloud.org/results/ergolyam/rpms-orangepi3-lts/fedora-$releasever-$basearch/
+type=rpm-md
+skip_if_unavailable=True
+gpgcheck=1
+gpgkey=https://download.copr.fedorainfracloud.org/results/ergolyam/rpms-orangepi3-lts/pubkey.gpg
+repo_gpgcheck=0
+enabled=1
+enabled_metadata=1
+priority=90

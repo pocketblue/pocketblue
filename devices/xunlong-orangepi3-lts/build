@@ -2,4 +2,15 @@
 
 set -uexo pipefail
 
-# Nothing to do here yet!
+cp -arfT files/etc /etc
+
+mkdir -p /boot/dtb
+dnf -y remove \
+    kernel \
+    kernel-core \
+    kernel-modules \
+    kernel-modules-core
+dnf -y install \
+    kernel \
+    kernel-headers
+rm -r /boot/dtb
