@@ -37,7 +37,7 @@ jobs:
       - uses: pocketblue/actions/images@main
         with:
           device: ${{ inputs.device }}
-          registry: ${{ vars.REGISTRY }}
+          registry: ${{ vars.REGISTRY || format('ghcr.io/{0}', github.repository_owner) }}
           image_name: ${{ inputs.device }}-${{ matrix.desktop }}
           image_tag: ${{ inputs.tag }}
           build_aux: ${{ inputs.device == 'xiaomi-nabu' && inputs.nabu_samsung_ufs && 'build-aux.samsung' || 'build-aux' }}
