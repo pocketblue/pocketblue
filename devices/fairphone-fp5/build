@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+set -uexo pipefail
+
+cp -arfT files/etc /etc
+cp -arfT files/usr /usr
+
+# packages
+dnf -y remove alsa-ucm # conflicts with alsa-ucm-conf-qcom-sc7280
+dnf -y install \
+    fairphone-5-firmware \
+    alsa-ucm-conf-qcom-sc7280 \
+    hexagonrpc \
+    libssc \
+    iio-sensor-proxy \
+    tqftpserv \
+    qbootctl \
+    rmtfs \
+    qrtr
+
+# kernel
+mkdir -p /boot/dtb
+dnf -y remove \
+    kernel \
+    kernel-core \
+    kernel-modules \
+    kernel-modules-core
+dnf -y install \
+    kernel
+rm -r /boot/dtb
+
+# services
+systemctl enable \
+    hexagonrpcd-adsp-rootpd.service \
+    hexagonrpcd-adsp-sensorspd.service \
+    hexagonrpcd-sdsp.service \
+    tqftpserv.service \
+    qbootctl.service \
+    rmtfs.service
