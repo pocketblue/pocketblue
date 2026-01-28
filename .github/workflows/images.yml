@@ -8,6 +8,7 @@ on:
         description: 'device name'
         required: true
         options:
+          - fairphone-fp5
           - nothing-spacewar
           - oneplus-sdm845
           - xiaomi-beryllium
