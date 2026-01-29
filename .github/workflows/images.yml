@@ -1,5 +1,5 @@
 name: images
-run-name: 'images: ${{ inputs.device }} / fedora ${{ inputs.tag }}'
+run-name: 'images: ${{ inputs.device }} / fedora ${{ inputs.target_tag_override && inputs.target_tag_override || inputs.fedora_branch }}'
 on:
   workflow_dispatch:
     inputs:
@@ -14,35 +14,66 @@ on:
           - xiaomi-nabu
           - xiaomi-pipa
           - xunlong-orangepi3-lts
-      tag:
-        type: string
-        description: image tag
+      fedora_branch:
+        type: choice
+        description: 'fedora branch'
         required: true
+        options:
+          - '42'
+          - '43'
+          - 'rawhide'
         default: '43'
+      target_tag_override:
+        type: string
+        description: 'override target tag'
+        required: false
       nabu_samsung_ufs:
         type: boolean
         description: build with Samsung UFS support (xiaomi-nabu only)
         required: true
         default: false
 jobs:
+  config:
+    runs-on: ubuntu-24.04-arm
+    outputs:
+      target_tag: ${{ steps.config.outputs.target_tag }}
+      registry: ${{ steps.config.outputs.registry }}
+    steps:
+      - name: config
+        id: config
+        uses: pocketblue/actions/container-config@main
+        with:
+          from_tag: ${{ inputs.fedora_branch }}
+          vars_registry: ${{ vars.REGISTRY }}
+          device: ${{ inputs.device || '' }}
+          device_list: |
+            nothing-spacewar
+            oneplus-sdm845
+            xiaomi-beryllium
+            xiaomi-nabu
+            xiaomi-pipa
+
   images:
+    needs: config
     runs-on: ubuntu-24.04-arm
     strategy:
       fail-fast: false
       matrix:
         desktop: [gnome-desktop, gnome-mobile, plasma-desktop, plasma-mobile, phosh]
-    name: ${{ inputs.device }}-${{ matrix.desktop }}:${{ inputs.tag }}
+    env:
+      TAG: ${{ inputs.target_tag_override && inputs.target_tag_override || needs.config.outputs.target_tag }}
+    name: ${{ inputs.device }}-${{ matrix.desktop }}:${{ inputs.target_tag_override && inputs.target_tag_override || needs.config.outputs.target_tag }}
     steps:
       - uses: actions/checkout@v6
       - uses: pocketblue/actions/images@main
         with:
           device: ${{ inputs.device }}
-          registry: ${{ vars.REGISTRY || format('ghcr.io/{0}', github.repository_owner) }}
+          registry: ${{ needs.config.outputs.registry }}
           image_name: ${{ inputs.device }}-${{ matrix.desktop }}
-          image_tag: ${{ inputs.tag }}
+          image_tag: ${{ env.TAG }}
           build_aux: ${{ inputs.device == 'xiaomi-nabu' && inputs.nabu_samsung_ufs && 'build-aux.samsung' || 'build-aux' }}
       - uses: actions/upload-artifact@v4
         with:
-          name: pocketblue-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.tag }}
-          path: pocketblue-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.tag }}.7z
+          name: pocketblue-${{ inputs.device }}-${{ matrix.desktop }}-${{ env.TAG }}
+          path: pocketblue-${{ inputs.device }}-${{ matrix.desktop }}-${{ env.TAG }}.7z
           compression-level: 0
