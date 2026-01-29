@@ -30,7 +30,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        desktop: [gnome-desktop, gnome-mobile, plasma-desktop, plasma-mobile, phosh]
+        desktop: [empty, gnome-desktop, gnome-mobile, plasma-desktop, plasma-mobile, phosh]
     name: ${{ inputs.device }}-${{ matrix.desktop }}:${{ inputs.tag }}
     steps:
       - uses: actions/checkout@v6
