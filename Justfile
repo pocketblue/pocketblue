@@ -1,34 +1,43 @@
-silverblue := "quay.io/fedora/fedora-silverblue"
-kinoite := "quay.io/fedora/fedora-kinoite"
-base_atomic := "quay.io/fedora-ostree-desktops/base-atomic"
+set dotenv-load
 
-branch := "43"
-tag := branch
+silverblue := env("PB_SILVERBLUE", "quay.io/fedora/fedora-silverblue")
+kinoite := env("PB_KINOITE", "quay.io/fedora/fedora-kinoite")
+base_atomic := env("PB_BASE_ATOMIC", "quay.io/fedora-ostree-desktops/base-atomic")
 
-device := "oneplus-sdm845"
-desktop := "phosh"
+branch := env("PB_BRANCH", "43")
+tag := env("PB_TAG", branch)
 
-base := if desktop == "gnome-desktop" {
-    silverblue
-} else if desktop == "gnome-mobile" {
-    silverblue
-} else if desktop == "phosh" {
-    silverblue
-} else if desktop == "plasma-desktop" {
-    kinoite
-} else if desktop == "plasma-mobile" {
-    kinoite
-} else {
-    base_atomic
-}
+device := env("PB_DEVICE", "oneplus-sdm845")
+desktop := env("PB_DESKTOP", "phosh")
 
-base_bootc := "quay.io/fedora/fedora-bootc:" + branch
+base := env("PB_BASE",
+    if desktop == "gnome-desktop" {
+        silverblue
+    } else if desktop == "gnome-mobile" {
+        silverblue
+    } else if desktop == "phosh" {
+        silverblue
+    } else if desktop == "plasma-desktop" {
+        kinoite
+    } else if desktop == "plasma-mobile" {
+        kinoite
+    } else {
+        base_atomic
+    }
+)
 
-registry := "localhost"
+base_bootc := env("PB_BASE_BOOTC", "quay.io/fedora/fedora-bootc:" + branch)
 
-expires_after := ""
-rechunk_suffix := ""
-arch := "arm64"
+registry := env("PB_REGISTRY", "localhost")
+
+expires_after := env("PB_EXPIRES_AFTER", "")
+rechunk_suffix := env("PB_RECHUNK_SUFFIX", "")
+arch := env("PB_ARCH", "arm64")
+
+pull:
+    sudo podman pull {{base}}:{{branch}}
+    sudo podman pull {{base_bootc}}
+    sudo podman pull {{registry}}/{{device}}-{{desktop}}:{{tag}} || true
 
 build *ARGS:
     sudo buildah bud \
@@ -51,3 +60,16 @@ rechunk *ARGS:
 
 rebase local_image=(registry / device + "-" + desktop + ":" + tag):
     sudo rpm-ostree rebase ostree-unverified-image:containers-storage:{{local_image}}
+
+bootc *ARGS:
+    sudo podman run \
+        --rm --privileged --pid=host \
+        -it \
+        -v /sys/fs/selinux:/sys/fs/selinux \
+        -v /etc/containers:/etc/containers:Z \
+        -v /var/lib/containers:/var/lib/containers:Z \
+        -v /dev:/dev \
+        -e RUST_LOG=debug \
+        -v .:/data \
+        --security-opt label=type:unconfined_t \
+        "{{registry}}/{{device}}-{{desktop}}:{{tag}}" bootc {{ARGS}}
