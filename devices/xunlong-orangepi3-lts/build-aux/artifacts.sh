@@ -13,12 +13,15 @@ if [ -f "$uboot_deb" ]; then
     fi
     uboot_bin="$(find "$tmp_dir/data" -name 'u-boot-sunxi-with-spl.bin' -print -quit)"
     if [ -z "$uboot_bin" ]; then
-        echo "u-boot-sunxi-with-spl.bin not found in $uboot_deb" >&2
+        echo "u-boot-sunxi-with-spl.bin not found in $uboot_deb"
         exit 1
     fi
     cp "$uboot_bin" "$OUT_PATH/images/u-boot-sunxi-with-spl.bin"
-    dd if="$uboot_bin" of="$OUT_PATH/images/disk.raw" bs=1024 seek=8 conv=notrunc
+    if [ -f "$OUT_PATH/images/disk.raw" ]; then
+        dd if="$uboot_bin" of="$OUT_PATH/images/disk.raw" bs=1024 seek=8 conv=notrunc
+    fi
     rm -r "$tmp_dir"
+    rm -r "$uboot_deb"
 fi
 
 install -Dm 0755 "$DEVICE_PATH/build-aux/flash-sd.sh" "$OUT_PATH/flash-orangepi3-lts.sh"
