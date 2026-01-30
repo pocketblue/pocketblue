@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+set -uexo pipefail
+
+# this empty desktop
