@@ -80,7 +80,6 @@ jobs:
           vars_registry: ${{ vars.REGISTRY }}
           device: ${{ inputs.device || '' }}
           device_list: |
-            nothing-spacewar
             oneplus-sdm845
             xiaomi-beryllium
             xiaomi-nabu
