@@ -2,6 +2,7 @@
 
 set -uexo pipefail
 
+which 7z
 which git
 which python
 

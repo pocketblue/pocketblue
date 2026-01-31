@@ -2,12 +2,12 @@
 
 set -uexo pipefail
 
-which unzip
+which 7z
 which git
 which python
 
 mv $OUT_PATH/uboot.zip ./
-unzip uboot.zip -d ./uboot
+7z x uboot.zip -o./uboot
 cp uboot/.output/u-boot.img $OUT_PATH/images/uboot.img
 
 git clone --depth=1 https://android.googlesource.com/platform/external/avb

@@ -50,5 +50,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: pocketblue-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.tag }}
-          path: pocketblue-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.tag }}.tar.xz
+          path: pocketblue-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.tag }}.7z
           compression-level: 0
