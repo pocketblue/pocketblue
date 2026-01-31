@@ -54,12 +54,12 @@ Before installing Pocketblue on your Fairphone 5, ensure you have:
 
 Download the latest Pocketblue image for Fairphone 5 from the [GitHub Releases page](https://github.com/pocketblue/pocketblue/releases).
 
-The recommended image is: `pocketblue-fairphone-fp5-gnome-mobile-<version>.7z`
+The recommended image is: `pocketblue-fairphone-fp5-gnome-mobile-<version>.tar.xz`
 
-Extract the archive using 7-Zip or a compatible tool:
+Extract the archive using tar:
 
 ```bash
-7z x pocketblue-fairphone-fp5-gnome-mobile-42.7z
+tar -xvJf pocketblue-fairphone-fp5-gnome-mobile-42.tar.xz
 ```
 
 This will create an `images/` directory containing the required files.
