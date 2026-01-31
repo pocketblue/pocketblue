@@ -6,16 +6,16 @@ cp -arfT files/etc /etc
 
 # packages
 dnf -y remove alsa-ucm # conflicts with alsa-ucm-conf-qcom-sc7280
-dnf -y swap iio-sensor-proxy iio-sensor-proxy
-dnf -y swap qrtr qrtr
-dnf -y swap rmtfs rmtfs
 dnf -y install \
     alsa-ucm-conf-qcom-sc7280 \
     hexagonrpc \
+    iio-sensor-proxy \
     libssc \
-    mobility-tweaks \
+    pd-mapper \
     qbootctl \
     qcom-firmware \
+    qrtr \
+    rmtfs \
     tqftpserv
 
 # install device-specific files (after packages to override defaults)
@@ -87,6 +87,7 @@ systemctl mask \
 
 systemctl enable \
     hexagonrpcd-adsp-sensorspd.service \
+    pd-mapper.service \
     tqftpserv.service \
     qbootctl.service \
     rmtfs.service
