@@ -70,13 +70,13 @@ ln -sfn ../sc7280/Fairphone/FP5 /usr/lib/firmware/qcom/qcm6490/fairphone5
 
 rm -rf "${FW_DIR}"
 
-# kernel
+# kernel (from lorbus/misc copr)
 dnf -y remove \
     kernel \
     kernel-core \
     kernel-modules \
     kernel-modules-core
-dnf -y install --refresh \
+dnf -y install --refresh --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
     kernel
 
 # services
