@@ -64,6 +64,10 @@ done
 find /usr/lib/firmware/qcom/sc7280/Fairphone -type f -exec chmod 0644 {} \;
 find /usr/share/qcom/sc7280/Fairphone/FP5 -type f -exec chmod 0644 {} \;
 
+# create symlink for kernel firmware path (kernel expects qcom/qcm6490/fairphone)
+mkdir -p /usr/lib/firmware/qcom/qcm6490
+ln -sfn ../sc7280/Fairphone/FP5 /usr/lib/firmware/qcom/qcm6490/fairphone5
+
 rm -rf "${FW_DIR}"
 
 # kernel
