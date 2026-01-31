@@ -38,18 +38,42 @@ mkdir -p /usr/lib/firmware/qcom/qcm6490/fairphone5 \
 
 FW_DEST="/usr/lib/firmware/qcom/qcm6490/fairphone5"
 
-# Install pil-squasher to convert .mdt to .mbn
-dnf -y install --refresh --repo='copr:copr.fedorainfracloud.org:pocketblue:sdm845' pil-squasher
+# Install split firmware files (.mdt + .bXX) - do NOT use pil-squasher
+# The kernel's qcom_mdt_loader handles split format natively and it's more reliable
+# than squashed .mbn format which can produce corrupt files
 
-# qcom firmware - convert .mdt to .mbn using pil-squasher
+# qcom firmware - copy split firmware files (.mdt + .b* segments)
 for fw in adsp cdsp modem wpss a660_zap; do
-    [ -f "${FW_DIR}/${fw}.mdt" ] && pil-squasher "${FW_DEST}/${fw}.mbn" "${FW_DIR}/${fw}.mdt"
+    if [ -f "${FW_DIR}/${fw}.mdt" ]; then
+        echo "Installing ${fw} firmware (split format)..."
+        # Install the .mdt header file
+        install -Dm644 "${FW_DIR}/${fw}.mdt" "${FW_DEST}/${fw}.mdt"
+        # Count and install all segment files (.b00, .b01, etc.)
+        seg_count=0
+        for seg in "${FW_DIR}/${fw}".b*; do
+            if [ -f "$seg" ]; then
+                install -Dm644 "$seg" "${FW_DEST}/$(basename "$seg")"
+                ((seg_count++)) || true
+            fi
+        done
+        echo "  Installed ${seg_count} segment files for ${fw}"
+        # Create .mbn symlink pointing to .mdt (kernel accepts both)
+        ln -sf "${fw}.mdt" "${FW_DEST}/${fw}.mbn"
+    else
+        echo "WARNING: ${fw}.mdt not found in firmware archive"
+    fi
 done
 
 # IPA firmware (kernel expects ipa_fws.mbn, repo has yupik_ipa_fws.*)
-[ -f "${FW_DIR}/yupik_ipa_fws.mdt" ] && pil-squasher "${FW_DEST}/ipa_fws.mbn" "${FW_DIR}/yupik_ipa_fws.mdt"
+if [ -f "${FW_DIR}/yupik_ipa_fws.mdt" ]; then
+    install -Dm644 "${FW_DIR}/yupik_ipa_fws.mdt" "${FW_DEST}/ipa_fws.mdt"
+    for seg in "${FW_DIR}/yupik_ipa_fws".b*; do
+        [ -f "$seg" ] && install -Dm644 "$seg" "${FW_DEST}/$(basename "$seg" | sed 's/yupik_ipa_fws/ipa_fws/')"
+    done
+    ln -sf "ipa_fws.mdt" "${FW_DEST}/ipa_fws.mbn"
+fi
 
-# Venus (video codec) firmware
+# Venus (video codec) firmware - this is already a single .mbn file
 [ -f "${FW_DIR}/vpu20_1v.mbn" ] && install -Dm644 "${FW_DIR}/vpu20_1v.mbn" "${FW_DEST}/venus.mbn"
 
 # Other firmware files (jsn, etc.)
@@ -63,9 +87,10 @@ done
 # audio codec firmware
 [ -f "${FW_DIR}/aw882xx_acf.bin" ] && install -Dm644 "${FW_DIR}/aw882xx_acf.bin" /usr/lib/firmware/awinic/aw882xx_acf.bin
 
-# bluetooth firmware
-[ -f "${FW_DIR}/msbtfw11.mbn" ] && install -Dm644 "${FW_DIR}/msbtfw11.mbn" /usr/lib/firmware/ath11k/WCN6855/hw2.1/msbtfw11.mbn
-[ -f "${FW_DIR}/msnv11.bin" ] && install -Dm644 "${FW_DIR}/msnv11.bin" /usr/lib/firmware/ath11k/WCN6855/hw2.1/msnv11.bin
+# bluetooth firmware - install to qca/ path where kernel expects it
+mkdir -p /usr/lib/firmware/qca
+[ -f "${FW_DIR}/msbtfw11.mbn" ] && install -Dm644 "${FW_DIR}/msbtfw11.mbn" /usr/lib/firmware/qca/msbtfw11.mbn
+[ -f "${FW_DIR}/msnv11.bin" ] && install -Dm644 "${FW_DIR}/msnv11.bin" /usr/lib/firmware/qca/msnv11.bin
 
 # hexagon filesystem
 [ -d "${FW_DIR}/hexagonfs/acdb" ] && cp -a "${FW_DIR}/hexagonfs/acdb/"* /usr/share/qcom/qcm6490/fairphone5/acdb/ 2>/dev/null || true
@@ -75,6 +100,20 @@ done
 
 find /usr/lib/firmware/qcom/qcm6490/fairphone5 -type f -exec chmod 0644 {} \;
 find /usr/share/qcom/qcm6490/fairphone5 -type f -exec chmod 0644 {} \;
+
+# Verify critical firmware files are installed
+echo "Verifying firmware installation..."
+for fw in adsp cdsp modem wpss a660_zap; do
+    if [ -f "${FW_DEST}/${fw}.mdt" ] && [ -L "${FW_DEST}/${fw}.mbn" ]; then
+        echo "  ✓ ${fw}: OK"
+    else
+        echo "  ✗ ${fw}: MISSING or incomplete"
+        exit 1
+    fi
+done
+
+echo "Firmware installation complete."
+ls -la "${FW_DEST}/"
 
 rm -rf "${FW_DIR}"
 
