@@ -2,12 +2,12 @@
 
 set -uexo pipefail
 
-which 7z
+which unzip
 which git
 which python
 
 mv $OUT_PATH/aloha.zip ./
-7z x aloha.zip -o./aloha
+unzip aloha.zip -d ./aloha
 cp aloha/xiaomi-nabu/xiaomi-nabu_NOSB.img $OUT_PATH/images/aloha.img
 
 mkdir -p $OUT_PATH/bin

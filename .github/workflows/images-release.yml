@@ -33,10 +33,10 @@ jobs:
           tag_name: ${{ steps.version.outputs.version }}
           draft: true
           body: |
-            recommended image for fairphone 5: [gnome-mobile](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-fairphone-fp5-gnome-mobile-${{ inputs.fedora_branch }}.7z)
-            recommended image for xiaomi pad 5: [gnome-desktop](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-xiaomi-nabu-gnome-desktop-${{ inputs.fedora_branch }}.7z)
-            recommended image for xiaomi pad 6: [gnome-desktop](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-xiaomi-pipa-gnome-desktop-${{ inputs.fedora_branch }}.7z)
-            recommended image for oneplus 6 and oneplus 6t: [gnome-mobile](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-oneplus-sdm845-gnome-mobile-${{ inputs.fedora_branch }}.7z)
+            recommended image for fairphone 5: [gnome-mobile](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-fairphone-fp5-gnome-mobile-${{ inputs.fedora_branch }}.tar.xz)
+            recommended image for xiaomi pad 5: [gnome-desktop](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-xiaomi-nabu-gnome-desktop-${{ inputs.fedora_branch }}.tar.xz)
+            recommended image for xiaomi pad 6: [gnome-desktop](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-xiaomi-pipa-gnome-desktop-${{ inputs.fedora_branch }}.tar.xz)
+            recommended image for oneplus 6 and oneplus 6t: [gnome-mobile](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-oneplus-sdm845-gnome-mobile-${{ inputs.fedora_branch }}.tar.xz)
 
   images_build:
     needs: create_release
@@ -73,18 +73,17 @@ jobs:
           registry: ${{ vars.REGISTRY }}
           image_name: ${{ matrix.device.name }}-${{ matrix.desktop }}
           image_tag: ${{ matrix.device.tag }}
-          args_7z: -mmt=1 -md=1500m
           build_aux: ${{ matrix.device.build_aux }}
       - name: check size
         run: |
-          du 'pocketblue-${{ matrix.device.name }}-${{ matrix.desktop }}-${{ matrix.device.tag }}.7z' -h
-          du 'pocketblue-${{ matrix.device.name }}-${{ matrix.desktop }}-${{ matrix.device.tag }}.7z'
+          du 'pocketblue-${{ matrix.device.name }}-${{ matrix.desktop }}-${{ matrix.device.tag }}.tar.xz' -h
+          du 'pocketblue-${{ matrix.device.name }}-${{ matrix.desktop }}-${{ matrix.device.tag }}.tar.xz'
       - uses: actions/upload-artifact@v4
         with:
           name: pocketblue-${{ matrix.device.name }}-${{ matrix.desktop }}-${{ matrix.device.tag }}
-          path: pocketblue-${{ matrix.device.name }}-${{ matrix.desktop }}-${{ matrix.device.tag }}.7z
+          path: pocketblue-${{ matrix.device.name }}-${{ matrix.desktop }}-${{ matrix.device.tag }}.tar.xz
           compression-level: 0
       - uses: svenstaro/upload-release-action@v2
         with:
           release_id: ${{ needs.create_release.outputs.release_id}}
-          file: pocketblue-${{ matrix.device.name }}-${{ matrix.desktop }}-${{ matrix.device.tag }}.7z
+          file: pocketblue-${{ matrix.device.name }}-${{ matrix.desktop }}-${{ matrix.device.tag }}.tar.xz
