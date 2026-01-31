@@ -76,7 +76,7 @@ dnf -y remove \
     kernel-core \
     kernel-modules \
     kernel-modules-core
-dnf -y install \
+dnf -y install --refresh \
     kernel
 
 # services
