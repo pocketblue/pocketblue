@@ -4,7 +4,8 @@ After=tqftpserv.service sys-devices-virtual-misc-fastrpc\x2dadsp.device
 Requires=tqftpserv.service sys-devices-virtual-misc-fastrpc\x2dadsp.device
 
 [Service]
-ExecStart=/usr/bin/hexagonrpcd -f /dev/fastrpc-adsp -d adsp -U sensors -s -R /usr/share/qcom/sc7280/Fairphone/FP5
+ExecStart=/usr/bin/hexagonrpcd -f /dev/fastrpc-adsp -d adsp -U sensors -s -R /usr/share/qcom/qcm6490/fairphone5
+WorkingDirectory=/
 Restart=always
 RestartSec=3
 User=fastrpc

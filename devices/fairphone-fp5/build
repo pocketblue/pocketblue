@@ -28,12 +28,13 @@ FW_DIR="/tmp/FP5-firmware-${FW_COMMIT}"
 
 curl -L "${FW_URL}" | tar xz -C /tmp
 
-mkdir -p /usr/lib/firmware/qcom/sc7280/Fairphone/FP5 \
+mkdir -p /usr/lib/firmware/qcom/qcm6490/fairphone5 \
          /usr/lib/firmware/awinic \
          /usr/lib/firmware/ath11k/WCN6855/hw2.1 \
-         /usr/share/qcom/sc7280/Fairphone/FP5/acdb \
-         /usr/share/qcom/sc7280/Fairphone/FP5/dsp \
-         /usr/share/qcom/sc7280/Fairphone/FP5/sensors
+         /usr/share/qcom/qcm6490/fairphone5/acdb \
+         /usr/share/qcom/qcm6490/fairphone5/dsp \
+         /usr/share/qcom/qcm6490/fairphone5/sensors \
+         /usr/share/qcom/qcm6490/fairphone5/socinfo
 
 # qcom firmware
 for fw in a660_zap.mdt a660_zap.b0{0,1,2} \
@@ -42,11 +43,11 @@ for fw in a660_zap.mdt a660_zap.b0{0,1,2} \
           modem.mdt modem.b* modemr.jsn \
           wpss.mdt wpss.b{00..07} \
           vpu20_1v.mbn yupik_ipa_fws.mdt yupik_ipa_fws.b{00..04} yupik_ipa_fws.elf; do
-    [ -f "${FW_DIR}/${fw}" ] && install -Dm644 "${FW_DIR}/${fw}" "/usr/lib/firmware/qcom/sc7280/Fairphone/FP5/$(basename "${fw}")"
+    [ -f "${FW_DIR}/${fw}" ] && install -Dm644 "${FW_DIR}/${fw}" "/usr/lib/firmware/qcom/qcm6490/fairphone5/$(basename "${fw}")"
 done
 
 # modem_pr directory
-[ -d "${FW_DIR}/modem_pr" ] && cp -a "${FW_DIR}/modem_pr" /usr/lib/firmware/qcom/sc7280/Fairphone/FP5/
+[ -d "${FW_DIR}/modem_pr" ] && cp -a "${FW_DIR}/modem_pr" /usr/lib/firmware/qcom/qcm6490/fairphone5/
 
 # audio codec firmware
 [ -f "${FW_DIR}/aw882xx_acf.bin" ] && install -Dm644 "${FW_DIR}/aw882xx_acf.bin" /usr/lib/firmware/awinic/aw882xx_acf.bin
@@ -56,17 +57,13 @@ done
 [ -f "${FW_DIR}/msnv11.bin" ] && install -Dm644 "${FW_DIR}/msnv11.bin" /usr/lib/firmware/ath11k/WCN6855/hw2.1/msnv11.bin
 
 # hexagon filesystem
-[ -d "${FW_DIR}/hexagonfs/acdb" ] && cp -a "${FW_DIR}/hexagonfs/acdb/"* /usr/share/qcom/sc7280/Fairphone/FP5/acdb/ 2>/dev/null || true
-[ -d "${FW_DIR}/hexagonfs/dsp" ] && cp -a "${FW_DIR}/hexagonfs/dsp/"* /usr/share/qcom/sc7280/Fairphone/FP5/dsp/ 2>/dev/null || true
-[ -d "${FW_DIR}/hexagonfs/sensors" ] && cp -a "${FW_DIR}/hexagonfs/sensors/"* /usr/share/qcom/sc7280/Fairphone/FP5/sensors/ 2>/dev/null || true
-[ -d "${FW_DIR}/hexagonfs/socinfo" ] && cp -a "${FW_DIR}/hexagonfs/socinfo" /usr/share/qcom/sc7280/Fairphone/FP5/
+[ -d "${FW_DIR}/hexagonfs/acdb" ] && cp -a "${FW_DIR}/hexagonfs/acdb/"* /usr/share/qcom/qcm6490/fairphone5/acdb/ 2>/dev/null || true
+[ -d "${FW_DIR}/hexagonfs/dsp" ] && cp -a "${FW_DIR}/hexagonfs/dsp/"* /usr/share/qcom/qcm6490/fairphone5/dsp/ 2>/dev/null || true
+[ -d "${FW_DIR}/hexagonfs/sensors" ] && cp -a "${FW_DIR}/hexagonfs/sensors/"* /usr/share/qcom/qcm6490/fairphone5/sensors/ 2>/dev/null || true
+[ -d "${FW_DIR}/hexagonfs/socinfo" ] && cp -a "${FW_DIR}/hexagonfs/socinfo" /usr/share/qcom/qcm6490/fairphone5/
 
-find /usr/lib/firmware/qcom/sc7280/Fairphone -type f -exec chmod 0644 {} \;
-find /usr/share/qcom/sc7280/Fairphone/FP5 -type f -exec chmod 0644 {} \;
-
-# create symlink for kernel firmware path (kernel expects qcom/qcm6490/fairphone)
-mkdir -p /usr/lib/firmware/qcom/qcm6490
-ln -sfn ../sc7280/Fairphone/FP5 /usr/lib/firmware/qcom/qcm6490/fairphone5
+find /usr/lib/firmware/qcom/qcm6490/fairphone5 -type f -exec chmod 0644 {} \;
+find /usr/share/qcom/qcm6490/fairphone5 -type f -exec chmod 0644 {} \;
 
 rm -rf "${FW_DIR}"
 
