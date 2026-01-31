@@ -80,10 +80,16 @@ dnf -y install \
     kernel
 
 # services
-systemctl enable \
+# Mask generic/unused hexagonrpcd services
+# Note: hexagonrpcd-adsp-sensorspd is enabled (needed for sensors via libssc)
+# The others require fastrpc devices that may not be available on this SoC
+systemctl mask \
+    hexagonrpcd-adsp.service \
     hexagonrpcd-adsp-rootpd.service \
+    hexagonrpcd-sdsp.service
+
+systemctl enable \
     hexagonrpcd-adsp-sensorspd.service \
-    hexagonrpcd-sdsp.service \
     tqftpserv.service \
     qbootctl.service \
     rmtfs.service

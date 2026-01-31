@@ -16,4 +16,5 @@ fastboot flash logdump   images/fedora_boot.raw
 fastboot flash userdata  images/fedora_rootfs.raw
 
 echo 'done flashing, rebooting now'
+sleep 10
 fastboot reboot
