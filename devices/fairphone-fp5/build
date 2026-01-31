@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+
+set -uexo pipefail
+
+cp -arfT files/etc /etc
+cp -arfT files/usr /usr
+
+# packages
+dnf -y remove alsa-ucm # conflicts with alsa-ucm-conf-qcom-sc7280
+dnf -y swap iio-sensor-proxy iio-sensor-proxy
+dnf -y swap qrtr qrtr
+dnf -y swap rmtfs rmtfs
+dnf -y install \
+    alsa-ucm-conf-qcom-sc7280 \
+    hexagonrpc \
+    libssc \
+    mobility-tweaks \
+    qbootctl \
+    qcom-firmware \
+    tqftpserv
+
+# fairphone-5-firmware (direct install)
+FW_COMMIT="a4908f548e6f88965e78b1478af1751b6a854fc9"
+FW_URL="https://github.com/FairBlobs/FP5-firmware/archive/${FW_COMMIT}.tar.gz"
+FW_DIR="/tmp/FP5-firmware-${FW_COMMIT}"
+
+curl -L "${FW_URL}" | tar xz -C /tmp
+
+mkdir -p /usr/lib/firmware/qcom/sc7280/Fairphone/FP5 \
+         /usr/lib/firmware/awinic \
+         /usr/lib/firmware/ath11k/WCN6855/hw2.1 \
+         /usr/share/qcom/sc7280/Fairphone/FP5/acdb \
+         /usr/share/qcom/sc7280/Fairphone/FP5/dsp \
+         /usr/share/qcom/sc7280/Fairphone/FP5/sensors
+
+# qcom firmware
+for fw in a660_zap.mdt a660_zap.b0{0,1,2} \
+          adsp.mdt adsp.b{00..36} adspr.jsn adsps.jsn adspua.jsn battmgr.jsn \
+          cdsp.mdt cdsp.b{00..15} cdspr.jsn \
+          modem.mdt modem.b* modemr.jsn \
+          wpss.mdt wpss.b{00..07} \
+          vpu20_1v.mbn yupik_ipa_fws.mdt yupik_ipa_fws.b{00..04} yupik_ipa_fws.elf; do
+    [ -f "${FW_DIR}/${fw}" ] && install -Dm644 "${FW_DIR}/${fw}" "/usr/lib/firmware/qcom/sc7280/Fairphone/FP5/$(basename "${fw}")"
+done
+
+# modem_pr directory
+[ -d "${FW_DIR}/modem_pr" ] && cp -a "${FW_DIR}/modem_pr" /usr/lib/firmware/qcom/sc7280/Fairphone/FP5/
+
+# audio codec firmware
+[ -f "${FW_DIR}/aw882xx_acf.bin" ] && install -Dm644 "${FW_DIR}/aw882xx_acf.bin" /usr/lib/firmware/awinic/aw882xx_acf.bin
+
+# bluetooth firmware
+[ -f "${FW_DIR}/msbtfw11.mbn" ] && install -Dm644 "${FW_DIR}/msbtfw11.mbn" /usr/lib/firmware/ath11k/WCN6855/hw2.1/msbtfw11.mbn
+[ -f "${FW_DIR}/msnv11.bin" ] && install -Dm644 "${FW_DIR}/msnv11.bin" /usr/lib/firmware/ath11k/WCN6855/hw2.1/msnv11.bin
+
+# hexagon filesystem
+[ -d "${FW_DIR}/hexagonfs/acdb" ] && cp -a "${FW_DIR}/hexagonfs/acdb/"* /usr/share/qcom/sc7280/Fairphone/FP5/acdb/ 2>/dev/null || true
+[ -d "${FW_DIR}/hexagonfs/dsp" ] && cp -a "${FW_DIR}/hexagonfs/dsp/"* /usr/share/qcom/sc7280/Fairphone/FP5/dsp/ 2>/dev/null || true
+[ -d "${FW_DIR}/hexagonfs/sensors" ] && cp -a "${FW_DIR}/hexagonfs/sensors/"* /usr/share/qcom/sc7280/Fairphone/FP5/sensors/ 2>/dev/null || true
+[ -d "${FW_DIR}/hexagonfs/socinfo" ] && cp -a "${FW_DIR}/hexagonfs/socinfo" /usr/share/qcom/sc7280/Fairphone/FP5/
+
+find /usr/lib/firmware/qcom/sc7280/Fairphone -type f -exec chmod 0644 {} \;
+find /usr/share/qcom/sc7280/Fairphone/FP5 -type f -exec chmod 0644 {} \;
+
+rm -rf "${FW_DIR}"
+
+# kernel
+dnf -y remove \
+    kernel \
+    kernel-core \
+    kernel-modules \
+    kernel-modules-core
+dnf -y install \
+    kernel
+
+# services
+systemctl enable \
+    hexagonrpcd-adsp-rootpd.service \
+    hexagonrpcd-adsp-sensorspd.service \
+    hexagonrpcd-sdsp.service \
+    tqftpserv.service \
+    qbootctl.service \
+    rmtfs.service
+
+KERNEL_SUFFIX=""
+QUALIFIED_KERNEL="$(rpm -qa | grep -P 'kernel-(|'"$KERNEL_SUFFIX"'-)(\d+\.\d+\.\d+)' | sed -E 's/kernel-(|'"$KERNEL_SUFFIX"'-)//')"
+export DRACUT_NO_XATTR=1
+/usr/bin/dracut --no-hostonly --kver "$QUALIFIED_KERNEL" --reproducible -v --add ostree -f "/lib/modules/$QUALIFIED_KERNEL/initramfs.img"
+chmod 0600 "/lib/modules/$QUALIFIED_KERNEL/initramfs.img"

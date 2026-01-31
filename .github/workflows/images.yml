@@ -8,6 +8,7 @@ on:
         description: 'device name'
         required: true
         options:
+          - fairphone-fp5
           - nothing-spacewar
           - oneplus-sdm845
           - xiaomi-beryllium
@@ -32,12 +33,17 @@ jobs:
       matrix:
         desktop: [tty, gnome-desktop, gnome-mobile, plasma-desktop, plasma-mobile, phosh]
     name: ${{ inputs.device }}-${{ matrix.desktop }}:${{ inputs.tag }}
+    env:
+      IMAGE_REGISTRY: ${{ vars.REGISTRY || format('ghcr.io/{0}', github.repository_owner) }}
     steps:
+      - name: Prepare environment
+        run: |
+          echo "IMAGE_REGISTRY=${IMAGE_REGISTRY,,}" >> ${GITHUB_ENV}
       - uses: actions/checkout@v6
-      - uses: pocketblue/actions/images@main
+      - uses: LorbusChris/pocketblue-actions/images@fp5
         with:
           device: ${{ inputs.device }}
-          registry: ${{ vars.REGISTRY || format('ghcr.io/{0}', github.repository_owner) }}
+          registry: ${{ env.IMAGE_REGISTRY }}
           image_name: ${{ inputs.device }}-${{ matrix.desktop }}
           image_tag: ${{ inputs.tag }}
           build_aux: ${{ inputs.device == 'xiaomi-nabu' && inputs.nabu_samsung_ufs && 'build-aux.samsung' || 'build-aux' }}
