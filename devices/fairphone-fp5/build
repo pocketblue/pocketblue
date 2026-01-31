@@ -11,7 +11,7 @@ dnf -y install \
     hexagonrpc \
     iio-sensor-proxy \
     libssc \
-    pd-mapper \
+    mobility-tweaks \
     qbootctl \
     qcom-firmware \
     qrtr \
@@ -28,7 +28,7 @@ FW_DIR="/tmp/FP5-firmware-${FW_COMMIT}"
 
 curl -L "${FW_URL}" | tar xz -C /tmp
 
-mkdir -p /usr/lib/firmware/qcom/qcm6490/fairphone5 \
+mkdir -p /usr/lib/firmware/qcom/qcm6490 \
          /usr/lib/firmware/awinic \
          /usr/lib/firmware/ath11k/WCN6855/hw2.1 \
          /usr/share/qcom/qcm6490/fairphone5/acdb \
@@ -36,18 +36,24 @@ mkdir -p /usr/lib/firmware/qcom/qcm6490/fairphone5 \
          /usr/share/qcom/qcm6490/fairphone5/sensors \
          /usr/share/qcom/qcm6490/fairphone5/socinfo
 
-# qcom firmware
+# qcom firmware (installed to qcom/qcm6490/ as expected by kernel)
 for fw in a660_zap.mdt a660_zap.b0{0,1,2} \
           adsp.mdt adsp.b{00..36} adspr.jsn adsps.jsn adspua.jsn battmgr.jsn \
           cdsp.mdt cdsp.b{00..15} cdspr.jsn \
           modem.mdt modem.b* modemr.jsn \
           wpss.mdt wpss.b{00..07} \
-          vpu20_1v.mbn yupik_ipa_fws.mdt yupik_ipa_fws.b{00..04} yupik_ipa_fws.elf; do
-    [ -f "${FW_DIR}/${fw}" ] && install -Dm644 "${FW_DIR}/${fw}" "/usr/lib/firmware/qcom/qcm6490/fairphone5/$(basename "${fw}")"
+          vpu20_1v.mbn; do
+    [ -f "${FW_DIR}/${fw}" ] && install -Dm644 "${FW_DIR}/${fw}" "/usr/lib/firmware/qcom/qcm6490/$(basename "${fw}")"
+done
+
+# IPA firmware (kernel expects ipa_fws.mbn, repo has yupik_ipa_fws.*)
+for fw in yupik_ipa_fws.mdt yupik_ipa_fws.b{00..04} yupik_ipa_fws.elf; do
+    newname="${fw/yupik_ipa_fws/ipa_fws}"
+    [ -f "${FW_DIR}/${fw}" ] && install -Dm644 "${FW_DIR}/${fw}" "/usr/lib/firmware/qcom/qcm6490/${newname}"
 done
 
 # modem_pr directory
-[ -d "${FW_DIR}/modem_pr" ] && cp -a "${FW_DIR}/modem_pr" /usr/lib/firmware/qcom/qcm6490/fairphone5/
+[ -d "${FW_DIR}/modem_pr" ] && cp -a "${FW_DIR}/modem_pr" /usr/lib/firmware/qcom/qcm6490/
 
 # audio codec firmware
 [ -f "${FW_DIR}/aw882xx_acf.bin" ] && install -Dm644 "${FW_DIR}/aw882xx_acf.bin" /usr/lib/firmware/awinic/aw882xx_acf.bin
@@ -62,7 +68,7 @@ done
 [ -d "${FW_DIR}/hexagonfs/sensors" ] && cp -a "${FW_DIR}/hexagonfs/sensors/"* /usr/share/qcom/qcm6490/fairphone5/sensors/ 2>/dev/null || true
 [ -d "${FW_DIR}/hexagonfs/socinfo" ] && cp -a "${FW_DIR}/hexagonfs/socinfo" /usr/share/qcom/qcm6490/fairphone5/
 
-find /usr/lib/firmware/qcom/qcm6490/fairphone5 -type f -exec chmod 0644 {} \;
+find /usr/lib/firmware/qcom/qcm6490 -type f -exec chmod 0644 {} \;
 find /usr/share/qcom/qcm6490/fairphone5 -type f -exec chmod 0644 {} \;
 
 rm -rf "${FW_DIR}"
@@ -87,7 +93,6 @@ systemctl mask \
 
 systemctl enable \
     hexagonrpcd-adsp-sensorspd.service \
-    pd-mapper.service \
     tqftpserv.service \
     qbootctl.service \
     rmtfs.service
