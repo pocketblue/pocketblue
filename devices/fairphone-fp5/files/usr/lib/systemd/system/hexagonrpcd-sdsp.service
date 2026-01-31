@@ -1,0 +1,14 @@
+[Unit]
+Description=Daemon to support Qualcomm Hexagon SDSP virtual filesystem
+After=tqftpserv.service sys-devices-virtual-misc-fastrpc\x2dsdsp.device
+Requires=tqftpserv.service sys-devices-virtual-misc-fastrpc\x2dsdsp.device
+
+[Service]
+ExecStart=/usr/bin/hexagonrpcd -f /dev/fastrpc-sdsp -d sdsp -s -R /usr/share/qcom/sc7280/Fairphone/FP5
+Restart=always
+RestartSec=3
+User=fastrpc
+Group=fastrpc
+
+[Install]
+WantedBy=multi-user.target

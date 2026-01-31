@@ -33,6 +33,7 @@ jobs:
           tag_name: ${{ steps.version.outputs.version }}
           draft: true
           body: |
+            recommended image for fairphone 5: [gnome-mobile](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-fairphone-fp5-gnome-mobile-${{ inputs.fedora_branch }}.7z)
             recommended image for xiaomi pad 5: [gnome-desktop](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-xiaomi-nabu-gnome-desktop-${{ inputs.fedora_branch }}.7z)
             recommended image for xiaomi pad 6: [gnome-desktop](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-xiaomi-pipa-gnome-desktop-${{ inputs.fedora_branch }}.7z)
             recommended image for oneplus 6 and oneplus 6t: [gnome-mobile](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-oneplus-sdm845-gnome-mobile-${{ inputs.fedora_branch }}.7z)
@@ -44,6 +45,9 @@ jobs:
       fail-fast: false
       matrix:
         device:
+          - name: fairphone-fp5
+            tag: ${{ inputs.fedora_branch }}
+            build_aux: 'build-aux'
           - name: oneplus-sdm845
             tag: ${{ inputs.fedora_branch }}
             build_aux: 'build-aux'

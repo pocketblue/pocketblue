@@ -1,0 +1,14 @@
+[Unit]
+Description=Daemon to support Qualcomm Hexagon ADSP sensorspd virtual filesystem
+After=hexagonrpcd-adsp-rootpd.service tqftpserv.service sys-devices-virtual-misc-fastrpc\x2dadsp.device
+Requires=hexagonrpcd-adsp-rootpd.service tqftpserv.service sys-devices-virtual-misc-fastrpc\x2dadsp.device
+
+[Service]
+ExecStart=/usr/bin/hexagonrpcd -f /dev/fastrpc-adsp -d adsp -U sensors -s -R /usr/share/qcom/sc7280/Fairphone/FP5
+Restart=always
+RestartSec=3
+User=fastrpc
+Group=fastrpc
+
+[Install]
+WantedBy=multi-user.target

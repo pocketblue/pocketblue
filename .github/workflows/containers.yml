@@ -31,6 +31,7 @@ on:
         required: true
         options:
           - 'all'
+          - 'fairphone-fp5'
           - 'nothing-spacewar'
           - 'oneplus-sdm845'
           - 'xiaomi-beryllium'
@@ -80,6 +81,7 @@ jobs:
           vars_registry: ${{ vars.REGISTRY }}
           device: ${{ inputs.device || '' }}
           device_list: |
+            fairphone-fp5
             oneplus-sdm845
             xiaomi-beryllium
             xiaomi-nabu
