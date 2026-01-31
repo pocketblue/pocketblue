@@ -28,7 +28,7 @@ FW_DIR="/tmp/FP5-firmware-${FW_COMMIT}"
 
 curl -L "${FW_URL}" | tar xz -C /tmp
 
-mkdir -p /usr/lib/firmware/qcom/qcm6490 \
+mkdir -p /usr/lib/firmware/qcom/qcm6490/fairphone5 \
          /usr/lib/firmware/awinic \
          /usr/lib/firmware/ath11k/WCN6855/hw2.1 \
          /usr/share/qcom/qcm6490/fairphone5/acdb \
@@ -36,24 +36,29 @@ mkdir -p /usr/lib/firmware/qcom/qcm6490 \
          /usr/share/qcom/qcm6490/fairphone5/sensors \
          /usr/share/qcom/qcm6490/fairphone5/socinfo
 
-# qcom firmware (installed to qcom/qcm6490/ as expected by kernel)
-for fw in a660_zap.mdt a660_zap.b0{0,1,2} \
-          adsp.mdt adsp.b{00..36} adspr.jsn adsps.jsn adspua.jsn battmgr.jsn \
-          cdsp.mdt cdsp.b{00..15} cdspr.jsn \
-          modem.mdt modem.b* modemr.jsn \
-          wpss.mdt wpss.b{00..07} \
-          vpu20_1v.mbn; do
-    [ -f "${FW_DIR}/${fw}" ] && install -Dm644 "${FW_DIR}/${fw}" "/usr/lib/firmware/qcom/qcm6490/$(basename "${fw}")"
+FW_DEST="/usr/lib/firmware/qcom/qcm6490/fairphone5"
+
+# Install pil-squasher to convert .mdt to .mbn
+dnf -y install --refresh --repo='copr:copr.fedorainfracloud.org:pocketblue:sdm845' pil-squasher
+
+# qcom firmware - convert .mdt to .mbn using pil-squasher
+for fw in adsp cdsp modem wpss a660_zap; do
+    [ -f "${FW_DIR}/${fw}.mdt" ] && pil-squasher "${FW_DEST}/${fw}.mbn" "${FW_DIR}/${fw}.mdt"
 done
 
 # IPA firmware (kernel expects ipa_fws.mbn, repo has yupik_ipa_fws.*)
-for fw in yupik_ipa_fws.mdt yupik_ipa_fws.b{00..04} yupik_ipa_fws.elf; do
-    newname="${fw/yupik_ipa_fws/ipa_fws}"
-    [ -f "${FW_DIR}/${fw}" ] && install -Dm644 "${FW_DIR}/${fw}" "/usr/lib/firmware/qcom/qcm6490/${newname}"
+[ -f "${FW_DIR}/yupik_ipa_fws.mdt" ] && pil-squasher "${FW_DEST}/ipa_fws.mbn" "${FW_DIR}/yupik_ipa_fws.mdt"
+
+# Venus (video codec) firmware
+[ -f "${FW_DIR}/vpu20_1v.mbn" ] && install -Dm644 "${FW_DIR}/vpu20_1v.mbn" "${FW_DEST}/venus.mbn"
+
+# Other firmware files (jsn, etc.)
+for fw in adspr.jsn adsps.jsn adspua.jsn battmgr.jsn cdspr.jsn modemr.jsn; do
+    [ -f "${FW_DIR}/${fw}" ] && install -Dm644 "${FW_DIR}/${fw}" "${FW_DEST}/${fw}"
 done
 
 # modem_pr directory
-[ -d "${FW_DIR}/modem_pr" ] && cp -a "${FW_DIR}/modem_pr" /usr/lib/firmware/qcom/qcm6490/
+[ -d "${FW_DIR}/modem_pr" ] && cp -a "${FW_DIR}/modem_pr" "${FW_DEST}/"
 
 # audio codec firmware
 [ -f "${FW_DIR}/aw882xx_acf.bin" ] && install -Dm644 "${FW_DIR}/aw882xx_acf.bin" /usr/lib/firmware/awinic/aw882xx_acf.bin
@@ -68,7 +73,7 @@ done
 [ -d "${FW_DIR}/hexagonfs/sensors" ] && cp -a "${FW_DIR}/hexagonfs/sensors/"* /usr/share/qcom/qcm6490/fairphone5/sensors/ 2>/dev/null || true
 [ -d "${FW_DIR}/hexagonfs/socinfo" ] && cp -a "${FW_DIR}/hexagonfs/socinfo" /usr/share/qcom/qcm6490/fairphone5/
 
-find /usr/lib/firmware/qcom/qcm6490 -type f -exec chmod 0644 {} \;
+find /usr/lib/firmware/qcom/qcm6490/fairphone5 -type f -exec chmod 0644 {} \;
 find /usr/share/qcom/qcm6490/fairphone5 -type f -exec chmod 0644 {} \;
 
 rm -rf "${FW_DIR}"
