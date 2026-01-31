@@ -3,7 +3,6 @@
 set -uexo pipefail
 
 cp -arfT files/etc /etc
-cp -arfT files/usr /usr
 
 # packages
 dnf -y remove alsa-ucm # conflicts with alsa-ucm-conf-qcom-sc7280
@@ -18,6 +17,9 @@ dnf -y install \
     qbootctl \
     qcom-firmware \
     tqftpserv
+
+# install device-specific files (after packages to override defaults)
+cp -arfT files/usr /usr
 
 # fairphone-5-firmware (direct install)
 FW_COMMIT="a4908f548e6f88965e78b1478af1751b6a854fc9"
