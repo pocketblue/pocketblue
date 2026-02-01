@@ -26,19 +26,16 @@ ARG xiaomi_nabu_samsung_ufs=false
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=cache,target=/var/cache \
-    --mount=type=tmpfs,dst=/tmp \
     env --chdir=/ctx/common ./build && \
     /ctx/common/cleanup
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=cache,target=/var/cache \
-    --mount=type=tmpfs,dst=/tmp \
     env --chdir=/ctx/device ./build && \
     /ctx/common/cleanup
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=cache,target=/var/cache \
-    --mount=type=tmpfs,dst=/tmp \
     env --chdir=/ctx/desktop ./build && \
     /ctx/common/cleanup
 
