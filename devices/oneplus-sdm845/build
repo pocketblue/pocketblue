@@ -7,9 +7,6 @@ set -uexo pipefail
 cp -arfT files/etc /etc
 cp -arfT files/usr /usr
 
-cp -arfT files/usbnet/etc /etc
-cp -arfT files/usbnet/usr /usr
-
 # Qualcomm tools and libs
 
 dnf -y install \
