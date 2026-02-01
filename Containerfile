@@ -25,25 +25,22 @@ ARG target_tag
 ARG xiaomi_nabu_samsung_ufs=false
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
-    --mount=type=cache,target=/var/lib/dnf \
     --mount=type=cache,target=/var/cache \
     --mount=type=tmpfs,dst=/tmp \
     env --chdir=/ctx/common ./build && \
-    ostree container commit
+    /ctx/common/cleanup
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
-    --mount=type=cache,target=/var/lib/dnf \
     --mount=type=cache,target=/var/cache \
     --mount=type=tmpfs,dst=/tmp \
     env --chdir=/ctx/device ./build && \
-    ostree container commit
+    /ctx/common/cleanup
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
-    --mount=type=cache,target=/var/lib/dnf \
     --mount=type=cache,target=/var/cache \
     --mount=type=tmpfs,dst=/tmp \
     env --chdir=/ctx/desktop ./build && \
-    ostree container commit
+    /ctx/common/cleanup
 
 # os-release file
 RUN sed -i "s/^PRETTY_NAME=.*/PRETTY_NAME=\"Fedora Linux $target_tag ($desktop)\"/" /usr/lib/os-release
