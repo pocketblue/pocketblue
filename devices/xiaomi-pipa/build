@@ -27,7 +27,8 @@ dnf -y remove \
     kernel \
     kernel-core \
     kernel-modules \
-    kernel-modules-core
+    kernel-modules-core \
+    kernel-headers
 dnf -y install \
     kernel \
     kernel-headers
