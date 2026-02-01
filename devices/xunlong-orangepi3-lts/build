@@ -3,6 +3,7 @@
 set -uexo pipefail
 
 cp -arfT files/etc /etc
+cp -arfT files/usr /usr
 
 mkdir -p /boot/dtb
 dnf -y remove \
