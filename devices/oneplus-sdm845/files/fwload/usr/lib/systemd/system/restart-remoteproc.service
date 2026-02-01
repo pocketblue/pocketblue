@@ -1,0 +1,18 @@
+[Unit]
+Description=Start remoteproc after firmware state overlay is mounted
+DefaultDependencies=no
+Requires=ostree-state-overlay@usr-lib-firmware-updates.service
+After=ostree-state-overlay@usr-lib-firmware-updates.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+Restart=on-failure
+
+# Make sure SLPI remoteproc has started:
+ExecStart=bash -c 'for f in /sys/class/remoteproc/remoteproc*; do if [[ "$(cat $f/name)" == "slpi" ]]; then echo start > $f/state; fi; done'
+# Make sure ADSP remoteproc has started:
+ExecStart=bash -c 'for f in /sys/class/remoteproc/remoteproc*; do if [[ "$(cat $f/name)" == "adsp" ]]; then echo start > $f/state; fi; done'
+
+[Install]
+WantedBy=local-fs.target
