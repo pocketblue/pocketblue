@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 set -euo pipefail
 
 device="${1:-}"
@@ -43,44 +42,46 @@ esp_size_mib="$(get_size_mib "$esp_image")"
 boot_size_mib="$(get_size_mib "$boot_image")"
 
 if ! command -v sfdisk >/dev/null; then
-    echo "sfdisk not found; please install it to partition the device" >&2
+    echo "sfdisk not found; please install util-linux (sfdisk >= 2.26 for GPT)" >&2
     exit 1
 fi
 
+GPT_TYPE_ESP="C12A7328-F81F-11D2-BA4B-00A0C93EC93B"
+GPT_TYPE_LINUX_FS="0FC63DAF-8483-4772-8E79-3D69D8477DE4"
+
+UBOOT_DD_BS="${UBOOT_DD_BS:-1024}"
+UBOOT_DD_SEEK="${UBOOT_DD_SEEK:-8}"
+
+GPT_TABLE_LENGTH="${GPT_TABLE_LENGTH:-56}"
+
 write_partition_table() {
-    if sfdisk --help 2>/dev/null | grep -q -- '--unit'; then
-        if sfdisk --label dos --unit MiB "$device" <<EOF
-1 : start=1, size=$esp_size_mib, type=0x0c, bootable
-2 : size=$boot_size_mib, type=0x83
-3 : type=0x83
-EOF
-        then
-            return 0
-        fi
-    fi
+    local label_id
+    label_id="$(uuidgen 2>/dev/null || cat /proc/sys/kernel/random/uuid)"
 
-    if sfdisk -h 2>/dev/null | grep -q -- '-u'; then
-        if sfdisk -uM "$device" <<EOF
-1 : start=1, size=$esp_size_mib, type=0x0c, bootable
-2 : size=$boot_size_mib, type=0x83
-3 : type=0x83
-EOF
-        then
-            return 0
-        fi
-    fi
+    if sfdisk --help 2>/dev/null | grep -q -- '--wipe'; then
+        sfdisk --wipe always --wipe-partitions always "$device" <<EOF
+label: gpt
+label-id: $label_id
+table-length: $GPT_TABLE_LENGTH
 
-    start_sectors=2048
-    esp_sectors=$((esp_size_mib * 2048))
-    boot_sectors=$((boot_size_mib * 2048))
-    sfdisk "$device" <<EOF
-$start_sectors,$esp_sectors,0x0c,*
-,$boot_sectors,0x83
-,,0x83
+1 : start=1MiB,  size=${esp_size_mib}MiB,  type=$GPT_TYPE_ESP,      name="esp"
+2 :             size=${boot_size_mib}MiB, type=$GPT_TYPE_LINUX_FS, name="boot"
+3 :                                  type=$GPT_TYPE_LINUX_FS,     name="rootfs"
 EOF
+    else
+        sfdisk "$device" <<EOF
+label: gpt
+label-id: $label_id
+table-length: $GPT_TABLE_LENGTH
+
+1 : start=1MiB,  size=${esp_size_mib}MiB,  type=$GPT_TYPE_ESP,      name="esp"
+2 :             size=${boot_size_mib}MiB, type=$GPT_TYPE_LINUX_FS, name="boot"
+3 :                                  type=$GPT_TYPE_LINUX_FS,     name="rootfs"
+EOF
+    fi
 }
 
-echo "Writing partition table to $device"
+echo "Writing GPT partition table to $device"
 write_partition_table
 
 sync
@@ -115,11 +116,12 @@ for part in "$part1" "$part2" "$part3"; do
     fi
 done
 
-echo "Writing U-Boot to $device"
-dd if="$uboot_bin" of="$device" bs=1024 seek=8 conv=fsync,notrunc status=progress
+echo "Writing U-Boot to $device (bs=$UBOOT_DD_BS seek=$UBOOT_DD_SEEK)"
+dd if="$uboot_bin" of="$device" bs="$UBOOT_DD_BS" seek="$UBOOT_DD_SEEK" conv=fsync,notrunc status=progress
 
 echo "Flashing partitions"
-dd if="$esp_image" of="$part1" bs=4M conv=fsync status=progress
-dd if="$boot_image" of="$part2" bs=4M conv=fsync status=progress
+dd if="$esp_image"    of="$part1" bs=4M conv=fsync status=progress
+dd if="$boot_image"   of="$part2" bs=4M conv=fsync status=progress
 dd if="$rootfs_image" of="$part3" bs=4M conv=fsync status=progress
 sync
+
