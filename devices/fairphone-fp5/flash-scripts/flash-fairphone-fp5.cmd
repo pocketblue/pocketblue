@@ -13,10 +13,10 @@ echo.
 echo Checking image sizes against partition sizes...
 echo.
 
-call :check_image_size rawdump images\fedora_esp.raw
+call :check_image_size logdump images\fedora_esp.raw
 if errorlevel 1 goto :error
 
-call :check_image_size logdump images\fedora_boot.raw
+call :check_image_size rawdump images\fedora_boot.raw
 if errorlevel 1 goto :error
 
 call :check_image_size userdata images\fedora_rootfs.raw
@@ -43,11 +43,11 @@ fastboot flash boot images\u-boot.img --slot=all
 if errorlevel 1 goto :error
 
 echo Flashing ESP partition...
-call :flash_image rawdump images\fedora_esp.raw
+call :flash_image logdump images\fedora_esp.raw
 if errorlevel 1 goto :error
 
 echo Flashing boot partition...
-call :flash_image logdump images\fedora_boot.raw
+call :flash_image rawdump images\fedora_boot.raw
 if errorlevel 1 goto :error
 
 echo Flashing root filesystem (this may take a while)...

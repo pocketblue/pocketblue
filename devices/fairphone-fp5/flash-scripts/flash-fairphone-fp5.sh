@@ -50,8 +50,8 @@ echo 'waiting for device to appear in fastboot'
 fastboot getvar product 2>&1 | grep -i fp5
 
 echo 'Checking image sizes against partition sizes...'
-check_image_size rawdump  images/fedora_esp.raw
-check_image_size logdump  images/fedora_boot.raw
+check_image_size logdump  images/fedora_esp.raw
+check_image_size rawdump  images/fedora_boot.raw
 check_image_size userdata images/fedora_rootfs.raw
 
 echo 'All image size checks passed, proceeding with flash...'
@@ -60,8 +60,8 @@ fastboot erase dtbo
 fastboot erase vendor_boot
 # fastboot flash vbmeta    images/vbmeta-disabled.img
 fastboot flash boot      images/u-boot.img --slot=all
-flash_image rawdump      images/fedora_esp.raw
-flash_image logdump      images/fedora_boot.raw
+flash_image logdump      images/fedora_esp.raw
+flash_image rawdump      images/fedora_boot.raw
 flash_image userdata     images/fedora_rootfs.raw
 
 echo 'done flashing, rebooting now'

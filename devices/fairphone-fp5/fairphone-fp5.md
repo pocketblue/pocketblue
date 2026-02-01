@@ -182,8 +182,8 @@ To return to the original Fairphone OS:
 |-----------|-----|------|
 | vbmeta_a / vbmeta_b | Disabled verified boot image | - |
 | boot_a / boot_b | U-Boot bootloader | - |
-| rawdump | ESP (EFI System Partition) | 30MB |
-| logdump | Boot partition (kernel, initramfs) | 512MB |
+| logdump | ESP (EFI System Partition) | 30MB |
+| rawdump | Boot partition (kernel, initramfs) | 1024MB |
 | userdata | Root filesystem | Remaining space |
 
 ### Enabled Services
