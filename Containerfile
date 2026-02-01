@@ -25,24 +25,25 @@ ARG target_tag
 ARG xiaomi_nabu_samsung_ufs=false
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
-    cd /ctx/common && \
-    ./build && \
+    --mount=type=cache,target=/var/cache \
+    env --chdir=/ctx/common ./build && \
     /ctx/common/cleanup
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
-    cd /ctx/device && \
-    ./build && \
+    --mount=type=cache,target=/var/cache \
+    env --chdir=/ctx/device ./build && \
     /ctx/common/cleanup
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
-    cd /ctx/desktop && \
-    ./build && \
+    --mount=type=cache,target=/var/cache \
+    env --chdir=/ctx/desktop ./build && \
     /ctx/common/cleanup
 
 # os-release file
 RUN sed -i "s/^PRETTY_NAME=.*/PRETTY_NAME=\"Fedora Linux $target_tag ($desktop)\"/" /usr/lib/os-release
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
+    /ctx/common/cleanup && \
     /ctx/common/finalize
 
 RUN bootc container lint --no-truncate
