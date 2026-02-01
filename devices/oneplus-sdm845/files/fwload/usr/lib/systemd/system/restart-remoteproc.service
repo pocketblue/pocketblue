@@ -3,6 +3,8 @@ Description=Start remoteproc after firmware state overlay is mounted
 DefaultDependencies=no
 Requires=ostree-state-overlay@usr-lib-firmware-updates.service
 After=ostree-state-overlay@usr-lib-firmware-updates.service
+Before=rmtfs.service
+Before=ModemManager.service
 
 [Service]
 Type=oneshot
