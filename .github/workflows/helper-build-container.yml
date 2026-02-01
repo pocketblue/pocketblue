@@ -55,6 +55,11 @@ jobs:
       - uses: actions/checkout@v6
       - uses: extractions/setup-just@v3
 
+      - name: Pull
+        id: pull
+        run: |
+          just $JUST_ARGS pull
+
       - name: Build
         id: build
         run: just $JUST_ARGS build --build-arg xiaomi_nabu_samsung_ufs=${{ inputs.xiaomi_nabu_samsung_ufs }}
