@@ -1,0 +1,42 @@
+#!/bin/bash
+# Initialize sensors on Fairphone 5
+# This script ensures the sensor stack is properly initialized after ADSP is ready
+
+set -e
+
+echo "Fairphone 5 sensor initialization starting..."
+
+# Wait for fastrpc-adsp device to be fully ready
+for i in {1..30}; do
+    if [ -c /dev/fastrpc-adsp ]; then
+        echo "fastrpc-adsp device ready"
+        break
+    fi
+    echo "Waiting for fastrpc-adsp device... ($i/30)"
+    sleep 1
+done
+
+if [ ! -c /dev/fastrpc-adsp ]; then
+    echo "ERROR: fastrpc-adsp device not available"
+    exit 1
+fi
+
+# Ensure proper permissions on fastrpc devices
+chmod 0666 /dev/fastrpc-adsp 2>/dev/null || true
+chmod 0666 /dev/fastrpc-cdsp 2>/dev/null || true
+
+# Create sensors data directory if it doesn't exist
+mkdir -p /var/lib/sensors
+
+# Check if sensor firmware is present
+SENSOR_FW_PATH="/usr/share/qcom/qcm6490/fairphone5/sensors"
+if [ -d "$SENSOR_FW_PATH" ]; then
+    echo "Sensor firmware found at $SENSOR_FW_PATH"
+else
+    echo "WARNING: Sensor firmware not found at $SENSOR_FW_PATH"
+fi
+
+# Trigger udev to re-process any IIO devices that might have been added
+udevadm trigger --subsystem-match=iio --action=change 2>/dev/null || true
+
+echo "Sensor initialization complete"

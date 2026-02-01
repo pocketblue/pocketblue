@@ -3,21 +3,32 @@
 set -uexo pipefail
 
 cp -arfT files/etc /etc
-cp -arfT files/usr /usr
 
 # packages
 dnf -y remove alsa-ucm # conflicts with alsa-ucm-conf-qcom-sc7280
-dnf -y swap iio-sensor-proxy iio-sensor-proxy
-dnf -y swap qrtr qrtr
-dnf -y swap rmtfs rmtfs
 dnf -y install \
     alsa-ucm-conf-qcom-sc7280 \
+    bluez \
+    bluez-tools \
     hexagonrpc \
+    iio-sensor-proxy \
     libssc \
     mobility-tweaks \
     qbootctl \
     qcom-firmware \
-    tqftpserv
+    qrtr \
+    rmtfs \
+    tqftpserv \
+    usb_modeswitch
+
+# install device-specific files (after packages to override defaults)
+# This includes our custom hexagonrpcd-adsp-sensorspd.service
+cp -arfT files/usr /usr
+
+# Set executable permissions on helper scripts
+chmod +x /usr/libexec/fairphone-fp5-usbc-rebind
+chmod +x /usr/libexec/fairphone-fp5-sensors-init
+chmod +x /usr/libexec/fairphone-fp5-bluetooth-init
 
 # fairphone-5-firmware (direct install)
 FW_COMMIT="a4908f548e6f88965e78b1478af1751b6a854fc9"
@@ -26,61 +37,121 @@ FW_DIR="/tmp/FP5-firmware-${FW_COMMIT}"
 
 curl -L "${FW_URL}" | tar xz -C /tmp
 
-mkdir -p /usr/lib/firmware/qcom/sc7280/Fairphone/FP5 \
+mkdir -p /usr/lib/firmware/qcom/qcm6490/fairphone5 \
          /usr/lib/firmware/awinic \
          /usr/lib/firmware/ath11k/WCN6855/hw2.1 \
-         /usr/share/qcom/sc7280/Fairphone/FP5/acdb \
-         /usr/share/qcom/sc7280/Fairphone/FP5/dsp \
-         /usr/share/qcom/sc7280/Fairphone/FP5/sensors
+         /usr/share/qcom/qcm6490/fairphone5/acdb \
+         /usr/share/qcom/qcm6490/fairphone5/dsp \
+         /usr/share/qcom/qcm6490/fairphone5/sensors \
+         /usr/share/qcom/qcm6490/fairphone5/socinfo
 
-# qcom firmware
-for fw in a660_zap.mdt a660_zap.b0{0,1,2} \
-          adsp.mdt adsp.b{00..36} adspr.jsn adsps.jsn adspua.jsn battmgr.jsn \
-          cdsp.mdt cdsp.b{00..15} cdspr.jsn \
-          modem.mdt modem.b* modemr.jsn \
-          wpss.mdt wpss.b{00..07} \
-          vpu20_1v.mbn yupik_ipa_fws.mdt yupik_ipa_fws.b{00..04} yupik_ipa_fws.elf; do
-    [ -f "${FW_DIR}/${fw}" ] && install -Dm644 "${FW_DIR}/${fw}" "/usr/lib/firmware/qcom/sc7280/Fairphone/FP5/$(basename "${fw}")"
+FW_DEST="/usr/lib/firmware/qcom/qcm6490/fairphone5"
+
+# Install split firmware files (.mdt + .bXX) - do NOT use pil-squasher
+# The kernel's qcom_mdt_loader handles split format natively and it's more reliable
+# than squashed .mbn format which can produce corrupt files
+
+# qcom firmware - copy split firmware files (.mdt + .b* segments)
+for fw in adsp cdsp modem wpss a660_zap; do
+    if [ -f "${FW_DIR}/${fw}.mdt" ]; then
+        echo "Installing ${fw} firmware (split format)..."
+        # Install the .mdt header file
+        install -Dm644 "${FW_DIR}/${fw}.mdt" "${FW_DEST}/${fw}.mdt"
+        # Count and install all segment files (.b00, .b01, etc.)
+        seg_count=0
+        for seg in "${FW_DIR}/${fw}".b*; do
+            if [ -f "$seg" ]; then
+                install -Dm644 "$seg" "${FW_DEST}/$(basename "$seg")"
+                ((seg_count++)) || true
+            fi
+        done
+        echo "  Installed ${seg_count} segment files for ${fw}"
+        # Create .mbn symlink pointing to .mdt (kernel accepts both)
+        ln -sf "${fw}.mdt" "${FW_DEST}/${fw}.mbn"
+    else
+        echo "WARNING: ${fw}.mdt not found in firmware archive"
+    fi
+done
+
+# IPA firmware (kernel expects ipa_fws.mbn, repo has yupik_ipa_fws.*)
+if [ -f "${FW_DIR}/yupik_ipa_fws.mdt" ]; then
+    install -Dm644 "${FW_DIR}/yupik_ipa_fws.mdt" "${FW_DEST}/ipa_fws.mdt"
+    for seg in "${FW_DIR}/yupik_ipa_fws".b*; do
+        [ -f "$seg" ] && install -Dm644 "$seg" "${FW_DEST}/$(basename "$seg" | sed 's/yupik_ipa_fws/ipa_fws/')"
+    done
+    ln -sf "ipa_fws.mdt" "${FW_DEST}/ipa_fws.mbn"
+fi
+
+# Venus (video codec) firmware - this is already a single .mbn file
+[ -f "${FW_DIR}/vpu20_1v.mbn" ] && install -Dm644 "${FW_DIR}/vpu20_1v.mbn" "${FW_DEST}/venus.mbn"
+
+# Other firmware files (jsn, etc.)
+for fw in adspr.jsn adsps.jsn adspua.jsn battmgr.jsn cdspr.jsn modemr.jsn; do
+    [ -f "${FW_DIR}/${fw}" ] && install -Dm644 "${FW_DIR}/${fw}" "${FW_DEST}/${fw}"
 done
 
 # modem_pr directory
-[ -d "${FW_DIR}/modem_pr" ] && cp -a "${FW_DIR}/modem_pr" /usr/lib/firmware/qcom/sc7280/Fairphone/FP5/
+[ -d "${FW_DIR}/modem_pr" ] && cp -a "${FW_DIR}/modem_pr" "${FW_DEST}/"
 
 # audio codec firmware
 [ -f "${FW_DIR}/aw882xx_acf.bin" ] && install -Dm644 "${FW_DIR}/aw882xx_acf.bin" /usr/lib/firmware/awinic/aw882xx_acf.bin
 
-# bluetooth firmware
-[ -f "${FW_DIR}/msbtfw11.mbn" ] && install -Dm644 "${FW_DIR}/msbtfw11.mbn" /usr/lib/firmware/ath11k/WCN6855/hw2.1/msbtfw11.mbn
-[ -f "${FW_DIR}/msnv11.bin" ] && install -Dm644 "${FW_DIR}/msnv11.bin" /usr/lib/firmware/ath11k/WCN6855/hw2.1/msnv11.bin
+# bluetooth firmware - install to qca/ path where kernel expects it
+mkdir -p /usr/lib/firmware/qca
+[ -f "${FW_DIR}/msbtfw11.mbn" ] && install -Dm644 "${FW_DIR}/msbtfw11.mbn" /usr/lib/firmware/qca/msbtfw11.mbn
+[ -f "${FW_DIR}/msnv11.bin" ] && install -Dm644 "${FW_DIR}/msnv11.bin" /usr/lib/firmware/qca/msnv11.bin
 
 # hexagon filesystem
-[ -d "${FW_DIR}/hexagonfs/acdb" ] && cp -a "${FW_DIR}/hexagonfs/acdb/"* /usr/share/qcom/sc7280/Fairphone/FP5/acdb/ 2>/dev/null || true
-[ -d "${FW_DIR}/hexagonfs/dsp" ] && cp -a "${FW_DIR}/hexagonfs/dsp/"* /usr/share/qcom/sc7280/Fairphone/FP5/dsp/ 2>/dev/null || true
-[ -d "${FW_DIR}/hexagonfs/sensors" ] && cp -a "${FW_DIR}/hexagonfs/sensors/"* /usr/share/qcom/sc7280/Fairphone/FP5/sensors/ 2>/dev/null || true
-[ -d "${FW_DIR}/hexagonfs/socinfo" ] && cp -a "${FW_DIR}/hexagonfs/socinfo" /usr/share/qcom/sc7280/Fairphone/FP5/
+[ -d "${FW_DIR}/hexagonfs/acdb" ] && cp -a "${FW_DIR}/hexagonfs/acdb/"* /usr/share/qcom/qcm6490/fairphone5/acdb/ 2>/dev/null || true
+[ -d "${FW_DIR}/hexagonfs/dsp" ] && cp -a "${FW_DIR}/hexagonfs/dsp/"* /usr/share/qcom/qcm6490/fairphone5/dsp/ 2>/dev/null || true
+[ -d "${FW_DIR}/hexagonfs/sensors" ] && cp -a "${FW_DIR}/hexagonfs/sensors/"* /usr/share/qcom/qcm6490/fairphone5/sensors/ 2>/dev/null || true
+[ -d "${FW_DIR}/hexagonfs/socinfo" ] && cp -a "${FW_DIR}/hexagonfs/socinfo" /usr/share/qcom/qcm6490/fairphone5/
 
-find /usr/lib/firmware/qcom/sc7280/Fairphone -type f -exec chmod 0644 {} \;
-find /usr/share/qcom/sc7280/Fairphone/FP5 -type f -exec chmod 0644 {} \;
+find /usr/lib/firmware/qcom/qcm6490/fairphone5 -type f -exec chmod 0644 {} \;
+find /usr/share/qcom/qcm6490/fairphone5 -type f -exec chmod 0644 {} \;
+
+# Verify critical firmware files are installed
+echo "Verifying firmware installation..."
+for fw in adsp cdsp modem wpss a660_zap; do
+    if [ -f "${FW_DEST}/${fw}.mdt" ] && [ -L "${FW_DEST}/${fw}.mbn" ]; then
+        echo "  ✓ ${fw}: OK"
+    else
+        echo "  ✗ ${fw}: MISSING or incomplete"
+        exit 1
+    fi
+done
+
+echo "Firmware installation complete."
+ls -la "${FW_DEST}/"
 
 rm -rf "${FW_DIR}"
 
-# kernel
+# kernel (from lorbus/misc copr)
 dnf -y remove \
     kernel \
     kernel-core \
     kernel-modules \
     kernel-modules-core
-dnf -y install \
+dnf -y install --refresh --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
     kernel
 
 # services
-systemctl enable \
+# Mask generic/unused hexagonrpcd services
+# Note: hexagonrpcd-adsp-sensorspd is enabled (needed for sensors via libssc)
+# The others require fastrpc devices that may not be available on this SoC
+systemctl mask \
+    hexagonrpcd-adsp.service \
     hexagonrpcd-adsp-rootpd.service \
+    hexagonrpcd-sdsp.service
+
+systemctl enable \
     hexagonrpcd-adsp-sensorspd.service \
-    hexagonrpcd-sdsp.service \
     tqftpserv.service \
     qbootctl.service \
-    rmtfs.service
+    rmtfs.service \
+    fairphone-fp5-usbc-rebind.service \
+    fairphone-fp5-sensors.service \
+    fairphone-fp5-bluetooth.service
 
 KERNEL_SUFFIX=""
 QUALIFIED_KERNEL="$(rpm -qa | grep -P 'kernel-(|'"$KERNEL_SUFFIX"'-)(\d+\.\d+\.\d+)' | sed -E 's/kernel-(|'"$KERNEL_SUFFIX"'-)//')"

@@ -1,0 +1,13 @@
+[Unit]
+Description=Fairphone 5 Bluetooth Initialization
+After=bluetooth.target
+Wants=bluetooth.service
+ConditionPathExists=/sys/class/bluetooth/hci0
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/libexec/fairphone-fp5-bluetooth-init
+
+[Install]
+WantedBy=bluetooth.target

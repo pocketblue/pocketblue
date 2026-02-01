@@ -1,0 +1,16 @@
+[Unit]
+Description=Rebind PMIC GLINK for USB-C functionality (if needed)
+After=sys-devices-platform-pmic\x2dglink.device
+After=sys-devices-platform-soc@0-a600000.usb.device
+ConditionPathExists=/sys/bus/platform/drivers/qcom_pmic_glink
+# Only run if Type-C port is not functional
+ConditionPathExists=!/sys/class/typec/port0
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStartPre=/usr/bin/sleep 2
+ExecStart=/usr/libexec/fairphone-fp5-usbc-rebind
+
+[Install]
+WantedBy=multi-user.target

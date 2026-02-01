@@ -1,0 +1,93 @@
+#!/bin/bash
+# Rebind PMIC GLINK driver to re-establish device links after all
+# USB-C components (FSA4480, PTN36502, USB controller) are ready
+#
+# This script is only run if Type-C functionality is not working.
+# The kernel usually handles this automatically, but in some cases
+# a rebind may help.
+
+PMIC_GLINK_PATH="/sys/bus/platform/drivers/qcom_pmic_glink"
+PMIC_GLINK_DEV="pmic-glink"
+
+# Check if Type-C port already exists and is functional
+if [ -d "/sys/class/typec/port0" ]; then
+    echo "Type-C port0 already exists, no rebind needed"
+    exit 0
+fi
+
+# Check if driver and device exist
+if [ ! -d "$PMIC_GLINK_PATH" ]; then
+    echo "PMIC GLINK driver not found, skipping rebind"
+    exit 0
+fi
+
+if [ ! -e "$PMIC_GLINK_PATH/$PMIC_GLINK_DEV" ]; then
+    echo "PMIC GLINK device not bound, skipping rebind"
+    exit 0
+fi
+
+# Check if all suppliers are ready before rebinding
+echo "Checking USB-C component status..."
+
+# FSA4480 on i2c bus 1
+if [ -d "/sys/bus/i2c/devices/1-0042/driver" ]; then
+    echo "  FSA4480 (1-0042): ready"
+else
+    echo "  FSA4480 (1-0042): not ready, skipping rebind"
+    exit 0
+fi
+
+# PTN36502 on i2c bus 4 (may not exist on all variants)
+if [ -d "/sys/bus/i2c/devices/4-001a" ]; then
+    if [ -d "/sys/bus/i2c/devices/4-001a/driver" ]; then
+        echo "  PTN36502 (4-001a): ready"
+    else
+        echo "  PTN36502 (4-001a): not ready, skipping rebind"
+        exit 0
+    fi
+fi
+
+# USB controller
+if [ -d "/sys/bus/platform/devices/a600000.usb/driver" ]; then
+    echo "  USB controller: ready"
+else
+    echo "  USB controller: not ready, skipping rebind"
+    exit 0
+fi
+
+# QMP combo PHY
+if [ -d "/sys/bus/platform/devices/88e8000.phy/driver" ]; then
+    echo "  QMP combo PHY: ready"
+else
+    echo "  QMP combo PHY: not ready, skipping rebind"
+    exit 0
+fi
+
+echo "All USB-C suppliers ready, attempting PMIC GLINK rebind..."
+
+# Unbind
+if echo "$PMIC_GLINK_DEV" > "$PMIC_GLINK_PATH/unbind" 2>/dev/null; then
+    echo "  Unbound PMIC GLINK"
+else
+    echo "  Failed to unbind PMIC GLINK (may already be unbound)"
+fi
+
+# Short delay to allow cleanup
+sleep 1
+
+# Rebind
+if echo "$PMIC_GLINK_DEV" > "$PMIC_GLINK_PATH/bind" 2>/dev/null; then
+    echo "  Rebound PMIC GLINK successfully"
+else
+    echo "  Note: PMIC GLINK rebind returned error (may already be bound)"
+fi
+
+# Verify Type-C port appeared
+sleep 1
+if [ -d "/sys/class/typec/port0" ]; then
+    echo "Type-C port0 is now available"
+else
+    echo "Warning: Type-C port0 still not available after rebind"
+fi
+
+exit 0

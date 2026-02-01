@@ -1,0 +1,26 @@
+# Fairphone 5 FastRPC device permissions
+# These rules allow userspace access to DSP subsystems for sensors and compute
+
+# FastRPC devices for ADSP (sensors) and CDSP (compute)
+KERNEL=="fastrpc-adsp", MODE="0666"
+KERNEL=="fastrpc-cdsp", MODE="0666"
+KERNEL=="fastrpc-sdsp", MODE="0666"
+KERNEL=="fastrpc-mdsp", MODE="0666"
+
+# Legacy device node names
+KERNEL=="adsprpc-smd", MODE="0666"
+KERNEL=="cdsprpc-smd", MODE="0666"
+
+# Qualcomm SMD/GLINK devices
+SUBSYSTEM=="rpmsg", MODE="0666"
+
+# IIO sensors (if exposed directly)
+SUBSYSTEM=="iio", MODE="0666"
+SUBSYSTEM=="iio", ATTR{name}=="*accel*", MODE="0666", GROUP="input"
+SUBSYSTEM=="iio", ATTR{name}=="*gyro*", MODE="0666", GROUP="input"
+SUBSYSTEM=="iio", ATTR{name}=="*magn*", MODE="0666", GROUP="input"
+SUBSYSTEM=="iio", ATTR{name}=="*als*", MODE="0666", GROUP="input"
+SUBSYSTEM=="iio", ATTR{name}=="*prox*", MODE="0666", GROUP="input"
+
+# libssc sensor client needs access to these
+KERNEL=="sns_client", MODE="0666"

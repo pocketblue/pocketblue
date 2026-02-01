@@ -1,0 +1,49 @@
+#!/bin/bash
+# Bluetooth initialization for Fairphone 5 (WCN6750)
+# This script helps recover from frame reassembly errors during HCI setup
+
+set -e
+
+HCI_DEV="hci0"
+
+echo "Fairphone 5 Bluetooth initialization..."
+
+# Wait for HCI device to appear
+for i in {1..30}; do
+    if [ -d "/sys/class/bluetooth/$HCI_DEV" ]; then
+        echo "Bluetooth device $HCI_DEV found"
+        break
+    fi
+    echo "Waiting for $HCI_DEV... ($i/30)"
+    sleep 1
+done
+
+if [ ! -d "/sys/class/bluetooth/$HCI_DEV" ]; then
+    echo "ERROR: Bluetooth device $HCI_DEV not found"
+    exit 1
+fi
+
+# Check if device is UP
+if hciconfig "$HCI_DEV" 2>/dev/null | grep -q "UP RUNNING"; then
+    echo "Bluetooth $HCI_DEV is already UP"
+    exit 0
+fi
+
+# Try to bring up the device
+echo "Bringing up $HCI_DEV..."
+hciconfig "$HCI_DEV" up 2>/dev/null || {
+    echo "Failed to bring up $HCI_DEV, attempting reset..."
+    
+    # Reset the device
+    hciconfig "$HCI_DEV" reset 2>/dev/null || true
+    sleep 2
+    
+    # Try again
+    hciconfig "$HCI_DEV" up 2>/dev/null || {
+        echo "ERROR: Could not bring up $HCI_DEV after reset"
+        exit 1
+    }
+}
+
+echo "Bluetooth $HCI_DEV initialized successfully"
+hciconfig "$HCI_DEV"

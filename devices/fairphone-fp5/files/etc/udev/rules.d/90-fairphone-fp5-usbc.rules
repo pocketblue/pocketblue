@@ -1,0 +1,17 @@
+# Fairphone 5 USB-C and DisplayPort Alt Mode udev rules
+# These rules ensure proper permissions and device initialization for Type-C functionality
+
+# Ensure Type-C port device has proper permissions
+ACTION=="add", SUBSYSTEM=="typec", MODE="0664", GROUP="input"
+
+# DisplayPort alt mode permissions
+ACTION=="add", SUBSYSTEM=="typec", ATTR{svid}=="ff01", MODE="0664", GROUP="video"
+
+# USB Type-C connector class devices
+SUBSYSTEM=="typec", MODE="0664"
+
+# UCSI (USB Type-C Connector System Software Interface)
+KERNEL=="ucsi*", MODE="0664"
+
+# PMIC GLINK Type-C device
+SUBSYSTEM=="pmic_glink", MODE="0664"

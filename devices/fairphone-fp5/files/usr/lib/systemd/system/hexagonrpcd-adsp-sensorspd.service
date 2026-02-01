@@ -1,0 +1,18 @@
+[Unit]
+Description=Hexagon ADSP Sensors Protection Domain Daemon
+Documentation=https://gitlab.com/postmarketOS/pmaports/-/tree/master/main/hexagonrpc
+After=tqftpserv.service
+After=sys-devices-virtual-misc-fastrpc\x2dadsp.device
+Requires=tqftpserv.service
+BindsTo=sys-devices-virtual-misc-fastrpc\x2dadsp.device
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/hexagonrpcd -U sensors -f /dev/fastrpc-adsp -s -R /usr/share/qcom/qcm6490/fairphone5
+Restart=on-failure
+RestartSec=5
+User=fastrpc
+Group=fastrpc
+
+[Install]
+WantedBy=multi-user.target

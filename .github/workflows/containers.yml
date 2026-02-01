@@ -82,10 +82,6 @@ jobs:
           device: ${{ inputs.device || '' }}
           device_list: |
             fairphone-fp5
-            oneplus-sdm845
-            xiaomi-beryllium
-            xiaomi-nabu
-            xiaomi-pipa
 
   build:
     needs: config
