@@ -188,14 +188,16 @@ To return to the original Fairphone OS:
 
 ### Enabled Services
 
-The following Qualcomm-specific services are enabled:
+The following device-specific services are enabled:
 
-- `hexagonrpcd-adsp-rootpd.service` - ADSP root protection domain
-- `hexagonrpcd-adsp-sensorspd.service` - ADSP sensors protection domain
-- `hexagonrpcd-sdsp.service` - SDSP (Sensors DSP) service
+- `hexagonrpcd-adsp-sensorspd.service` - ADSP sensors protection domain for sensor access via libssc
 - `tqftpserv.service` - TFTP server for firmware loading
 - `qbootctl.service` - Qualcomm A/B boot control
 - `rmtfs.service` - Remote filesystem service for modem
+- `fairphone-fp5-usbc-rebind.service` - USB-C Type-C and DisplayPort Alt Mode initialization
+- `fairphone-fp5-sensors.service` - Sensor stack initialization after ADSP is ready
+- `fairphone-fp5-bluetooth.service` - Bluetooth initialization with WCN6750 recovery
+- `fairphone-fp5-lpass-audio-rebind.service` - LPASS audio clock controller rebind
 
 ### Kernel
 

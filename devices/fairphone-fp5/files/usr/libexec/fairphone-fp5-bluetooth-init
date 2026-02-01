@@ -2,9 +2,8 @@
 # Bluetooth initialization for Fairphone 5 (WCN6750)
 # This script helps recover from frame reassembly errors during HCI setup
 
-set -e
-
 HCI_DEV="hci0"
+MAX_RETRIES=3
 
 echo "Fairphone 5 Bluetooth initialization..."
 
@@ -23,27 +22,71 @@ if [ ! -d "/sys/class/bluetooth/$HCI_DEV" ]; then
     exit 1
 fi
 
-# Check if device is UP
-if hciconfig "$HCI_DEV" 2>/dev/null | grep -q "UP RUNNING"; then
+# Wait for QCA firmware download to complete
+# The kernel logs "QCA setup on UART is completed" when ready
+sleep 2
+
+# Check if device is already UP and RUNNING
+check_bt_running() {
+    hciconfig "$HCI_DEV" 2>/dev/null | grep -q "UP RUNNING"
+}
+
+if check_bt_running; then
     echo "Bluetooth $HCI_DEV is already UP"
+    hciconfig "$HCI_DEV"
     exit 0
 fi
 
-# Try to bring up the device
-echo "Bringing up $HCI_DEV..."
-hciconfig "$HCI_DEV" up 2>/dev/null || {
-    echo "Failed to bring up $HCI_DEV, attempting reset..."
-    
-    # Reset the device
-    hciconfig "$HCI_DEV" reset 2>/dev/null || true
-    sleep 2
-    
-    # Try again
-    hciconfig "$HCI_DEV" up 2>/dev/null || {
-        echo "ERROR: Could not bring up $HCI_DEV after reset"
-        exit 1
-    }
+# Function to bring up bluetooth with rfkill handling
+bring_up_bluetooth() {
+    # Ensure rfkill is not blocking bluetooth
+    if command -v rfkill &>/dev/null; then
+        rfkill unblock bluetooth 2>/dev/null || true
+        sleep 0.5
+    fi
+
+    # Down the device first to reset state
+    hciconfig "$HCI_DEV" down 2>/dev/null || true
+    sleep 1
+
+    # Bring up the device
+    hciconfig "$HCI_DEV" up 2>/dev/null
 }
 
-echo "Bluetooth $HCI_DEV initialized successfully"
+# Try to bring up the device with retries
+echo "Bringing up $HCI_DEV..."
+for retry in $(seq 1 $MAX_RETRIES); do
+    if bring_up_bluetooth; then
+        sleep 1
+        if check_bt_running; then
+            echo "Bluetooth $HCI_DEV initialized successfully (attempt $retry)"
+            hciconfig "$HCI_DEV"
+            exit 0
+        fi
+    fi
+    
+    echo "Attempt $retry failed, retrying..."
+    
+    # Reset the HCI device
+    hciconfig "$HCI_DEV" reset 2>/dev/null || true
+    sleep 2
+done
+
+# Final attempt: try btmgmt as alternative
+if command -v btmgmt &>/dev/null; then
+    echo "Trying btmgmt power cycle..."
+    btmgmt power off 2>/dev/null || true
+    sleep 1
+    btmgmt power on 2>/dev/null || true
+    sleep 1
+    
+    if check_bt_running; then
+        echo "Bluetooth $HCI_DEV initialized via btmgmt"
+        hciconfig "$HCI_DEV"
+        exit 0
+    fi
+fi
+
+echo "WARNING: Bluetooth $HCI_DEV may not be fully initialized"
 hciconfig "$HCI_DEV"
+exit 0

@@ -15,3 +15,13 @@ KERNEL=="ucsi*", MODE="0664"
 
 # PMIC GLINK Type-C device
 SUBSYSTEM=="pmic_glink", MODE="0664"
+
+# When USB controller appears, tag it for later processing
+ACTION=="add", KERNEL=="a600000.usb", TAG+="systemd", ENV{SYSTEMD_WANTS}+="fairphone-fp5-usbc-rebind.service"
+
+# When Type-C mux chips are bound, tag for PMIC GLINK rebind check
+ACTION=="bind", SUBSYSTEM=="i2c", KERNEL=="1-0042", TAG+="systemd"
+ACTION=="bind", SUBSYSTEM=="i2c", KERNEL=="4-001a", TAG+="systemd"
+
+# QMP combo PHY binding - trigger USB-C check
+ACTION=="bind", SUBSYSTEM=="platform", KERNEL=="88e8000.phy", TAG+="systemd"

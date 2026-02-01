@@ -1,0 +1,15 @@
+[Unit]
+Description=Rebind LPASS Audio Clock Controller after ADSP is ready
+After=sys-devices-platform-soc\x400-3700000.remoteproc.device
+After=sys-devices-virtual-misc-fastrpc\x2dadsp.device
+ConditionPathExists=/sys/bus/platform/drivers/lpass_audio_cc-sc7280
+ConditionPathExists=!/sys/bus/platform/drivers/lpass_audio_cc-sc7280/3300000.clock-controller
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStartPre=/usr/bin/sleep 2
+ExecStart=/bin/bash -c 'echo "3300000.clock-controller" > /sys/bus/platform/drivers/lpass_audio_cc-sc7280/bind 2>/dev/null || echo "LPASS audio already bound or failed"'
+
+[Install]
+WantedBy=multi-user.target

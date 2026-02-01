@@ -101,6 +101,18 @@ mkdir -p /usr/lib/firmware/qca
 [ -f "${FW_DIR}/msbtfw11.mbn" ] && install -Dm644 "${FW_DIR}/msbtfw11.mbn" /usr/lib/firmware/qca/msbtfw11.mbn
 [ -f "${FW_DIR}/msnv11.bin" ] && install -Dm644 "${FW_DIR}/msnv11.bin" /usr/lib/firmware/qca/msnv11.bin
 
+# GPU firmware (a660_sqe.fw, a660_gmu.bin) - symlink from qcom-firmware if available
+# The kernel looks in qcom/qcm6490/fairphone5/ first, then falls back to qcom/
+# Creating symlinks avoids the "failed with error -2" warning at boot
+if [ -f /usr/lib/firmware/qcom/a660_sqe.fw ]; then
+    ln -sf ../../a660_sqe.fw "${FW_DEST}/a660_sqe.fw"
+    echo "  Linked a660_sqe.fw from qcom-firmware"
+fi
+if [ -f /usr/lib/firmware/qcom/a660_gmu.bin ]; then
+    ln -sf ../../a660_gmu.bin "${FW_DEST}/a660_gmu.bin"
+    echo "  Linked a660_gmu.bin from qcom-firmware"
+fi
+
 # hexagon filesystem
 [ -d "${FW_DIR}/hexagonfs/acdb" ] && cp -a "${FW_DIR}/hexagonfs/acdb/"* /usr/share/qcom/qcm6490/fairphone5/acdb/ 2>/dev/null || true
 [ -d "${FW_DIR}/hexagonfs/dsp" ] && cp -a "${FW_DIR}/hexagonfs/dsp/"* /usr/share/qcom/qcm6490/fairphone5/dsp/ 2>/dev/null || true
@@ -151,7 +163,8 @@ systemctl enable \
     rmtfs.service \
     fairphone-fp5-usbc-rebind.service \
     fairphone-fp5-sensors.service \
-    fairphone-fp5-bluetooth.service
+    fairphone-fp5-bluetooth.service \
+    fairphone-fp5-lpass-audio-rebind.service
 
 KERNEL_SUFFIX=""
 QUALIFIED_KERNEL="$(rpm -qa | grep -P 'kernel-(|'"$KERNEL_SUFFIX"'-)(\d+\.\d+\.\d+)' | sed -E 's/kernel-(|'"$KERNEL_SUFFIX"'-)//')"
