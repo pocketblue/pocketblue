@@ -6,6 +6,9 @@ SUBSYSTEM=="misc", KERNEL=="fastrpc-adsp", MODE="0666", GROUP="fastrpc", TAG+="s
 SUBSYSTEM=="misc", KERNEL=="fastrpc-cdsp", MODE="0666", GROUP="fastrpc", TAG+="systemd"
 SUBSYSTEM=="misc", KERNEL=="fastrpc-sdsp", MODE="0666", GROUP="fastrpc", TAG+="systemd"
 SUBSYSTEM=="misc", KERNEL=="fastrpc-mdsp", MODE="0666", GROUP="fastrpc", TAG+="systemd"
+
+# iio-sensor-proxy with libssc: accelerometer mount matrix
+SUBSYSTEM=="misc", KERNEL=="fastrpc-*", ENV{ACCEL_MOUNT_MATRIX}+="-1, 0, 0; 0, -1, 0; 0, 0, -1"
 KERNEL=="adsprpc-smd", MODE="0666"
 KERNEL=="cdsprpc-smd", MODE="0666"
 KERNEL=="sns_client", MODE="0666"
