@@ -5,6 +5,8 @@ set -uexo pipefail
 cp -arfT files/etc /etc
 cp -arfT files/usr /usr
 
+dnf -y install uwe5622-firmware
+
 mkdir -p /boot/dtb
 dnf -y remove \
     kernel \
