@@ -1,42 +1,88 @@
 #!/bin/bash
-# Initialize sensors on Fairphone 5
-# This script ensures the sensor stack is properly initialized after ADSP is ready
-
 set -e
 
 echo "Fairphone 5 sensor initialization starting..."
 
-# Wait for fastrpc-adsp device to be fully ready
-for i in {1..30}; do
-    if [ -c /dev/fastrpc-adsp ]; then
-        echo "fastrpc-adsp device ready"
-        break
-    fi
-    echo "Waiting for fastrpc-adsp device... ($i/30)"
-    sleep 1
-done
+ADSP_TIMEOUT=60
+SENSOR_FW_PATH="/usr/share/qcom/qcm6490/fairphone5/sensors"
 
-if [ ! -c /dev/fastrpc-adsp ]; then
+wait_for_fastrpc_device() {
+    local timeout=$1
+    local device=$2
+    local waited=0
+    
+    while [ $waited -lt $timeout ]; do
+        if [ -c "/dev/${device}" ]; then
+            echo "${device} device ready after ${waited}s"
+            return 0
+        fi
+        echo "Waiting for ${device} device... ($waited/${timeout}s)"
+        sleep 1
+        ((waited++))
+    done
+    
+    echo "ERROR: ${device} device not available after ${timeout}s"
+    return 1
+}
+
+wait_for_hexagonrpcd() {
+    local timeout=30
+    local waited=0
+    
+    echo "Waiting for hexagonrpcd to initialize sensors domain..."
+    
+    while [ $waited -lt $timeout ]; do
+        if systemctl is-active --quiet hexagonrpcd-adsp-sensorspd.service; then
+            echo "hexagonrpcd-adsp-sensorspd is active"
+            return 0
+        fi
+        sleep 1
+        ((waited++))
+    done
+    
+    echo "WARNING: hexagonrpcd-adsp-sensorspd not active after ${timeout}s"
+    return 1
+}
+
+if ! wait_for_fastrpc_device $ADSP_TIMEOUT "fastrpc-adsp"; then
     echo "ERROR: fastrpc-adsp device not available"
     exit 1
 fi
 
-# Ensure proper permissions on fastrpc devices
 chmod 0666 /dev/fastrpc-adsp 2>/dev/null || true
 chmod 0666 /dev/fastrpc-cdsp 2>/dev/null || true
 
-# Create sensors data directory if it doesn't exist
 mkdir -p /var/lib/sensors
 
-# Check if sensor firmware is present
-SENSOR_FW_PATH="/usr/share/qcom/qcm6490/fairphone5/sensors"
 if [ -d "$SENSOR_FW_PATH" ]; then
     echo "Sensor firmware found at $SENSOR_FW_PATH"
+    echo "Contents:"
+    ls -la "$SENSOR_FW_PATH/" 2>/dev/null || echo "  (empty or not accessible)"
 else
     echo "WARNING: Sensor firmware not found at $SENSOR_FW_PATH"
 fi
 
-# Trigger udev to re-process any IIO devices that might have been added
+sleep 2
+
+wait_for_hexagonrpcd || echo "Continuing with sensor setup..."
+
 udevadm trigger --subsystem-match=iio --action=change 2>/dev/null || true
 
+udevadm trigger --subsystem-match=misc --action=change 2>/dev/null || true
+
+sleep 2
+
+echo "Checking for IIO devices..."
+if [ -d /sys/bus/iio/devices ]; then
+    for dev in /sys/bus/iio/devices/iio:device*; do
+        if [ -d "$dev" ]; then
+            name=$(cat "$dev/name" 2>/dev/null || echo "unknown")
+            echo "  Found IIO device: $(basename $dev) - $name"
+        fi
+    done
+else
+    echo "  No IIO devices found (may appear later via libssc)"
+fi
+
 echo "Sensor initialization complete"
+echo "Note: Sensors are accessed via libssc/ADSP, not direct IIO"

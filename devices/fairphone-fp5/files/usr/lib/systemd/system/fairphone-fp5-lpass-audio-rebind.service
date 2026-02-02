@@ -2,15 +2,15 @@
 Description=Rebind LPASS Audio Clock Controller after ADSP is ready
 After=sys-devices-platform-soc\x400-3700000.remoteproc.device
 After=hexagonrpcd-adsp-sensorspd.service
+After=fairphone-fp5-sensors.service
 Wants=hexagonrpcd-adsp-sensorspd.service
 ConditionPathExists=/sys/bus/platform/drivers/lpass_audio_cc-sc7280
 
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStartPre=/usr/bin/sleep 5
-ExecStart=/bin/bash -c 'if [ ! -e /sys/bus/platform/drivers/lpass_audio_cc-sc7280/3300000.clock-controller ]; then echo "3300000.clock-controller" > /sys/bus/platform/drivers/lpass_audio_cc-sc7280/bind 2>/dev/null || true; fi'
-ExecStartPost=/bin/bash -c 'if [ -e /sys/bus/platform/drivers/lpass_audio_cc-sc7280/3300000.clock-controller ]; then echo "LPASS audio bound successfully"; else echo "LPASS audio bind skipped or failed"; fi'
+ExecStart=/usr/libexec/fairphone-fp5-lpass-audio-rebind
+TimeoutStartSec=180
 
 [Install]
 WantedBy=multi-user.target

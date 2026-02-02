@@ -29,6 +29,7 @@ cp -arfT files/usr /usr
 chmod +x /usr/libexec/fairphone-fp5-usbc-rebind
 chmod +x /usr/libexec/fairphone-fp5-sensors-init
 chmod +x /usr/libexec/fairphone-fp5-bluetooth-init
+chmod +x /usr/libexec/fairphone-fp5-lpass-audio-rebind
 
 # fairphone-5-firmware (direct install)
 FW_COMMIT="a4908f548e6f88965e78b1478af1751b6a854fc9"
@@ -97,20 +98,55 @@ done
 [ -f "${FW_DIR}/aw882xx_acf.bin" ] && install -Dm644 "${FW_DIR}/aw882xx_acf.bin" /usr/lib/firmware/awinic/aw882xx_acf.bin
 
 # bluetooth firmware - install to qca/ path where kernel expects it
+# The QCA Bluetooth driver may look for either .mbn or .tlv format depending on chip
+# WCN6750 on FP5 uses .tlv format, but firmware is provided as .mbn
+# Create symlinks for both formats to ensure compatibility
 mkdir -p /usr/lib/firmware/qca
-[ -f "${FW_DIR}/msbtfw11.mbn" ] && install -Dm644 "${FW_DIR}/msbtfw11.mbn" /usr/lib/firmware/qca/msbtfw11.mbn
-[ -f "${FW_DIR}/msnv11.bin" ] && install -Dm644 "${FW_DIR}/msnv11.bin" /usr/lib/firmware/qca/msnv11.bin
+if [ -f "${FW_DIR}/msbtfw11.mbn" ]; then
+    install -Dm644 "${FW_DIR}/msbtfw11.mbn" /usr/lib/firmware/qca/msbtfw11.mbn
+    # Create .tlv symlink for kernel compatibility (btqca driver requests .tlv)
+    ln -sf msbtfw11.mbn /usr/lib/firmware/qca/msbtfw11.tlv
+    echo "  Installed msbtfw11.mbn and created .tlv symlink"
+fi
+if [ -f "${FW_DIR}/msnv11.bin" ]; then
+    install -Dm644 "${FW_DIR}/msnv11.bin" /usr/lib/firmware/qca/msnv11.bin
+    # Create .b symlink for kernel compatibility (btqca driver may request .b format for NVM)
+    ln -sf msnv11.bin /usr/lib/firmware/qca/msnv11.b
+    echo "  Installed msnv11.bin and created .b symlink"
+fi
 
-# GPU firmware (a660_sqe.fw, a660_gmu.bin) - symlink from qcom-firmware if available
+# GPU firmware (a660_sqe.fw, a660_gmu.bin)
 # The kernel looks in qcom/qcm6490/fairphone5/ first, then falls back to qcom/
-# Creating symlinks avoids the "failed with error -2" warning at boot
+# Try to symlink from qcom-firmware first, otherwise download from linux-firmware
+GPU_FW_INSTALLED=false
 if [ -f /usr/lib/firmware/qcom/a660_sqe.fw ]; then
     ln -sf ../../a660_sqe.fw "${FW_DEST}/a660_sqe.fw"
     echo "  Linked a660_sqe.fw from qcom-firmware"
+    GPU_FW_INSTALLED=true
+else
+    echo "  a660_sqe.fw not found in qcom-firmware, downloading from linux-firmware..."
+    curl -sL "https://gitlab.com/kernel-firmware/linux-firmware/-/raw/main/qcom/a660_sqe.fw" -o "${FW_DEST}/a660_sqe.fw" && \
+        chmod 0644 "${FW_DEST}/a660_sqe.fw" && \
+        echo "  Downloaded a660_sqe.fw from linux-firmware" && \
+        GPU_FW_INSTALLED=true || \
+        echo "  WARNING: Failed to download a660_sqe.fw"
 fi
+
 if [ -f /usr/lib/firmware/qcom/a660_gmu.bin ]; then
     ln -sf ../../a660_gmu.bin "${FW_DEST}/a660_gmu.bin"
     echo "  Linked a660_gmu.bin from qcom-firmware"
+else
+    echo "  a660_gmu.bin not found in qcom-firmware, downloading from linux-firmware..."
+    curl -sL "https://gitlab.com/kernel-firmware/linux-firmware/-/raw/main/qcom/a660_gmu.bin" -o "${FW_DEST}/a660_gmu.bin" && \
+        chmod 0644 "${FW_DEST}/a660_gmu.bin" && \
+        echo "  Downloaded a660_gmu.bin from linux-firmware" || \
+        echo "  WARNING: Failed to download a660_gmu.bin"
+fi
+
+if [ "$GPU_FW_INSTALLED" = true ] && [ -f "${FW_DEST}/a660_sqe.fw" ]; then
+    echo "  ✓ GPU firmware: OK"
+else
+    echo "  ⚠ GPU firmware: may be incomplete (display may still work with fallback)"
 fi
 
 # hexagon filesystem

@@ -4,12 +4,16 @@ After=tqftpserv.service
 After=sys-devices-virtual-misc-fastrpc\x2dadsp.device
 Requires=tqftpserv.service
 BindsTo=sys-devices-virtual-misc-fastrpc\x2dadsp.device
+StartLimitIntervalSec=300
+StartLimitBurst=5
 
 [Service]
 Type=simple
+ExecStartPre=/bin/sleep 2
 ExecStart=/usr/bin/hexagonrpcd -U sensors -f /dev/fastrpc-adsp -s -R /usr/share/qcom/qcm6490/fairphone5
 Restart=on-failure
-RestartSec=5
+RestartSec=10
+TimeoutStartSec=60
 User=fastrpc
 Group=fastrpc
 

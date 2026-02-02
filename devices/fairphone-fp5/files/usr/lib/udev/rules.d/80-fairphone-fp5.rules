@@ -18,9 +18,6 @@ SUBSYSTEM=="iio", ATTR{name}=="*magn*", MODE="0666", GROUP="input"
 SUBSYSTEM=="iio", ATTR{name}=="*als*", MODE="0666", GROUP="input"
 SUBSYSTEM=="iio", ATTR{name}=="*prox*", MODE="0666", GROUP="input"
 
-# libssc accelerometer mount matrix
-SUBSYSTEM=="misc", KERNEL=="fastrpc-*", ENV{ACCEL_MOUNT_MATRIX}+="-1, 0, 0; 0, -1, 0; 0, 0, -1"
-
 # Bluetooth (WCN6750/QCA)
 ACTION=="add", SUBSYSTEM=="bluetooth", KERNEL=="hci*", TAG+="systemd", ENV{SYSTEMD_WANTS}+="fairphone-fp5-bluetooth.service"
 ACTION=="add", SUBSYSTEM=="tty", KERNEL=="ttyHS0", MODE="0660", GROUP="dialout"

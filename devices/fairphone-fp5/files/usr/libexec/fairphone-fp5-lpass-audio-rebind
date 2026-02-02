@@ -1,0 +1,91 @@
+#!/bin/bash
+set -e
+
+LPASS_DRIVER="/sys/bus/platform/drivers/lpass_audio_cc-sc7280"
+LPASS_DEVICE="3300000.clock-controller"
+MAX_RETRIES=10
+RETRY_DELAY=3
+
+echo "Fairphone 5 LPASS Audio Clock Controller rebind..."
+
+if [ ! -d "$LPASS_DRIVER" ]; then
+    echo "ERROR: LPASS audio driver not loaded"
+    exit 1
+fi
+
+wait_for_adsp() {
+    local timeout=60
+    local waited=0
+    
+    echo "Waiting for ADSP to be fully operational..."
+    
+    while [ $waited -lt $timeout ]; do
+        if [ -c /dev/fastrpc-adsp ]; then
+            echo "ADSP fastrpc device available after ${waited}s"
+            return 0
+        fi
+        sleep 1
+        ((waited++))
+    done
+    
+    echo "WARNING: ADSP fastrpc device not available after ${timeout}s"
+    return 1
+}
+
+unbind_device() {
+    if [ -e "${LPASS_DRIVER}/${LPASS_DEVICE}" ]; then
+        echo "Unbinding ${LPASS_DEVICE}..."
+        echo "$LPASS_DEVICE" > "${LPASS_DRIVER}/unbind" 2>/dev/null || true
+        sleep 1
+    fi
+}
+
+bind_device() {
+    if [ ! -e "${LPASS_DRIVER}/${LPASS_DEVICE}" ]; then
+        echo "Binding ${LPASS_DEVICE}..."
+        echo "$LPASS_DEVICE" > "${LPASS_DRIVER}/bind" 2>/dev/null
+        return $?
+    fi
+    return 0
+}
+
+check_device_bound() {
+    if [ -e "${LPASS_DRIVER}/${LPASS_DEVICE}" ]; then
+        if dmesg | tail -50 | grep -q "lpass_audio_cc.*probe.*failed"; then
+            return 1
+        fi
+        return 0
+    fi
+    return 1
+}
+
+wait_for_adsp || echo "Continuing anyway..."
+
+sleep 2
+
+if check_device_bound; then
+    echo "LPASS audio clock controller already bound and operational"
+    exit 0
+fi
+
+for attempt in $(seq 1 $MAX_RETRIES); do
+    echo "Attempt ${attempt}/${MAX_RETRIES}..."
+    
+    unbind_device
+    
+    sleep $RETRY_DELAY
+    
+    if bind_device; then
+        sleep 2
+        if check_device_bound; then
+            echo "LPASS audio clock controller bound successfully on attempt ${attempt}"
+            exit 0
+        fi
+    fi
+    
+    echo "Bind attempt ${attempt} failed, retrying..."
+done
+
+echo "WARNING: LPASS audio clock controller bind failed after ${MAX_RETRIES} attempts"
+echo "Audio may not work correctly"
+exit 0

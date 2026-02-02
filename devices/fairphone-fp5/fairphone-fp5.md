@@ -174,6 +174,96 @@ To return to the original Fairphone OS:
 - Wait several minutes - first boot may take time
 - Connect via USB and check if the device is accessible via SSH over USB networking
 
+### Bluetooth Not Working
+
+If Bluetooth is not activatable, check the following:
+
+1. Verify firmware files are present:
+   ```bash
+   ls -la /usr/lib/firmware/qca/
+   # Should show: msbtfw11.mbn, msbtfw11.tlv (symlink), msnv11.bin
+   ```
+
+2. Check kernel messages for firmware loading errors:
+   ```bash
+   dmesg | grep -i bluetooth
+   dmesg | grep -i qca
+   ```
+
+3. Ensure rfkill is not blocking Bluetooth:
+   ```bash
+   rfkill list bluetooth
+   rfkill unblock bluetooth
+   ```
+
+4. Restart the Bluetooth service:
+   ```bash
+   sudo systemctl restart fairphone-fp5-bluetooth.service
+   sudo systemctl restart bluetooth.service
+   ```
+
+### Orientation Sensor Not Working
+
+Sensors on the Fairphone 5 are accessed via the ADSP (Audio DSP) subsystem using libssc:
+
+1. Check if the ADSP fastrpc device is available:
+   ```bash
+   ls -la /dev/fastrpc-adsp
+   ```
+
+2. Check hexagonrpcd service status:
+   ```bash
+   sudo systemctl status hexagonrpcd-adsp-sensorspd.service
+   ```
+
+3. Verify sensor firmware is present:
+   ```bash
+   ls -la /usr/share/qcom/qcm6490/fairphone5/sensors/
+   ```
+
+4. Check iio-sensor-proxy status:
+   ```bash
+   sudo systemctl status iio-sensor-proxy.service
+   ```
+
+5. Restart the sensor stack:
+   ```bash
+   sudo systemctl restart hexagonrpcd-adsp-sensorspd.service
+   sudo systemctl restart fairphone-fp5-sensors.service
+   sudo systemctl restart iio-sensor-proxy.service
+   ```
+
+### Audio Not Working (LPASS Clock Controller Error)
+
+The LPASS audio clock controller may fail to probe on first boot:
+
+1. Check service status:
+   ```bash
+   sudo systemctl status fairphone-fp5-lpass-audio-rebind.service
+   ```
+
+2. Manually trigger rebind:
+   ```bash
+   sudo /usr/libexec/fairphone-fp5-lpass-audio-rebind
+   ```
+
+3. Restart audio services:
+   ```bash
+   sudo systemctl restart wireplumber.service pipewire.service
+   ```
+
+### GPU Firmware Errors
+
+If you see `failed to load a660_sqe.fw` errors:
+
+1. Verify GPU firmware:
+   ```bash
+   ls -la /usr/lib/firmware/qcom/qcm6490/fairphone5/a660_*
+   ls -la /usr/lib/firmware/qcom/a660_*
+   ```
+
+2. The display should still work with fallback, but GPU acceleration may be affected
+
 ## Technical Details
 
 ### Partition Layout

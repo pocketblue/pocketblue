@@ -1,47 +1,83 @@
 #!/bin/bash
-# Bluetooth initialization for Fairphone 5 (WCN6750)
-# This script helps recover from frame reassembly errors during HCI setup
+set -e
 
 HCI_DEV="hci0"
-MAX_RETRIES=5
-FIRMWARE_WAIT_TIMEOUT=30
+MAX_RETRIES=10
+FIRMWARE_WAIT_TIMEOUT=60
 
-echo "Fairphone 5 Bluetooth initialization..."
+echo "Fairphone 5 Bluetooth initialization (WCN6750)..."
 
-# Wait for HCI device to appear
-for i in $(seq 1 30); do
-    if [ -d "/sys/class/bluetooth/$HCI_DEV" ]; then
-        echo "Bluetooth device $HCI_DEV found"
-        break
+wait_for_hci_device() {
+    local timeout=30
+    local waited=0
+    
+    while [ $waited -lt $timeout ]; do
+        if [ -d "/sys/class/bluetooth/$HCI_DEV" ]; then
+            echo "Bluetooth device $HCI_DEV found after ${waited}s"
+            return 0
+        fi
+        echo "Waiting for $HCI_DEV... ($waited/${timeout}s)"
+        sleep 1
+        ((waited++))
+    done
+    
+    echo "ERROR: Bluetooth device $HCI_DEV not found after ${timeout}s"
+    return 1
+}
+
+check_firmware_files() {
+    echo "Checking Bluetooth firmware files..."
+    
+    local fw_ok=true
+    
+    if [ -f /usr/lib/firmware/qca/msbtfw11.mbn ]; then
+        echo "  ✓ msbtfw11.mbn found"
+    else
+        echo "  ✗ msbtfw11.mbn NOT found"
+        fw_ok=false
     fi
-    echo "Waiting for $HCI_DEV... ($i/30)"
-    sleep 1
-done
+    
+    if [ -f /usr/lib/firmware/qca/msbtfw11.tlv ] || [ -L /usr/lib/firmware/qca/msbtfw11.tlv ]; then
+        echo "  ✓ msbtfw11.tlv found (or symlink)"
+    else
+        echo "  ✗ msbtfw11.tlv NOT found - creating symlink..."
+        if [ -f /usr/lib/firmware/qca/msbtfw11.mbn ]; then
+            ln -sf msbtfw11.mbn /usr/lib/firmware/qca/msbtfw11.tlv
+            echo "    Created symlink msbtfw11.tlv -> msbtfw11.mbn"
+        else
+            fw_ok=false
+        fi
+    fi
+    
+    if [ -f /usr/lib/firmware/qca/msnv11.bin ]; then
+        echo "  ✓ msnv11.bin found"
+    else
+        echo "  ⚠ msnv11.bin NOT found (NVM data, may not be critical)"
+    fi
+    
+    if [ "$fw_ok" = true ]; then
+        return 0
+    else
+        return 1
+    fi
+}
 
-if [ ! -d "/sys/class/bluetooth/$HCI_DEV" ]; then
-    echo "ERROR: Bluetooth device $HCI_DEV not found"
-    exit 1
-fi
-
-# Wait for QCA firmware download to complete
-# The kernel logs "QCA setup on UART is completed" when ready
-# Check dmesg for firmware loading status
-wait_for_firmware() {
+wait_for_firmware_load() {
     local timeout=$1
     local waited=0
     
     echo "Waiting for QCA Bluetooth firmware to load (timeout: ${timeout}s)..."
     
     while [ $waited -lt $timeout ]; do
-        # Check if firmware has been successfully loaded
-        if dmesg | grep -q "QCA setup on UART is completed\|Bluetooth: hci0: QCA.*setup.*completed"; then
+        if dmesg | tail -100 | grep -q "QCA setup on UART is completed\|Bluetooth.*hci0.*QCA.*setup.*completed\|hci0.*firmware.*loaded"; then
             echo "QCA firmware loaded successfully"
             return 0
         fi
         
-        # Check if firmware loading failed
-        if dmesg | grep -q "hci0.*failed to\|qca.*firmware.*failed\|btqca.*failed"; then
-            echo "WARNING: Detected firmware loading failure in dmesg"
+        if dmesg | tail -50 | grep -q "hci0.*QCA Failed\|btqca.*failed\|firmware.*failed.*-2"; then
+            echo "WARNING: Detected firmware loading failure"
+            echo "Recent dmesg:"
+            dmesg | tail -20 | grep -i bluetooth || true
             return 1
         fi
         
@@ -53,39 +89,44 @@ wait_for_firmware() {
     return 1
 }
 
-wait_for_firmware $FIRMWARE_WAIT_TIMEOUT
-
-# Additional delay for device stabilization after firmware load
-sleep 2
-
-# Check if device is already UP and RUNNING
 check_bt_running() {
     hciconfig "$HCI_DEV" 2>/dev/null | grep -q "UP RUNNING"
 }
 
-if check_bt_running; then
-    echo "Bluetooth $HCI_DEV is already UP"
-    hciconfig "$HCI_DEV"
-    exit 0
-fi
-
-# Function to bring up bluetooth with rfkill handling
 bring_up_bluetooth() {
-    # Ensure rfkill is not blocking bluetooth
     if command -v rfkill &>/dev/null; then
         rfkill unblock bluetooth 2>/dev/null || true
         sleep 0.5
     fi
 
-    # Down the device first to reset state
     hciconfig "$HCI_DEV" down 2>/dev/null || true
     sleep 1
 
-    # Bring up the device
     hciconfig "$HCI_DEV" up 2>/dev/null
 }
 
-# Try to bring up the device with retries
+check_firmware_files
+
+if ! wait_for_hci_device; then
+    echo "Bluetooth HCI device not available - checking kernel modules..."
+    lsmod | grep -E "btqca|hci_uart|bluetooth" || echo "Bluetooth modules may not be loaded"
+    exit 1
+fi
+
+sleep 2
+
+wait_for_firmware_load $FIRMWARE_WAIT_TIMEOUT || {
+    echo "Firmware may not have loaded correctly, attempting to continue..."
+}
+
+sleep 2
+
+if check_bt_running; then
+    echo "Bluetooth $HCI_DEV is already UP and RUNNING"
+    hciconfig "$HCI_DEV"
+    exit 0
+fi
+
 echo "Bringing up $HCI_DEV..."
 for retry in $(seq 1 $MAX_RETRIES); do
     if bring_up_bluetooth; then
@@ -99,12 +140,10 @@ for retry in $(seq 1 $MAX_RETRIES); do
     
     echo "Attempt $retry failed, retrying..."
     
-    # Reset the HCI device
     hciconfig "$HCI_DEV" reset 2>/dev/null || true
     sleep 3
 done
 
-# Final attempt: try btmgmt as alternative
 if command -v btmgmt &>/dev/null; then
     echo "Trying btmgmt power cycle..."
     btmgmt power off 2>/dev/null || true
@@ -120,5 +159,11 @@ if command -v btmgmt &>/dev/null; then
 fi
 
 echo "WARNING: Bluetooth $HCI_DEV may not be fully initialized"
-hciconfig "$HCI_DEV"
+echo "Final status:"
+hciconfig "$HCI_DEV" 2>/dev/null || echo "Device not accessible"
+echo ""
+echo "Troubleshooting:"
+echo "  - Check dmesg for firmware errors: dmesg | grep -i bluetooth"
+echo "  - Verify firmware files: ls -la /usr/lib/firmware/qca/"
+echo "  - Check rfkill: rfkill list bluetooth"
 exit 0
