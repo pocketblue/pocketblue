@@ -58,27 +58,19 @@ write_partition_table() {
     local label_id
     label_id="$(uuidgen 2>/dev/null || cat /proc/sys/kernel/random/uuid)"
 
+    local -a sfdisk_cmd=(sfdisk)
     if sfdisk --help 2>/dev/null | grep -q -- '--wipe'; then
-        sfdisk --wipe always --wipe-partitions always "$device" <<EOF
-label: gpt
-label-id: $label_id
-table-length: $GPT_TABLE_LENGTH
-
-1 : start=1MiB,  size=${esp_size_mib}MiB,  type=$GPT_TYPE_ESP,      name="esp"
-2 :             size=${boot_size_mib}MiB, type=$GPT_TYPE_LINUX_FS, name="boot"
-3 :                                  type=$GPT_TYPE_LINUX_FS,     name="rootfs"
-EOF
-    else
-        sfdisk "$device" <<EOF
-label: gpt
-label-id: $label_id
-table-length: $GPT_TABLE_LENGTH
-
-1 : start=1MiB,  size=${esp_size_mib}MiB,  type=$GPT_TYPE_ESP,      name="esp"
-2 :             size=${boot_size_mib}MiB, type=$GPT_TYPE_LINUX_FS, name="boot"
-3 :                                  type=$GPT_TYPE_LINUX_FS,     name="rootfs"
-EOF
+        sfdisk_cmd+=(--wipe always --wipe-partitions always)
     fi
+    "${sfdisk_cmd[@]}" "$device" <<EOF
+label: gpt
+label-id: $label_id
+table-length: $GPT_TABLE_LENGTH
+
+1 : start=1MiB,  size=${esp_size_mib}MiB,  type=$GPT_TYPE_ESP,      name="esp"
+2 :             size=${boot_size_mib}MiB, type=$GPT_TYPE_LINUX_FS, name="boot"
+3 :                                  type=$GPT_TYPE_LINUX_FS,     name="rootfs"
+EOF
 }
 
 echo "Writing GPT partition table to $device"
