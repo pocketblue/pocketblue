@@ -1,0 +1,38 @@
+# Fairphone 5 udev rules
+
+# FastRPC devices for DSP subsystems (sensors and compute)
+KERNEL=="fastrpc-adsp", MODE="0666"
+KERNEL=="fastrpc-cdsp", MODE="0666"
+KERNEL=="fastrpc-sdsp", MODE="0666"
+KERNEL=="fastrpc-mdsp", MODE="0666"
+KERNEL=="adsprpc-smd", MODE="0666"
+KERNEL=="cdsprpc-smd", MODE="0666"
+KERNEL=="sns_client", MODE="0666"
+
+# RPMSG and IIO sensors
+SUBSYSTEM=="rpmsg", MODE="0666"
+SUBSYSTEM=="iio", MODE="0666"
+SUBSYSTEM=="iio", ATTR{name}=="*accel*", MODE="0666", GROUP="input"
+SUBSYSTEM=="iio", ATTR{name}=="*gyro*", MODE="0666", GROUP="input"
+SUBSYSTEM=="iio", ATTR{name}=="*magn*", MODE="0666", GROUP="input"
+SUBSYSTEM=="iio", ATTR{name}=="*als*", MODE="0666", GROUP="input"
+SUBSYSTEM=="iio", ATTR{name}=="*prox*", MODE="0666", GROUP="input"
+
+# libssc accelerometer mount matrix
+SUBSYSTEM=="misc", KERNEL=="fastrpc-*", ENV{ACCEL_MOUNT_MATRIX}+="-1, 0, 0; 0, -1, 0; 0, 0, -1"
+
+# Bluetooth (WCN6750/QCA)
+ACTION=="add", SUBSYSTEM=="bluetooth", KERNEL=="hci*", TAG+="systemd", ENV{SYSTEMD_WANTS}+="fairphone-fp5-bluetooth.service"
+ACTION=="add", SUBSYSTEM=="tty", KERNEL=="ttyHS0", MODE="0660", GROUP="dialout"
+SUBSYSTEM=="bluetooth", MODE="0660", GROUP="bluetooth"
+
+# USB-C and DisplayPort Alt Mode
+ACTION=="add", SUBSYSTEM=="typec", MODE="0664", GROUP="input"
+ACTION=="add", SUBSYSTEM=="typec", ATTR{svid}=="ff01", MODE="0664", GROUP="video"
+SUBSYSTEM=="typec", MODE="0664"
+KERNEL=="ucsi*", MODE="0664"
+SUBSYSTEM=="pmic_glink", MODE="0664"
+ACTION=="add", KERNEL=="a600000.usb", TAG+="systemd", ENV{SYSTEMD_WANTS}+="fairphone-fp5-usbc-rebind.service"
+ACTION=="bind", SUBSYSTEM=="i2c", KERNEL=="1-0042", TAG+="systemd"
+ACTION=="bind", SUBSYSTEM=="i2c", KERNEL=="4-001a", TAG+="systemd"
+ACTION=="bind", SUBSYSTEM=="platform", KERNEL=="88e8000.phy", TAG+="systemd"

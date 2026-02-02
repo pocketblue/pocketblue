@@ -1,6 +1,5 @@
 [Unit]
 Description=Hexagon ADSP Sensors Protection Domain Daemon
-Documentation=https://gitlab.com/postmarketOS/pmaports/-/tree/master/main/hexagonrpc
 After=tqftpserv.service
 After=sys-devices-virtual-misc-fastrpc\x2dadsp.device
 Requires=tqftpserv.service
