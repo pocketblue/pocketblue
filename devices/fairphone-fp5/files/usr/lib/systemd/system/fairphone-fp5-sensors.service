@@ -1,7 +1,6 @@
 [Unit]
 Description=Fairphone 5 Sensor Initialization
 After=hexagonrpcd-adsp-sensorspd.service
-After=sys-devices-virtual-misc-fastrpc\x2dadsp.device
 Wants=hexagonrpcd-adsp-sensorspd.service
 ConditionPathExists=/dev/fastrpc-adsp
 

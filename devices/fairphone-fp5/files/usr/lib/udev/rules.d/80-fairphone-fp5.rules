@@ -1,10 +1,11 @@
 # Fairphone 5 udev rules
 
 # FastRPC devices for DSP subsystems (sensors and compute)
-KERNEL=="fastrpc-adsp", MODE="0666"
-KERNEL=="fastrpc-cdsp", MODE="0666"
-KERNEL=="fastrpc-sdsp", MODE="0666"
-KERNEL=="fastrpc-mdsp", MODE="0666"
+# TAG+="systemd" creates device units that services can depend on
+SUBSYSTEM=="misc", KERNEL=="fastrpc-adsp", MODE="0666", GROUP="fastrpc", TAG+="systemd"
+SUBSYSTEM=="misc", KERNEL=="fastrpc-cdsp", MODE="0666", GROUP="fastrpc", TAG+="systemd"
+SUBSYSTEM=="misc", KERNEL=="fastrpc-sdsp", MODE="0666", GROUP="fastrpc", TAG+="systemd"
+SUBSYSTEM=="misc", KERNEL=="fastrpc-mdsp", MODE="0666", GROUP="fastrpc", TAG+="systemd"
 KERNEL=="adsprpc-smd", MODE="0666"
 KERNEL=="cdsprpc-smd", MODE="0666"
 KERNEL=="sns_client", MODE="0666"
