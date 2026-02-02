@@ -3,12 +3,13 @@
 # This script helps recover from frame reassembly errors during HCI setup
 
 HCI_DEV="hci0"
-MAX_RETRIES=3
+MAX_RETRIES=5
+FIRMWARE_WAIT_TIMEOUT=30
 
 echo "Fairphone 5 Bluetooth initialization..."
 
 # Wait for HCI device to appear
-for i in {1..30}; do
+for i in $(seq 1 30); do
     if [ -d "/sys/class/bluetooth/$HCI_DEV" ]; then
         echo "Bluetooth device $HCI_DEV found"
         break
@@ -24,6 +25,37 @@ fi
 
 # Wait for QCA firmware download to complete
 # The kernel logs "QCA setup on UART is completed" when ready
+# Check dmesg for firmware loading status
+wait_for_firmware() {
+    local timeout=$1
+    local waited=0
+    
+    echo "Waiting for QCA Bluetooth firmware to load (timeout: ${timeout}s)..."
+    
+    while [ $waited -lt $timeout ]; do
+        # Check if firmware has been successfully loaded
+        if dmesg | grep -q "QCA setup on UART is completed\|Bluetooth: hci0: QCA.*setup.*completed"; then
+            echo "QCA firmware loaded successfully"
+            return 0
+        fi
+        
+        # Check if firmware loading failed
+        if dmesg | grep -q "hci0.*failed to\|qca.*firmware.*failed\|btqca.*failed"; then
+            echo "WARNING: Detected firmware loading failure in dmesg"
+            return 1
+        fi
+        
+        sleep 1
+        ((waited++))
+    done
+    
+    echo "WARNING: Firmware loading status unknown after ${timeout}s"
+    return 1
+}
+
+wait_for_firmware $FIRMWARE_WAIT_TIMEOUT
+
+# Additional delay for device stabilization after firmware load
 sleep 2
 
 # Check if device is already UP and RUNNING
@@ -57,7 +89,7 @@ bring_up_bluetooth() {
 echo "Bringing up $HCI_DEV..."
 for retry in $(seq 1 $MAX_RETRIES); do
     if bring_up_bluetooth; then
-        sleep 1
+        sleep 2
         if check_bt_running; then
             echo "Bluetooth $HCI_DEV initialized successfully (attempt $retry)"
             hciconfig "$HCI_DEV"
@@ -69,16 +101,16 @@ for retry in $(seq 1 $MAX_RETRIES); do
     
     # Reset the HCI device
     hciconfig "$HCI_DEV" reset 2>/dev/null || true
-    sleep 2
+    sleep 3
 done
 
 # Final attempt: try btmgmt as alternative
 if command -v btmgmt &>/dev/null; then
     echo "Trying btmgmt power cycle..."
     btmgmt power off 2>/dev/null || true
-    sleep 1
+    sleep 2
     btmgmt power on 2>/dev/null || true
-    sleep 1
+    sleep 2
     
     if check_bt_running; then
         echo "Bluetooth $HCI_DEV initialized via btmgmt"
