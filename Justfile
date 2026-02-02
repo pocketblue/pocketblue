@@ -34,6 +34,8 @@ expires_after := env("PB_EXPIRES_AFTER", "")
 rechunk_suffix := env("PB_RECHUNK_SUFFIX", "")
 arch := env("PB_ARCH", "arm64")
 
+default: build
+
 pull:
     sudo podman pull {{base}}:{{branch}}
     sudo podman pull {{base_bootc}}
