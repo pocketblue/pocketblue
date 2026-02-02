@@ -12,6 +12,8 @@ dnf -y install \
     bluez-tools \
     hexagonrpc \
     iio-sensor-proxy \
+    libcamera \
+    libcamera-tools \
     libssc \
     mobility-tweaks \
     qbootctl \

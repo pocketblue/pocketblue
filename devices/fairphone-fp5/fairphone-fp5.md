@@ -35,7 +35,7 @@ The Fairphone 5 is supported by Pocketblue with the following desktop environmen
 
 ### What May Not Work or Has Limited Support
 
-- Camera (mainline camera support is still in development)
+- Camera (mainline CAMSS driver support for QCM6490 is still in development upstream)
 - Some hardware-specific features
 
 ## Prerequisites
@@ -263,6 +263,65 @@ If you see `failed to load a660_sqe.fw` errors:
    ```
 
 2. The display should still work with fallback, but GPU acceleration may be affected
+
+### Camera Not Working
+
+Camera support on the Fairphone 5 requires the Qualcomm CAMSS (Camera Subsystem) driver and sensor-specific drivers.
+
+**Current Status:**
+- The kernel is configured with `CONFIG_VIDEO_QCOM_CAMSS=m` (CAMSS driver enabled)
+- The Fairphone 5 uses Samsung camera sensors (S5KJN1 50MP main, S5K4H7 ultrawide/front)
+- These Samsung sensor drivers may not yet be in mainline Linux
+- Device tree support for the camera pipeline may still be incomplete
+
+**Camera Hardware:**
+| Camera | Sensor | Resolution |
+|--------|--------|------------|
+| Main (rear) | Samsung S5KJN1 | 50MP |
+| Ultrawide (rear) | Samsung S5K4H7 | 8MP |
+| Front | Samsung S5K4H7 | 32MP |
+
+**To check camera hardware detection:**
+
+1. Check if any video devices are available:
+   ```bash
+   ls -la /dev/video*
+   ls -la /dev/media*
+   ```
+
+2. Check kernel messages for camera-related drivers:
+   ```bash
+   dmesg | grep -i camss
+   dmesg | grep -i camera
+   dmesg | grep -i cci
+   dmesg | grep -i s5k
+   ```
+
+3. List V4L2 devices:
+   ```bash
+   v4l2-ctl --list-devices
+   ```
+
+4. Check libcamera detection:
+   ```bash
+   cam -l
+   ```
+
+5. Inspect the media controller topology:
+   ```bash
+   media-ctl -p
+   ```
+
+**What's needed for camera support:**
+1. Samsung S5KJN1 and S5K4H7 sensor drivers in mainline kernel
+2. Device tree entries for camera nodes in the sc7280/qcm6490 DTS
+3. libcamera pipeline handler support for CAMSS
+4. Possibly camera firmware/tuning files
+
+**Resources for camera support progress:**
+- [Qualcomm CAMSS driver upstream patches](https://lore.kernel.org/linux-media/)
+- [postmarketOS Fairphone 5 camera status](https://wiki.postmarketos.org/wiki/Fairphone_5_(fairphone-fp5)#Camera)
+- [libcamera Qualcomm support](https://libcamera.org/)
 
 ## Technical Details
 

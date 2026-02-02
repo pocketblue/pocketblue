@@ -37,3 +37,13 @@ ACTION=="add", KERNEL=="a600000.usb", TAG+="systemd", ENV{SYSTEMD_WANTS}+="fairp
 ACTION=="bind", SUBSYSTEM=="i2c", KERNEL=="1-0042", TAG+="systemd"
 ACTION=="bind", SUBSYSTEM=="i2c", KERNEL=="4-001a", TAG+="systemd"
 ACTION=="bind", SUBSYSTEM=="platform", KERNEL=="88e8000.phy", TAG+="systemd"
+
+# Camera (CAMSS - Camera Subsystem)
+# Video4Linux devices for camera capture
+SUBSYSTEM=="video4linux", MODE="0660", GROUP="video"
+KERNEL=="video[0-9]*", MODE="0660", GROUP="video"
+KERNEL=="v4l-subdev[0-9]*", MODE="0660", GROUP="video"
+
+# Media controller devices for camera pipeline configuration
+SUBSYSTEM=="media", MODE="0660", GROUP="video"
+KERNEL=="media[0-9]*", MODE="0660", GROUP="video"
