@@ -5,7 +5,7 @@ set -uexo pipefail
 cp -arfT files/etc /etc
 cp -arfT files/usr /usr
 
-dnf -y install uwe5622-firmware
+dnf -y install hciattach-opi uwe5622-firmware
 
 mkdir -p /boot/dtb
 dnf -y remove \
@@ -18,5 +18,7 @@ dnf -y install kernel
 rm -r /boot/dtb
 
 systemctl disable fstrim.timer
+systemctl --no-reload enable sprd-bluetooth.service
+systemctl --no-reload enable aw859a-wifi.service
 
 echo 123456 | passwd root --stdin
