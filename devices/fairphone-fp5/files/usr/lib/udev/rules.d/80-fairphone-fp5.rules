@@ -3,7 +3,9 @@
 # FastRPC devices for DSP subsystems (sensors and compute)
 # TAG+="systemd" creates device units that services can depend on
 SUBSYSTEM=="misc", KERNEL=="fastrpc-adsp", MODE="0666", GROUP="fastrpc", TAG+="systemd"
+SUBSYSTEM=="misc", KERNEL=="fastrpc-adsp-secure", MODE="0666", GROUP="fastrpc", TAG+="systemd", SYMLINK+="fastrpc-adsp"
 SUBSYSTEM=="misc", KERNEL=="fastrpc-cdsp", MODE="0666", GROUP="fastrpc", TAG+="systemd"
+SUBSYSTEM=="misc", KERNEL=="fastrpc-cdsp-secure", MODE="0666", GROUP="fastrpc", TAG+="systemd", SYMLINK+="fastrpc-cdsp"
 SUBSYSTEM=="misc", KERNEL=="fastrpc-sdsp", MODE="0666", GROUP="fastrpc", TAG+="systemd"
 SUBSYSTEM=="misc", KERNEL=="fastrpc-mdsp", MODE="0666", GROUP="fastrpc", TAG+="systemd"
 
