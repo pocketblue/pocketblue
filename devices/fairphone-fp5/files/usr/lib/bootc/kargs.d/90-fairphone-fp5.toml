@@ -1,6 +1,4 @@
 # Fairphone 5 kernel arguments
-
-[kargs]
 # Prevent unused clocks and power domains from being disabled
 # This helps with hardware that isn't fully described in device tree
 kargs = [
