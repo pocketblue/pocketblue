@@ -9,6 +9,10 @@ After=sysinit.target
 Before=basic.target
 
 [Service]
+Type=oneshot
+RemainAfterExit=yes
 ExecStart=/usr/libexec/grow-rootfs
+# Ensure filesystem metadata is fully synced before continuing
+ExecStop=/bin/sync
 # So we can temporarily remount the sysroot writable
 MountFlags=slave
