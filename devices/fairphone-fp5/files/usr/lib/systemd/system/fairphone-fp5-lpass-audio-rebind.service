@@ -1,16 +1,17 @@
 [Unit]
 Description=Rebind LPASS Audio Clock Controller after ADSP is ready
-After=sys-devices-platform-soc\x400-3700000.remoteproc.device
 After=hexagonrpcd-adsp-sensorspd.service
 After=fairphone-fp5-sensors.service
+After=rmtfs.service
 Wants=hexagonrpcd-adsp-sensorspd.service
-ConditionPathExists=/sys/bus/platform/drivers/lpass_audio_cc-sc7280
 
 [Service]
 Type=oneshot
 RemainAfterExit=yes
+ExecStartPre=/bin/sleep 5
 ExecStart=/usr/libexec/fairphone-fp5-lpass-audio-rebind
-TimeoutStartSec=180
+TimeoutStartSec=300
 
 [Install]
 WantedBy=multi-user.target
+WantedBy=sound.target

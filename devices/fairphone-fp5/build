@@ -96,8 +96,15 @@ done
 # modem_pr directory
 [ -d "${FW_DIR}/modem_pr" ] && cp -a "${FW_DIR}/modem_pr" "${FW_DEST}/"
 
-# audio codec firmware
-[ -f "${FW_DIR}/aw882xx_acf.bin" ] && install -Dm644 "${FW_DIR}/aw882xx_acf.bin" /usr/lib/firmware/awinic/aw882xx_acf.bin
+# audio codec firmware (AW88261 speaker amplifier)
+# Install to both paths for kernel compatibility
+if [ -f "${FW_DIR}/aw882xx_acf.bin" ]; then
+    # Path for awinic generic driver
+    install -Dm644 "${FW_DIR}/aw882xx_acf.bin" /usr/lib/firmware/awinic/aw882xx_acf.bin
+    # Path for aw88261 driver (matching pmOS)
+    install -Dm644 "${FW_DIR}/aw882xx_acf.bin" "${FW_DEST}/aw88261_acf.bin"
+    echo "  Installed aw882xx audio amplifier firmware"
+fi
 
 # bluetooth firmware - install to qca/ path where kernel expects it
 # The QCA Bluetooth driver may look for either .mbn or .tlv format depending on chip

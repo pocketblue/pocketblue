@@ -1,16 +1,19 @@
 [Unit]
 Description=Fairphone 5 Bluetooth Initialization
-After=bluetooth.target sys-subsystem-bluetooth-devices-hci0.device
+Description=Initialize Bluetooth on Fairphone 5 (WCN6750 via WCNSS)
+After=bluetooth.target
+After=sys-subsystem-net-devices-wlan0.device
 Wants=bluetooth.service
-Requires=sys-subsystem-bluetooth-devices-hci0.device
-ConditionPathExists=/sys/class/bluetooth/hci0
 
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStartPre=/bin/sleep 5
+ExecStartPre=/bin/sleep 10
 ExecStart=/usr/libexec/fairphone-fp5-bluetooth-init
-TimeoutStartSec=120
+TimeoutStartSec=180
+Restart=on-failure
+RestartSec=10
 
 [Install]
 WantedBy=bluetooth.target
+WantedBy=multi-user.target

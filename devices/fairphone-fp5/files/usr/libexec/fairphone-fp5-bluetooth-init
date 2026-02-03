@@ -3,25 +3,68 @@ set -e
 
 HCI_DEV="hci0"
 MAX_RETRIES=10
-FIRMWARE_WAIT_TIMEOUT=60
+WCNSS_TIMEOUT=90
 
-echo "Fairphone 5 Bluetooth initialization (WCN6750)..."
+echo "Fairphone 5 Bluetooth initialization (WCN6750 via WCNSS)..."
+
+wait_for_wcnss_remoteproc() {
+    local timeout=$WCNSS_TIMEOUT
+    local waited=0
+    
+    echo "Waiting for WCNSS/WPSS remoteproc to be running..."
+    
+    while [ $waited -lt $timeout ]; do
+        for rproc in /sys/class/remoteproc/remoteproc*/; do
+            if [ -f "${rproc}name" ]; then
+                local name=$(cat "${rproc}name" 2>/dev/null)
+                if echo "$name" | grep -qiE "wpss|wcnss"; then
+                    local state=$(cat "${rproc}state" 2>/dev/null)
+                    if [ "$state" = "running" ]; then
+                        echo "WCNSS/WPSS remoteproc ($name) is running after ${waited}s"
+                        return 0
+                    fi
+                fi
+            fi
+        done
+        sleep 1
+        ((waited++))
+    done
+    
+    echo "WARNING: WCNSS/WPSS remoteproc not running after ${timeout}s"
+    echo "Available remoteprocs:"
+    for rproc in /sys/class/remoteproc/remoteproc*/; do
+        if [ -f "${rproc}name" ]; then
+            echo "  $(basename $rproc): $(cat ${rproc}name 2>/dev/null) - $(cat ${rproc}state 2>/dev/null)"
+        fi
+    done
+    return 1
+}
 
 wait_for_hci_device() {
-    local timeout=30
+    local timeout=60
     local waited=0
+    
+    echo "Waiting for Bluetooth HCI device..."
     
     while [ $waited -lt $timeout ]; do
         if [ -d "/sys/class/bluetooth/$HCI_DEV" ]; then
             echo "Bluetooth device $HCI_DEV found after ${waited}s"
             return 0
         fi
-        echo "Waiting for $HCI_DEV... ($waited/${timeout}s)"
+        
+        for hci in /sys/class/bluetooth/hci*; do
+            if [ -d "$hci" ]; then
+                HCI_DEV=$(basename "$hci")
+                echo "Bluetooth device $HCI_DEV found after ${waited}s"
+                return 0
+            fi
+        done
+        
         sleep 1
         ((waited++))
     done
     
-    echo "ERROR: Bluetooth device $HCI_DEV not found after ${timeout}s"
+    echo "ERROR: No Bluetooth HCI device found after ${timeout}s"
     return 1
 }
 
@@ -40,10 +83,10 @@ check_firmware_files() {
     if [ -f /usr/lib/firmware/qca/msbtfw11.tlv ] || [ -L /usr/lib/firmware/qca/msbtfw11.tlv ]; then
         echo "  ✓ msbtfw11.tlv found (or symlink)"
     else
-        echo "  ✗ msbtfw11.tlv NOT found - creating symlink..."
+        echo "  Creating symlink msbtfw11.tlv -> msbtfw11.mbn..."
         if [ -f /usr/lib/firmware/qca/msbtfw11.mbn ]; then
             ln -sf msbtfw11.mbn /usr/lib/firmware/qca/msbtfw11.tlv
-            echo "    Created symlink msbtfw11.tlv -> msbtfw11.mbn"
+            echo "  ✓ Created symlink"
         else
             fw_ok=false
         fi
@@ -52,118 +95,121 @@ check_firmware_files() {
     if [ -f /usr/lib/firmware/qca/msnv11.bin ]; then
         echo "  ✓ msnv11.bin found"
     else
-        echo "  ⚠ msnv11.bin NOT found (NVM data, may not be critical)"
+        echo "  ⚠ msnv11.bin NOT found (NVM data)"
     fi
     
-    if [ "$fw_ok" = true ]; then
-        return 0
-    else
-        return 1
-    fi
+    return 0
 }
 
-wait_for_firmware_load() {
-    local timeout=$1
-    local waited=0
+check_bt_status() {
+    if [ ! -d "/sys/class/bluetooth/$HCI_DEV" ]; then
+        return 1
+    fi
     
-    echo "Waiting for QCA Bluetooth firmware to load (timeout: ${timeout}s)..."
+    if hciconfig "$HCI_DEV" 2>/dev/null | grep -q "UP RUNNING"; then
+        return 0
+    fi
     
-    while [ $waited -lt $timeout ]; do
-        if dmesg | tail -100 | grep -q "QCA setup on UART is completed\|Bluetooth.*hci0.*QCA.*setup.*completed\|hci0.*firmware.*loaded"; then
-            echo "QCA firmware loaded successfully"
-            return 0
-        fi
-        
-        if dmesg | tail -50 | grep -q "hci0.*QCA Failed\|btqca.*failed\|firmware.*failed.*-2"; then
-            echo "WARNING: Detected firmware loading failure"
-            echo "Recent dmesg:"
-            dmesg | tail -20 | grep -i bluetooth || true
-            return 1
-        fi
-        
-        sleep 1
-        ((waited++))
-    done
-    
-    echo "WARNING: Firmware loading status unknown after ${timeout}s"
     return 1
 }
 
-check_bt_running() {
-    hciconfig "$HCI_DEV" 2>/dev/null | grep -q "UP RUNNING"
-}
-
 bring_up_bluetooth() {
+    echo "Configuring Bluetooth interface..."
+    
     if command -v rfkill &>/dev/null; then
+        echo "  Unblocking Bluetooth via rfkill..."
         rfkill unblock bluetooth 2>/dev/null || true
-        sleep 0.5
+        sleep 1
     fi
-
+    
+    echo "  Bringing down $HCI_DEV..."
     hciconfig "$HCI_DEV" down 2>/dev/null || true
     sleep 1
-
-    hciconfig "$HCI_DEV" up 2>/dev/null
+    
+    echo "  Bringing up $HCI_DEV..."
+    if hciconfig "$HCI_DEV" up 2>/dev/null; then
+        return 0
+    fi
+    return 1
 }
 
+echo ""
+echo "=== Phase 1: Check firmware files ==="
 check_firmware_files
 
+echo ""
+echo "=== Phase 2: Wait for WCNSS subsystem ==="
+if ! wait_for_wcnss_remoteproc; then
+    echo "WCNSS not ready - Bluetooth may not work"
+    echo "Check if wpss firmware is loading: dmesg | grep -i wpss"
+fi
+
+sleep 3
+
+echo ""
+echo "=== Phase 3: Wait for HCI device ==="
 if ! wait_for_hci_device; then
-    echo "Bluetooth HCI device not available - checking kernel modules..."
-    lsmod | grep -E "btqca|hci_uart|bluetooth" || echo "Bluetooth modules may not be loaded"
+    echo "No HCI device available"
+    echo ""
+    echo "Debugging info:"
+    echo "  Kernel modules:"
+    lsmod | grep -E "bluetooth|btqca|hci|wcn" || echo "    (none found)"
+    echo "  rfkill status:"
+    rfkill list bluetooth 2>/dev/null || echo "    (rfkill not available)"
+    echo "  dmesg bluetooth:"
+    dmesg | grep -i bluetooth | tail -10 || echo "    (no bluetooth messages)"
     exit 1
 fi
 
-sleep 2
+echo ""
+echo "=== Phase 4: Configure Bluetooth interface ==="
 
-wait_for_firmware_load $FIRMWARE_WAIT_TIMEOUT || {
-    echo "Firmware may not have loaded correctly, attempting to continue..."
-}
-
-sleep 2
-
-if check_bt_running; then
+if check_bt_status; then
     echo "Bluetooth $HCI_DEV is already UP and RUNNING"
     hciconfig "$HCI_DEV"
     exit 0
 fi
 
-echo "Bringing up $HCI_DEV..."
 for retry in $(seq 1 $MAX_RETRIES); do
+    echo "Attempt ${retry}/${MAX_RETRIES}..."
+    
     if bring_up_bluetooth; then
         sleep 2
-        if check_bt_running; then
-            echo "Bluetooth $HCI_DEV initialized successfully (attempt $retry)"
+        if check_bt_status; then
+            echo ""
+            echo "✓ Bluetooth $HCI_DEV initialized successfully"
             hciconfig "$HCI_DEV"
             exit 0
         fi
     fi
     
-    echo "Attempt $retry failed, retrying..."
-    
-    hciconfig "$HCI_DEV" reset 2>/dev/null || true
-    sleep 3
+    echo "  Attempt $retry failed, waiting before retry..."
+    sleep $((2 + retry))
 done
 
 if command -v btmgmt &>/dev/null; then
-    echo "Trying btmgmt power cycle..."
+    echo ""
+    echo "Trying btmgmt as fallback..."
     btmgmt power off 2>/dev/null || true
     sleep 2
     btmgmt power on 2>/dev/null || true
     sleep 2
     
-    if check_bt_running; then
-        echo "Bluetooth $HCI_DEV initialized via btmgmt"
+    if check_bt_status; then
+        echo "✓ Bluetooth $HCI_DEV initialized via btmgmt"
         hciconfig "$HCI_DEV"
         exit 0
     fi
 fi
 
-echo "WARNING: Bluetooth $HCI_DEV may not be fully initialized"
+echo ""
+echo "⚠ Bluetooth initialization incomplete"
 echo "Final status:"
-hciconfig "$HCI_DEV" 2>/dev/null || echo "Device not accessible"
+hciconfig "$HCI_DEV" 2>/dev/null || echo "  Device not accessible"
 echo ""
 echo "Troubleshooting:"
-echo "  - Check dmesg for firmware errors: dmesg | grep -i bluetooth"
-echo "  - Verify firmware files: ls -la /usr/lib/firmware/qca/"
-echo "  - Check rfkill: rfkill list bluetooth"
+echo "  1. Check WCNSS firmware: dmesg | grep -iE 'wpss|wcnss'"
+echo "  2. Check Bluetooth dmesg: dmesg | grep -i bluetooth"
+echo "  3. Check rfkill: rfkill list bluetooth"
+echo "  4. Verify firmware: ls -la /usr/lib/firmware/qca/msbt*"
 exit 0

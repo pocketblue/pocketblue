@@ -3,21 +3,40 @@ set -e
 
 LPASS_DRIVER="/sys/bus/platform/drivers/lpass_audio_cc-sc7280"
 LPASS_DEVICE="3300000.clock-controller"
-MAX_RETRIES=10
-RETRY_DELAY=3
+MAX_RETRIES=15
+RETRY_DELAY=5
 
 echo "Fairphone 5 LPASS Audio Clock Controller rebind..."
 
-if [ ! -d "$LPASS_DRIVER" ]; then
-    echo "ERROR: LPASS audio driver not loaded"
-    exit 1
-fi
+wait_for_adsp_remoteproc() {
+    local timeout=90
+    local waited=0
+    
+    echo "Waiting for ADSP remoteproc to be running..."
+    
+    while [ $waited -lt $timeout ]; do
+        for rproc in /sys/class/remoteproc/remoteproc*/; do
+            if [ -f "${rproc}name" ] && grep -q "adsp" "${rproc}name" 2>/dev/null; then
+                local state=$(cat "${rproc}state" 2>/dev/null)
+                if [ "$state" = "running" ]; then
+                    echo "ADSP remoteproc is running after ${waited}s"
+                    return 0
+                fi
+            fi
+        done
+        sleep 1
+        ((waited++))
+    done
+    
+    echo "WARNING: ADSP remoteproc not running after ${timeout}s"
+    return 1
+}
 
-wait_for_adsp() {
+wait_for_adsp_fastrpc() {
     local timeout=60
     local waited=0
     
-    echo "Waiting for ADSP to be fully operational..."
+    echo "Waiting for ADSP fastrpc device..."
     
     while [ $waited -lt $timeout ]; do
         if [ -c /dev/fastrpc-adsp ]; then
@@ -32,11 +51,41 @@ wait_for_adsp() {
     return 1
 }
 
+wait_for_qdsp6() {
+    local timeout=30
+    local waited=0
+    
+    echo "Waiting for QDSP6 APM to be ready..."
+    
+    while [ $waited -lt $timeout ]; do
+        if [ -d /sys/kernel/debug/qcom,q6apm ] || \
+           dmesg | tail -100 | grep -q "q6apm.*registered\|audioreach.*ready" 2>/dev/null; then
+            echo "QDSP6 APM appears ready after ${waited}s"
+            return 0
+        fi
+        sleep 1
+        ((waited++))
+    done
+    
+    echo "WARNING: QDSP6 APM ready state unknown after ${timeout}s"
+    return 1
+}
+
+check_lpass_probed() {
+    if [ -e "${LPASS_DRIVER}/${LPASS_DEVICE}" ]; then
+        local recent_fail=$(dmesg | tail -20 | grep -c "lpass_audio_cc.*failed.*-110" 2>/dev/null || echo 0)
+        if [ "$recent_fail" -eq 0 ]; then
+            return 0
+        fi
+    fi
+    return 1
+}
+
 unbind_device() {
     if [ -e "${LPASS_DRIVER}/${LPASS_DEVICE}" ]; then
         echo "Unbinding ${LPASS_DEVICE}..."
         echo "$LPASS_DEVICE" > "${LPASS_DRIVER}/unbind" 2>/dev/null || true
-        sleep 1
+        sleep 2
     fi
 }
 
@@ -49,43 +98,51 @@ bind_device() {
     return 0
 }
 
-check_device_bound() {
-    if [ -e "${LPASS_DRIVER}/${LPASS_DEVICE}" ]; then
-        if dmesg | tail -50 | grep -q "lpass_audio_cc.*probe.*failed"; then
-            return 1
-        fi
-        return 0
+if [ ! -d "$LPASS_DRIVER" ]; then
+    echo "LPASS audio driver not loaded - this may be normal if audio uses different path"
+    echo "Checking for alternative audio paths..."
+    if [ -d /sys/bus/platform/drivers/qcom-audioreach-apm ]; then
+        echo "Audioreach APM driver found - audio may work via different path"
     fi
-    return 1
-}
-
-wait_for_adsp || echo "Continuing anyway..."
-
-sleep 2
-
-if check_device_bound; then
-    echo "LPASS audio clock controller already bound and operational"
     exit 0
 fi
+
+wait_for_adsp_remoteproc || true
+wait_for_adsp_fastrpc || true
+wait_for_qdsp6 || true
+
+sleep 5
+
+if check_lpass_probed; then
+    echo "LPASS audio clock controller already operational"
+    exit 0
+fi
+
+echo "LPASS needs rebinding, starting retry loop..."
 
 for attempt in $(seq 1 $MAX_RETRIES); do
     echo "Attempt ${attempt}/${MAX_RETRIES}..."
     
     unbind_device
-    
     sleep $RETRY_DELAY
     
     if bind_device; then
-        sleep 2
-        if check_device_bound; then
+        sleep 3
+        if check_lpass_probed; then
             echo "LPASS audio clock controller bound successfully on attempt ${attempt}"
             exit 0
         fi
     fi
     
-    echo "Bind attempt ${attempt} failed, retrying..."
+    echo "Bind attempt ${attempt} failed"
+    
+    if [ $attempt -lt $MAX_RETRIES ]; then
+        echo "Waiting before retry..."
+        sleep $((RETRY_DELAY + attempt))
+    fi
 done
 
-echo "WARNING: LPASS audio clock controller bind failed after ${MAX_RETRIES} attempts"
-echo "Audio may not work correctly"
+echo "WARNING: LPASS audio clock controller failed to bind after ${MAX_RETRIES} attempts"
+echo "Audio subsystem may not be fully functional"
+echo "This is a known timing issue with SC7280 LPASS - audio may still work via audioreach"
 exit 0
