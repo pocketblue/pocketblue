@@ -31,7 +31,6 @@ cp -arfT files/usr /usr
 chmod +x /usr/libexec/fairphone-fp5-usbc-rebind
 chmod +x /usr/libexec/fairphone-fp5-sensors-init
 chmod +x /usr/libexec/fairphone-fp5-bluetooth-init
-chmod +x /usr/libexec/fairphone-fp5-lpass-audio-rebind
 
 # fairphone-5-firmware (direct install)
 FW_COMMIT="a4908f548e6f88965e78b1478af1751b6a854fc9"
@@ -208,8 +207,7 @@ systemctl enable \
     rmtfs.service \
     fairphone-fp5-usbc-rebind.service \
     fairphone-fp5-sensors.service \
-    fairphone-fp5-bluetooth.service \
-    fairphone-fp5-lpass-audio-rebind.service
+    fairphone-fp5-bluetooth.service
 
 KERNEL_SUFFIX=""
 QUALIFIED_KERNEL="$(rpm -qa | grep -P 'kernel-(|'"$KERNEL_SUFFIX"'-)(\d+\.\d+\.\d+)' | sed -E 's/kernel-(|'"$KERNEL_SUFFIX"'-)//')"
