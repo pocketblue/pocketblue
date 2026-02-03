@@ -31,11 +31,11 @@ The Fairphone 5 is supported by Pocketblue with the following desktop environmen
 - USB
 - Modem/Telephony (via hexagonrpc, rmtfs, qrtr)
 - WiFi
-- Bluetooth
+- Bluetooth (WCN6750 with WPSS firmware dependency)
 
 ### What May Not Work or Has Limited Support
 
-- Camera (mainline CAMSS driver support for QCM6490 is still in development upstream)
+- Camera (requires Samsung S5KJN1/S5K4H7 sensor drivers not yet in mainline kernel)
 - Some hardware-specific features
 
 ## Prerequisites

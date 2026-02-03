@@ -5,6 +5,7 @@ echo "Fairphone 5 sensor initialization starting..."
 
 ADSP_TIMEOUT=60
 SENSOR_FW_PATH="/usr/share/qcom/qcm6490/fairphone5/sensors"
+SLPI_TIMEOUT=30
 
 wait_for_fastrpc_device() {
     local timeout=$1
@@ -44,6 +45,45 @@ wait_for_hexagonrpcd() {
     return 1
 }
 
+wait_for_slpi_remoteproc() {
+    local timeout=$SLPI_TIMEOUT
+    local waited=0
+    
+    echo "Checking for SLPI remoteproc (Sensor Low Power Island)..."
+    
+    for rproc in /sys/class/remoteproc/remoteproc*/; do
+        if [ -f "${rproc}name" ]; then
+            local name=$(cat "${rproc}name" 2>/dev/null)
+            if echo "$name" | grep -qi "slpi"; then
+                echo "Found SLPI remoteproc: $name"
+                local state=$(cat "${rproc}state" 2>/dev/null)
+                if [ "$state" = "running" ]; then
+                    echo "SLPI is already running"
+                    return 0
+                else
+                    echo "SLPI state: $state"
+                fi
+            fi
+        fi
+    done
+    
+    echo "Note: SLPI remoteproc not found (may not be required on this device)"
+    return 0
+}
+
+check_libssc() {
+    echo "Checking for libssc (Qualcomm Sensor Core library)..."
+    
+    if [ -f /usr/lib64/libssc.so ] || [ -f /usr/lib/libssc.so ]; then
+        echo "  ✓ libssc found"
+        return 0
+    else
+        echo "  ✗ libssc NOT found - this is required for FP5 sensors!"
+        echo "    Sensors will not work without libssc"
+        return 1
+    fi
+}
+
 if ! wait_for_fastrpc_device $ADSP_TIMEOUT "fastrpc-adsp"; then
     echo "ERROR: fastrpc-adsp device not available"
     exit 1
@@ -64,25 +104,60 @@ fi
 
 sleep 2
 
+# Check for required components
+check_libssc || echo "WARNING: libssc missing - sensors may not work"
+
+# Check for SLPI if present
+wait_for_slpi_remoteproc
+
 wait_for_hexagonrpcd || echo "Continuing with sensor setup..."
 
+# Apply mount matrix and permissions via udev
+echo "Triggering udev rules for sensors..."
+udevadm control --reload-rules 2>/dev/null || true
 udevadm trigger --subsystem-match=iio --action=change 2>/dev/null || true
-
 udevadm trigger --subsystem-match=misc --action=change 2>/dev/null || true
+
+# Wait for udev to settle
+udevadm settle --timeout=5 2>/dev/null || true
 
 sleep 2
 
 echo "Checking for IIO devices..."
 if [ -d /sys/bus/iio/devices ]; then
+    device_found=false
     for dev in /sys/bus/iio/devices/iio:device*; do
         if [ -d "$dev" ]; then
+            device_found=true
             name=$(cat "$dev/name" 2>/dev/null || echo "unknown")
             echo "  Found IIO device: $(basename $dev) - $name"
+            
+            # Check for mount matrix
+            if [ -f "$dev/mount_matrix" ]; then
+                echo "    Mount matrix: $(cat $dev/mount_matrix)"
+            elif [ -f "$dev/in_accel_mount_matrix" ]; then
+                echo "    Accel mount matrix: $(cat $dev/in_accel_mount_matrix)"
+            fi
         fi
     done
+    
+    if [ "$device_found" = false ]; then
+        echo "  No IIO devices found (may appear later via libssc)"
+    fi
 else
-    echo "  No IIO devices found (may appear later via libssc)"
+    echo "  No IIO devices directory found"
+fi
+
+# Check if iio-sensor-proxy can see the sensors
+if command -v monitor-sensor &>/dev/null; then
+    echo "Testing sensor detection with monitor-sensor..."
+    timeout 2 monitor-sensor 2>&1 | head -5 || echo "  (timeout or no sensors detected)"
 fi
 
 echo "Sensor initialization complete"
 echo "Note: Sensors are accessed via libssc/ADSP, not direct IIO"
+echo ""
+echo "To verify sensors are working:"
+echo "  1. Run: monitor-sensor"
+echo "  2. Check: gdbus introspect --system --dest net.hadess.SensorProxy --object-path /net/hadess/SensorProxy"
+echo "  3. In GNOME: Check Display settings for orientation lock toggle"

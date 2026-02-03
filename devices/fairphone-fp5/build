@@ -15,13 +15,16 @@ dnf -y install \
     libcamera \
     libcamera-tools \
     libssc \
+    libiio-utils \
     mobility-tweaks \
     qbootctl \
     qcom-firmware \
     qrtr \
     rmtfs \
     tqftpserv \
-    usb_modeswitch
+    usb_modeswitch \
+    v4l-utils \
+    media-ctl
 
 # install device-specific files (after packages to override defaults)
 # This includes our custom hexagonrpcd-adsp-sensorspd.service
@@ -31,6 +34,8 @@ cp -arfT files/usr /usr
 chmod +x /usr/libexec/fairphone-fp5-usbc-rebind
 chmod +x /usr/libexec/fairphone-fp5-sensors-init
 chmod +x /usr/libexec/fairphone-fp5-bluetooth-init
+chmod +x /usr/libexec/fairphone-fp5-bluetooth-debug
+chmod +x /usr/libexec/fairphone-fp5-camera-init
 
 # fairphone-5-firmware (direct install)
 FW_COMMIT="a4908f548e6f88965e78b1478af1751b6a854fc9"
@@ -106,21 +111,26 @@ if [ -f "${FW_DIR}/aw882xx_acf.bin" ]; then
 fi
 
 # bluetooth firmware - install to qca/ path where kernel expects it
-# The QCA Bluetooth driver may look for either .mbn or .tlv format depending on chip
-# WCN6750 on FP5 uses .tlv format, but firmware is provided as .mbn
-# Create symlinks for both formats to ensure compatibility
+# WCN6750 on FP5 requires specific firmware files
 mkdir -p /usr/lib/firmware/qca
 if [ -f "${FW_DIR}/msbtfw11.mbn" ]; then
     install -Dm644 "${FW_DIR}/msbtfw11.mbn" /usr/lib/firmware/qca/msbtfw11.mbn
-    # Create .tlv symlink for kernel compatibility (btqca driver requests .tlv)
-    ln -sf msbtfw11.mbn /usr/lib/firmware/qca/msbtfw11.tlv
-    echo "  Installed msbtfw11.mbn and created .tlv symlink"
+    echo "  Installed msbtfw11.mbn"
 fi
 if [ -f "${FW_DIR}/msnv11.bin" ]; then
     install -Dm644 "${FW_DIR}/msnv11.bin" /usr/lib/firmware/qca/msnv11.bin
-    # Create .b symlink for kernel compatibility (btqca driver may request .b format for NVM)
-    ln -sf msnv11.bin /usr/lib/firmware/qca/msnv11.b
-    echo "  Installed msnv11.bin and created .b symlink"
+    echo "  Installed msnv11.bin"
+fi
+
+# Additional WCN6750 firmware files that may be needed
+# The kernel may request different names depending on the driver version
+if [ -f "${FW_DIR}/hpbtfw11.tlv" ]; then
+    install -Dm644 "${FW_DIR}/hpbtfw11.tlv" /usr/lib/firmware/qca/hpbtfw11.tlv
+    echo "  Installed hpbtfw11.tlv"
+fi
+if [ -f "${FW_DIR}/hpnv11.bin" ]; then
+    install -Dm644 "${FW_DIR}/hpnv11.bin" /usr/lib/firmware/qca/hpnv11.bin
+    echo "  Installed hpnv11.bin"
 fi
 
 # GPU firmware (a660_sqe.fw, a660_gmu.bin)
@@ -207,7 +217,8 @@ systemctl enable \
     rmtfs.service \
     fairphone-fp5-usbc-rebind.service \
     fairphone-fp5-sensors.service \
-    fairphone-fp5-bluetooth.service
+    fairphone-fp5-bluetooth.service \
+    fairphone-fp5-camera.service
 
 KERNEL_SUFFIX=""
 QUALIFIED_KERNEL="$(rpm -qa | grep -P 'kernel-(|'"$KERNEL_SUFFIX"'-)(\d+\.\d+\.\d+)' | sed -E 's/kernel-(|'"$KERNEL_SUFFIX"'-)//')"

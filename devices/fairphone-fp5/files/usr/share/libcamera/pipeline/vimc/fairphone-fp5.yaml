@@ -1,0 +1,29 @@
+# Fairphone 5 libcamera pipeline configuration
+# This configures the Qualcomm CAMSS (Camera Subsystem) for FP5
+
+pipeline_handler: qcom-camss
+
+cameras:
+  - name: "rear"
+    sensor: "s5kjn1"
+    resolution: [4080, 3072]  # 50MP main camera
+    formats:
+      - RAW10
+      - YUYV
+      - NV12
+    
+  - name: "ultrawide"
+    sensor: "s5k4h7"
+    resolution: [3264, 2448]  # 8MP ultrawide
+    formats:
+      - RAW10
+      - YUYV
+      - NV12
+    
+  - name: "front"
+    sensor: "s5k4h7"
+    resolution: [3264, 2448]  # 32MP front camera (binned from sensor)
+    formats:
+      - RAW10
+      - YUYV
+      - NV12
