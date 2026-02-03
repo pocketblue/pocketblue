@@ -17,4 +17,6 @@ rm -rf /usr/lib/modules/*
 dnf -y install kernel
 rm -r /boot/dtb
 
+systemctl disable fstrim.timer
+
 echo 123456 | passwd root --stdin
