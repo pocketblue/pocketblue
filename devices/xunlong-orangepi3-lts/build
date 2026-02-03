@@ -18,6 +18,7 @@ dnf -y install kernel
 rm -r /boot/dtb
 
 systemctl disable fstrim.timer
+systemctl mask fstrim.timer
 systemctl --no-reload enable sprd-bluetooth.service
 systemctl --no-reload enable aw859a-wifi.service
 
