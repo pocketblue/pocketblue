@@ -38,6 +38,8 @@ dnf -y install \
     droid-juicer \
     make-dynpart-mappings
 
+rm -rf /etc/droid-juicer || true
+
 systemctl enable \
     droid-juicer.service \
     ostree-state-overlay@usr-lib-firmware-updates.service
