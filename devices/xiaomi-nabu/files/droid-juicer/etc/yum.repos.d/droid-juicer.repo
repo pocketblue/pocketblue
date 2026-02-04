@@ -1,0 +1,10 @@
+[copr:copr.fedorainfracloud.org:samcday:droid-juicer]
+name=Copr repo for droid-juicer owned by samcday
+baseurl=https://download.copr.fedorainfracloud.org/results/samcday/droid-juicer/fedora-$releasever-$basearch/
+type=rpm-md
+skip_if_unavailable=True
+gpgcheck=1
+gpgkey=https://download.copr.fedorainfracloud.org/results/samcday/droid-juicer/pubkey.gpg
+repo_gpgcheck=0
+enabled=1
+enabled_metadata=1
