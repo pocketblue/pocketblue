@@ -1,0 +1,22 @@
+[juicer]
+dynpart = "super"
+firmware = [
+    { partition = "vendor", origin = "firmware", destination = "qcom", files = [
+            { name = "a630_sqe.fw" },
+            { name = "a640_gmu.bin" },
+        ] },
+    { partition = "vendor", origin = "firmware", destination = "qcom/sm8150/xiaomi/nabu", files = [
+            { name = "a640_zap.mdt" },
+        ] },
+    { partition = "modem", origin = "image", destination = "qcom/sm8150/xiaomi/nabu", files = [
+            { name = "adsp.mdt" },
+            { name = "cdsp.mdt" },
+            { name = "modem.mdt" },
+            { name = "modemuw.jsn" },
+            { name = "venus.mdt" },
+            { name = "wlanmdsp.mbn" },
+        ] },
+    { partition = "vendor", origin = "firmware", destination = "cirrus", files = [
+            { name = "cs35l41-dsp1-spk-prot.wmfw" },
+        ] },
+]
