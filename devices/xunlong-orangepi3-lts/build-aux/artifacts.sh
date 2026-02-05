@@ -23,5 +23,3 @@ if [ -f "$uboot_deb" ]; then
     rm -r "$tmp_dir"
     rm -r "$uboot_deb"
 fi
-
-install -Dm 0755 "$DEVICE_PATH/build-aux/flash-sd.sh" "$OUT_PATH/flash-orangepi3-lts.sh"
