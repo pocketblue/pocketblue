@@ -26,5 +26,6 @@ systemctl mask fstrim.timer
 systemctl --no-reload enable sprd-bluetooth.service
 systemctl --no-reload enable aw859a-wifi.service
 systemctl --no-reload enable armbian-led-state.service
+systemctl --no-reload enable repart-root-disk.service
 
 echo 123456 | passwd root --stdin
