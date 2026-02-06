@@ -17,12 +17,12 @@ if [ -f "$uboot_deb" ]; then
         exit 1
     fi
     if [ -f "$OUT_PATH/disk.raw" ]; then
-        dd if="$uboot_bin" of="$OUT_PATH/disk.raw" bs=1024 seek=8 conv=notrunc
         if [ -f "$OUT_PATH/sgdisk" ]; then
             chmod +x "$OUT_PATH/sgdisk"
             "$OUT_PATH/sgdisk" --resize-table 56 "$OUT_PATH/disk.raw"
             rm -f "$OUT_PATH/sgdisk"
         fi
+        dd if="$uboot_bin" of="$OUT_PATH/disk.raw" bs=1024 seek=8 conv=notrunc
     fi
     rm -r "$tmp_dir"
     rm -r "$uboot_deb"
