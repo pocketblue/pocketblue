@@ -22,7 +22,10 @@ if [ -f "$uboot_deb" ]; then
             "$OUT_PATH/sgdisk" --resize-table 56 "$OUT_PATH/disk.raw"
             rm -f "$OUT_PATH/sgdisk"
         fi
-        dd if="$uboot_bin" of="$OUT_PATH/disk.raw" bs=1024 seek=8 conv=notrunc
+        start_lba=16
+        ss=512
+        start_bytes=$(( start_lba * ss ))
+        dd if="$uboot_bin" of="$OUT_PATH/disk.raw" oflag=seek_bytes seek="$start_bytes" conv=notrunc
     fi
     rm -r "$tmp_dir"
     rm -r "$uboot_deb"
