@@ -10,6 +10,7 @@ Before=basic.target armbian-led-state.service
 [Service]
 Type=oneshot
 ExecStart=/usr/libexec/repart-root-disk
+MountFlags=slave
 ExecStartPost=/usr/bin/systemctl reboot
 
 [Install]

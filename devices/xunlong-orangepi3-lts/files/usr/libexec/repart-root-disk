@@ -21,7 +21,7 @@ count_bytes=$(( (first_lba - start_lba) * ss ))
 dd if="$disk" of=/run/uboot-from-disk.bin iflag=skip_bytes,count_bytes skip="$start_bytes" count="$count_bytes" status=progress
 
 "$repart_bin" --definitions=/usr/lib/repart.d --dry-run=no "$disk"
-systemctl start --wait grow-rootfs.service
+/usr/libexec/grow-rootfs
 
 sgdisk --resize-table 56 "$disk"
 
