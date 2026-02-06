@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 set -euo pipefail
 
 repart_bin="$(command -v systemd-repart)"
@@ -6,7 +7,22 @@ if [ -z "$repart_bin" ]; then
     echo "systemd-repart not found"
     exit 1
 fi
-root_src="$(findmnt -no SOURCE /sysroot)"
+root_src="$(findmnt -nro SOURCE --target /sysroot --evaluate)"
 root_dev="${root_src%%[*}"
-parent="$(lsblk -no PKNAME "$root_dev" | head -n 1)"
-exec "$repart_bin" --definitions=/usr/lib/repart.d --dry-run=no "/dev/$parent"
+parent="$(lsblk -nro PKNAME "$root_dev" | head -n1)
+
+disk="/dev/$parent"
+start_lba=16
+ss="$(blockdev --getss "$disk")"
+first_lba="$(sgdisk -p "$disk" | awk '$1 ~ /^[0-9]+$/ {print $2}' | sort -n | head -n1)"
+start_bytes=$(( start_lba * ss ))
+count_bytes=$(( (first_lba - start_lba) * ss ))
+
+dd if="$disk" of=/run/uboot-from-disk.bin iflag=skip_bytes,count_bytes skip="$start_bytes" count="$count_bytes" status=progress
+
+"$repart_bin" --definitions=/usr/lib/repart.d --dry-run=no "$disk"
+systemctl start --wait grow-rootfs.service
+
+sgdisk --resize-table 56 "$disk"
+
+dd if=/run/uboot-from-disk.bin of="$disk" oflag=seek_bytes seek="$start_bytes" conv=notrunc,fsync status=progress
