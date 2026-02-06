@@ -12,7 +12,7 @@ Type=oneshot
 ExecStart=/usr/libexec/repart-root-disk
 MountFlags=slave
 ExecStartPost=/usr/bin/touch /var/lib/repart-root-disk.done
-ExecStartPost=/usr/bin/systemctl reboot
+ExecStartPost=/usr/bin/systemctl --no-wall --no-block reboot
 
 [Install]
 WantedBy=basic.target
