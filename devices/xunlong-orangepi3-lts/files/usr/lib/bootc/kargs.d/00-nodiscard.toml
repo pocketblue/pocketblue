@@ -1,0 +1,1 @@
+kargs = [ "rootflags=subvol=/root,nodiscard" ]
