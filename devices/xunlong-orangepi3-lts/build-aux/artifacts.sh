@@ -19,6 +19,11 @@ if [ -f "$uboot_deb" ]; then
     cp "$uboot_bin" "$OUT_PATH/images/u-boot-sunxi-with-spl.bin"
     if [ -f "$OUT_PATH/images/disk.raw" ]; then
         dd if="$uboot_bin" of="$OUT_PATH/images/disk.raw" bs=1024 seek=8 conv=notrunc
+        if [ -f "$OUT_PATH/sgdisk" ]; then
+            chmod +x "$OUT_PATH/sgdisk"
+            "$OUT_PATH/sgdisk" --resize-table 56 "$OUT_PATH/images/disk.raw"
+            rm -f "$OUT_PATH/sgdisk"
+        fi
     fi
     rm -r "$tmp_dir"
     rm -r "$uboot_deb"
