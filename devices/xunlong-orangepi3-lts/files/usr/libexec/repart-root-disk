@@ -1,0 +1,12 @@
+#!/bin/bash
+set -euo pipefail
+
+repart_bin="$(command -v systemd-repart)"
+if [ -z "$repart_bin" ]; then
+    echo "systemd-repart not found"
+    exit 1
+fi
+root_src="$(findmnt -no SOURCE /sysroot)"
+root_dev="${root_src%%[*}"
+parent="$(lsblk -no PKNAME "$root_dev" | head -n 1)"
+exec "$repart_bin" --definitions=/usr/lib/repart.d --dry-run=no "/dev/$parent"
