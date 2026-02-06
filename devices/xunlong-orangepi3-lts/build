@@ -8,7 +8,8 @@ cp -arfT files/usr /usr
 dnf -y install \
     hciattach-opi \
     uwe5622-firmware \
-    armbian-led-state
+    armbian-led-state \
+    gdisk
 
 mkdir -p /boot/dtb
 dnf -y remove \
