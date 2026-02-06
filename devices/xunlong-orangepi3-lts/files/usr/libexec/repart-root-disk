@@ -9,7 +9,7 @@ if [ -z "$repart_bin" ]; then
 fi
 root_src="$(findmnt -nro SOURCE --target /sysroot --evaluate)"
 root_dev="${root_src%%[*}"
-parent="$(lsblk -nro PKNAME "$root_dev" | head -n1)
+parent="$(lsblk -nro PKNAME "$root_dev" | head -n1)"
 
 disk="/dev/$parent"
 start_lba=16
