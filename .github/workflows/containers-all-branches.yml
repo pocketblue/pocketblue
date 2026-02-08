@@ -2,18 +2,17 @@ name: containers (all branches)
 on:
   workflow_dispatch: {}
   schedule:
-    - cron: '0 12 * * *'
+    - cron: '0 6 * * *'
 
 jobs:
   main:
-    if: ${{ github.event_name != 'schedule' || !github.event.repository.fork }}
     secrets: inherit
     permissions:
       packages: write
     strategy:
       fail-fast: false
       matrix:
-        fedora_branch: ['42', '43', 'rawhide']
+        fedora_branch: ['43']
     uses: ./.github/workflows/containers.yml
     with:
       fedora_branch: ${{ matrix.fedora_branch }}
