@@ -53,23 +53,23 @@ if [ $waited -ge $timeout ]; then
     echo "WARNING: hexagonrpcd-adsp-sensorspd not active after ${timeout}s"
 fi
 
+waited=0
+timeout=15
+while [ $waited -lt $timeout ]; do
+    if ls /sys/bus/qrtr/devices/* &>/dev/null; then
+        echo "QRTR bus available after ${waited}s"
+        break
+    fi
+    sleep 1
+    ((waited++))
+done
+
+if [ $waited -ge $timeout ]; then
+    echo "WARNING: QRTR bus not available after ${timeout}s"
+fi
+
 udevadm control --reload-rules 2>/dev/null || true
 udevadm trigger --subsystem-match=misc --action=change 2>/dev/null || true
 udevadm settle --timeout=5 2>/dev/null || true
-
-echo "Checking libssc availability..."
-if [ -f /usr/lib64/libssc.so ] || [ -f /usr/lib/libssc.so ]; then
-    echo "  libssc: found"
-else
-    echo "  libssc: NOT found"
-fi
-
-echo "Checking iio-sensor-proxy SSC support..."
-if strings "$(command -v iio-sensor-proxy 2>/dev/null)" 2>/dev/null | grep -q "ssc\|SSC\|fastrpc"; then
-    echo "  iio-sensor-proxy: has SSC support"
-else
-    echo "  iio-sensor-proxy: NO SSC support (stock Fedora build)"
-    echo "  Sensors will NOT work without iio-sensor-proxy-ssc package"
-fi
 
 echo "Sensor initialization complete"

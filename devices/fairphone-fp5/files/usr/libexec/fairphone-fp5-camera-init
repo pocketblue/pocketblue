@@ -2,8 +2,28 @@
 
 echo "Fairphone 5 Camera initialization..."
 
+missing_modules=""
+for mod in v4l2-cci i2c-qcom-cci qcom-camss; do
+    if ! modinfo "$mod" &>/dev/null; then
+        missing_modules="${missing_modules} ${mod}"
+    fi
+done
+
+if [ -n "$missing_modules" ]; then
+    echo "WARNING: Missing kernel modules:${missing_modules}"
+    echo "Camera support requires these modules in the kernel."
+    echo "Ensure the kernel is built with CONFIG_VIDEO_QCOM_CAMSS=m,"
+    echo "CONFIG_I2C_QCOM_CCI=y, and CONFIG_V4L2_CCI=m."
+    exit 0
+fi
+
 modprobe -q v4l2-cci 2>/dev/null || true
+modprobe -q i2c-qcom-cci 2>/dev/null || true
+modprobe -q camcc-sc7280 2>/dev/null || true
 modprobe -q qcom-camss 2>/dev/null || true
+
+sleep 2
+
 modprobe -q s5kjn1 2>/dev/null || true
 modprobe -q imx858 2>/dev/null || true
 modprobe -q imx471 2>/dev/null || true
@@ -28,5 +48,10 @@ ls -la /dev/media* 2>/dev/null || echo "None"
 
 echo "=== V4L sub-devices ==="
 ls -la /dev/v4l-subdev* 2>/dev/null || echo "None"
+
+if ! ls /dev/media* &>/dev/null; then
+    echo "NOTE: No media devices found."
+    echo "Check 'dmesg | grep -iE \"camss|cci|s5k|imx\"' for details."
+fi
 
 exit 0
