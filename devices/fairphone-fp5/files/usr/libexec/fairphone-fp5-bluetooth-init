@@ -1,7 +1,7 @@
 #!/bin/bash
 
 HCI_TIMEOUT=30
-FW_TIMEOUT=90
+FW_TIMEOUT=120
 
 echo "Fairphone 5 Bluetooth initialization (WCN6750)..."
 
@@ -45,6 +45,10 @@ if [ $waited -ge $FW_TIMEOUT ]; then
 fi
 
 sleep 2
+
+if command -v btmgmt &>/dev/null; then
+    btmgmt --index 0 power on 2>/dev/null && echo "Powered on $HCI_DEV via btmgmt" || true
+fi
 
 echo "Bluetooth $HCI_DEV ready — handing off to bluetoothd"
 exit 0

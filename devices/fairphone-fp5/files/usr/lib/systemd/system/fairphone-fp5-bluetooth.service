@@ -9,7 +9,7 @@ Type=oneshot
 RemainAfterExit=yes
 ExecStart=/usr/libexec/fairphone-fp5-bluetooth-init
 ExecStartPost=-/bin/sh -c 'sleep 1; systemctl try-restart bluetooth.service 2>/dev/null || true'
-TimeoutStartSec=120
+TimeoutStartSec=150
 
 [Install]
 WantedBy=bluetooth.target

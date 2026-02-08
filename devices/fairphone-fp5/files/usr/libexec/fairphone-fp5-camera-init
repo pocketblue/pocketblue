@@ -51,7 +51,7 @@ ls -la /dev/v4l-subdev* 2>/dev/null || echo "None"
 
 if ! ls /dev/media* &>/dev/null; then
     echo "NOTE: No media devices found."
-    echo "Check 'dmesg | grep -iE \"camss|cci|s5k|imx\"' for details."
+    echo "Check 'dmesg | grep -iE \"camss|cci|s5k|imx|pm8008\"' for details."
 fi
 
 exit 0
