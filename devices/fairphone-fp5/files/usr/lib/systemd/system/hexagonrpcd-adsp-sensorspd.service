@@ -2,6 +2,7 @@
 Description=Hexagon ADSP Sensors Protection Domain Daemon
 After=tqftpserv.service
 After=dev-fastrpc\x2dadsp.device
+After=sys-devices-platform-soc\x400-3700000.remoteproc.device
 Requires=tqftpserv.service
 Wants=dev-fastrpc\x2dadsp.device
 ConditionPathExists=/dev/fastrpc-adsp
@@ -13,7 +14,7 @@ Type=simple
 ExecStartPre=/bin/sleep 2
 ExecStart=/usr/bin/hexagonrpcd -f /dev/fastrpc-adsp -s -R /usr/share/qcom/qcm6490/fairphone5
 Restart=on-failure
-RestartSec=10
+RestartSec=5
 TimeoutStartSec=60
 User=fastrpc
 Group=fastrpc
