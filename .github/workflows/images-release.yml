@@ -63,7 +63,7 @@ jobs:
           # - name: xiaomi-pipa
           #   tag: ${{ inputs.fedora_branch }}
           #   build_aux: 'build-aux'
-        desktop: [tty, gnome-desktop, gnome-mobile, plasma-desktop, plasma-mobile, phosh]
+        desktop: [gnome-desktop]
     name: ${{ matrix.device.name }}-${{ matrix.desktop }}:${{ matrix.device.tag }}
     steps:
       - uses: actions/checkout@v6

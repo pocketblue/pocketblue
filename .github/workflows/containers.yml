@@ -85,7 +85,7 @@ jobs:
       fail-fast: false
       matrix:
         device: ${{ fromJson(needs.config.outputs.devices) }}
-        desktop: [tty, gnome-desktop, gnome-mobile, plasma-desktop, plasma-mobile, phosh]
+        desktop: [gnome-desktop]
     uses: ./.github/workflows/helper-build-container.yml
     with:
       fedora_branch: ${{ inputs.fedora_branch || 43 }}
