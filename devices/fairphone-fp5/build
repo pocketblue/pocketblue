@@ -163,34 +163,35 @@ if [ -f "${FW_DIR}/msnv11.bin" ]; then
 fi
 
 # GPU firmware (a660_sqe.fw, a660_gmu.bin)
-# The kernel looks in qcom/qcm6490/fairphone5/ first, then falls back to qcom/
-# Try to symlink from qcom-firmware first, otherwise download from linux-firmware
+# The msm DRM driver requests firmware as "qcom/a660_sqe.fw", which resolves
+# to /usr/lib/firmware/qcom/a660_sqe.fw — NOT the device-specific subdirectory.
+GPU_FW_DIR="/usr/lib/firmware/qcom"
 GPU_FW_INSTALLED=false
-if [ -f /usr/lib/firmware/qcom/a660_sqe.fw ]; then
-    ln -sf ../../a660_sqe.fw "${FW_DEST}/a660_sqe.fw"
-    echo "  Linked a660_sqe.fw from qcom-firmware"
-    GPU_FW_INSTALLED=true
-else
-    echo "  a660_sqe.fw not found in qcom-firmware, downloading from linux-firmware..."
-    curl -sL "https://gitlab.com/kernel-firmware/linux-firmware/-/raw/main/qcom/a660_sqe.fw" -o "${FW_DEST}/a660_sqe.fw" && \
-        chmod 0644 "${FW_DEST}/a660_sqe.fw" && \
-        echo "  Downloaded a660_sqe.fw from linux-firmware" && \
+if [ ! -f "${GPU_FW_DIR}/a660_sqe.fw" ]; then
+    echo "  a660_sqe.fw not found, downloading from linux-firmware..."
+    curl -sL "https://gitlab.com/kernel-firmware/linux-firmware/-/raw/main/qcom/a660_sqe.fw" \
+        -o "${GPU_FW_DIR}/a660_sqe.fw" && \
+        chmod 0644 "${GPU_FW_DIR}/a660_sqe.fw" && \
+        echo "  Downloaded a660_sqe.fw" && \
         GPU_FW_INSTALLED=true || \
         echo "  WARNING: Failed to download a660_sqe.fw"
-fi
-
-if [ -f /usr/lib/firmware/qcom/a660_gmu.bin ]; then
-    ln -sf ../../a660_gmu.bin "${FW_DEST}/a660_gmu.bin"
-    echo "  Linked a660_gmu.bin from qcom-firmware"
 else
-    echo "  a660_gmu.bin not found in qcom-firmware, downloading from linux-firmware..."
-    curl -sL "https://gitlab.com/kernel-firmware/linux-firmware/-/raw/main/qcom/a660_gmu.bin" -o "${FW_DEST}/a660_gmu.bin" && \
-        chmod 0644 "${FW_DEST}/a660_gmu.bin" && \
-        echo "  Downloaded a660_gmu.bin from linux-firmware" || \
-        echo "  WARNING: Failed to download a660_gmu.bin"
+    echo "  ✓ a660_sqe.fw already present"
+    GPU_FW_INSTALLED=true
 fi
 
-if [ "$GPU_FW_INSTALLED" = true ] && [ -f "${FW_DEST}/a660_sqe.fw" ]; then
+if [ ! -f "${GPU_FW_DIR}/a660_gmu.bin" ]; then
+    echo "  a660_gmu.bin not found, downloading from linux-firmware..."
+    curl -sL "https://gitlab.com/kernel-firmware/linux-firmware/-/raw/main/qcom/a660_gmu.bin" \
+        -o "${GPU_FW_DIR}/a660_gmu.bin" && \
+        chmod 0644 "${GPU_FW_DIR}/a660_gmu.bin" && \
+        echo "  Downloaded a660_gmu.bin" || \
+        echo "  WARNING: Failed to download a660_gmu.bin"
+else
+    echo "  ✓ a660_gmu.bin already present"
+fi
+
+if [ "$GPU_FW_INSTALLED" = true ] && [ -f "${GPU_FW_DIR}/a660_sqe.fw" ]; then
     echo "  ✓ GPU firmware: OK"
 else
     echo "  ⚠ GPU firmware: may be incomplete (display may still work with fallback)"
@@ -220,6 +221,13 @@ if [ -f /usr/lib/firmware/qca/msbtfw11.mbn ] && [ -L /usr/lib/firmware/qca/msbtf
     echo "  ✓ bluetooth: OK (msbtfw11.mbn + .tlv symlink + msnv11.bin from FairBlobs)"
 else
     echo "  ✗ bluetooth: MISSING or incomplete"
+    exit 1
+fi
+
+if [ -f /usr/lib/firmware/qcom/a660_sqe.fw ]; then
+    echo "  ✓ gpu: OK (a660_sqe.fw)"
+else
+    echo "  ✗ gpu: a660_sqe.fw MISSING"
     exit 1
 fi
 
