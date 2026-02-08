@@ -7,8 +7,10 @@ require {
     class qipcrtr_socket { create bind listen accept connect getattr setattr getopt setopt shutdown read write sendto recvfrom append lock ioctl };
     class file { getattr open read };
     class dir search;
+    class capability { dac_override dac_read_search };
 }
 
 allow iiosensorproxy_t self:qipcrtr_socket { create bind listen accept connect getattr setattr getopt setopt shutdown read write sendto recvfrom append lock ioctl };
 allow iiosensorproxy_t passwd_file_t:file { getattr open read };
 allow iiosensorproxy_t cache_home_t:dir search;
+allow iiosensorproxy_t self:capability { dac_override dac_read_search };
