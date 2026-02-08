@@ -54,6 +54,16 @@ echo "--- BT firmware files ---"
 ls -la /usr/lib/firmware/qca/msbtfw11.* /usr/lib/firmware/qca/msnv11.* 2>/dev/null || echo "  none"
 echo ""
 
+echo "--- BT firmware conflicts check ---"
+echo "  Compressed firmware that should NOT exist (conflicts with FairBlobs):"
+ls -la /usr/lib/firmware/qca/msbtfw11.*.xz /usr/lib/firmware/qca/msbtfw11.*.zst \
+      /usr/lib/firmware/qca/msnv11.*.xz /usr/lib/firmware/qca/msnv11.*.zst 2>/dev/null || echo "  none (good)"
+echo "  .tlv symlink check:"
+ls -la /usr/lib/firmware/qca/msbtfw11.tlv 2>/dev/null || echo "  MISSING — driver tries .tlv first, should be symlink to .mbn"
+echo "  Firmware in initramfs:"
+lsinitrd 2>/dev/null | grep -E "msbtfw|msnv" || echo "  not found in initramfs (check dracut config)"
+echo ""
+
 echo "--- BT devices ---"
 ls -la /sys/class/bluetooth/ 2>/dev/null || echo "  none"
 echo ""

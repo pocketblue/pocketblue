@@ -117,18 +117,43 @@ if [ -f "${FW_DIR}/aw882xx_acf.bin" ]; then
 fi
 
 # bluetooth firmware from FairBlobs dump
-# The kernel's serdev probe requests firmware very early at boot, before the
-# xz decompressor may be ready. Fedora's linux-firmware ships compressed
-# .mbn.xz/.tlv.xz which fail to load at this stage, leaving hci0 permanently
-# broken. Install uncompressed copies so the early probe succeeds.
+#
+# The FairBlobs firmware is extracted from the stock Fairphone 5 ROM and
+# contains device-specific NVM configuration (msnv11.bin) with correct RF
+# calibration for FP5 hardware. Fedora's linux-firmware ships generic
+# Qualcomm-provided versions that may differ.
+#
+# We must:
+# 1. Remove any competing firmware from linux-firmware (compressed or not)
+#    to ensure the FairBlobs version is used exclusively
+# 2. Install uncompressed copies (the serdev probe fires at t=2.9s during
+#    initramfs, before xz/zstd decompressors may be ready)
+# 3. Create a .tlv symlink (the QCA driver tries .tlv first, then .mbn)
 mkdir -p /usr/lib/firmware/qca
+
+# Remove any linux-firmware versions to avoid version conflicts
+rm -f /usr/lib/firmware/qca/msbtfw11.mbn.xz \
+      /usr/lib/firmware/qca/msbtfw11.mbn.zst \
+      /usr/lib/firmware/qca/msbtfw11.tlv \
+      /usr/lib/firmware/qca/msbtfw11.tlv.xz \
+      /usr/lib/firmware/qca/msbtfw11.tlv.zst \
+      /usr/lib/firmware/qca/msnv11.bin.xz \
+      /usr/lib/firmware/qca/msnv11.bin.zst \
+      /usr/lib/firmware/qca/msnv11b.bin \
+      /usr/lib/firmware/qca/msnv11b.bin.xz \
+      /usr/lib/firmware/qca/msnv11b.bin.zst
+echo "  Removed any competing linux-firmware BT files"
+
 if [ -f "${FW_DIR}/msbtfw11.mbn" ]; then
     install -Dm644 "${FW_DIR}/msbtfw11.mbn" /usr/lib/firmware/qca/msbtfw11.mbn
-    echo "  Installed msbtfw11.mbn (uncompressed BT firmware)"
+    # The QCA driver tries .tlv first, then falls back to .mbn.
+    # Create symlink so the first lookup succeeds immediately.
+    ln -sf msbtfw11.mbn /usr/lib/firmware/qca/msbtfw11.tlv
+    echo "  Installed msbtfw11.mbn + .tlv symlink (BT firmware)"
 fi
 if [ -f "${FW_DIR}/msnv11.bin" ]; then
     install -Dm644 "${FW_DIR}/msnv11.bin" /usr/lib/firmware/qca/msnv11.bin
-    echo "  Installed msnv11.bin (device-specific NV config)"
+    echo "  Installed msnv11.bin (FP5-specific NV config from FairBlobs)"  
 fi
 
 # GPU firmware (a660_sqe.fw, a660_gmu.bin)
@@ -185,12 +210,22 @@ for fw in adsp cdsp modem wpss a660_zap; do
     fi
 done
 
-if [ -f /usr/lib/firmware/qca/msbtfw11.mbn ] && [ -f /usr/lib/firmware/qca/msnv11.bin ]; then
-    echo "  ✓ bluetooth: OK (msbtfw11.mbn + msnv11.bin)"
+if [ -f /usr/lib/firmware/qca/msbtfw11.mbn ] && [ -L /usr/lib/firmware/qca/msbtfw11.tlv ] && [ -f /usr/lib/firmware/qca/msnv11.bin ]; then
+    echo "  ✓ bluetooth: OK (msbtfw11.mbn + .tlv symlink + msnv11.bin from FairBlobs)"
 else
     echo "  ✗ bluetooth: MISSING or incomplete"
     exit 1
 fi
+
+# Verify no competing compressed firmware from linux-firmware remains
+for conflict in /usr/lib/firmware/qca/msbtfw11.mbn.xz /usr/lib/firmware/qca/msbtfw11.mbn.zst \
+                /usr/lib/firmware/qca/msnv11.bin.xz /usr/lib/firmware/qca/msnv11.bin.zst; do
+    if [ -f "$conflict" ]; then
+        echo "  ⚠ WARNING: competing firmware file found: $conflict"
+        echo "    Removing to avoid version mismatch with FairBlobs firmware"
+        rm -f "$conflict"
+    fi
+done
 
 echo "Firmware installation complete."
 ls -la "${FW_DEST}/"

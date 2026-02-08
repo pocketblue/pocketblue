@@ -178,27 +178,41 @@ To return to the original Fairphone OS:
 
 If Bluetooth is not activatable, check the following:
 
-1. Verify firmware files are present:
+1. Verify firmware files are present (must be FairBlobs versions, not linux-firmware):
    ```bash
    ls -la /usr/lib/firmware/qca/msbtfw11.* /usr/lib/firmware/qca/msnv11.*
-   # Should show: msbtfw11.mbn, msbtfw11.tlv (symlink → msbtfw11.mbn), msnv11.bin
+   # Should show:
+   #   msbtfw11.mbn      (FairBlobs BT firmware, uncompressed)
+   #   msbtfw11.tlv      (symlink -> msbtfw11.mbn)
+   #   msnv11.bin        (FP5-specific NVM config from FairBlobs)
+   #
+   # Should NOT show any .xz or .zst compressed variants (those are from
+   # linux-firmware and may be a different version, causing mismatch)
    ```
 
-2. Check kernel messages for firmware loading errors:
+2. Check firmware is in initramfs (serdev probe fires at t=2.9s before ostree pivot):
    ```bash
-   dmesg | grep -i bluetooth
-   dmesg | grep -i qca
+   lsinitrd | grep -E "msbtfw|msnv"
    ```
 
-3. Ensure rfkill is not blocking Bluetooth:
+3. Check kernel messages for firmware loading errors:
+   ```bash
+   dmesg | grep -iE "bluetooth|qca|hci|btqca"
+   # Look for:
+   #   "QCA Downloading qca/msbtfw11.mbn"  (or .tlv) -> good
+   #   "QCA setup on UART is completed"     -> firmware loaded OK
+   #   "Frame reassembly failed"            -> early probe failure
+   #   "unexpected event for opcode"        -> HCI setup issue
+   ```
+
+4. Ensure rfkill is not blocking Bluetooth:
    ```bash
    rfkill list bluetooth
    rfkill unblock bluetooth
    ```
 
-4. Restart the Bluetooth service:
+5. Restart the Bluetooth service:
    ```bash
-   sudo systemctl restart fairphone-fp5-bluetooth.service
    sudo systemctl restart bluetooth.service
    ```
 
