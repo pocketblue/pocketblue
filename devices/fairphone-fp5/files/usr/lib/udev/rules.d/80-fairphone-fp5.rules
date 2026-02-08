@@ -1,7 +1,9 @@
 # Fairphone 5 udev rules
 
 # Accelerometer mount matrix for iio-sensor-proxy with libssc
-SUBSYSTEM=="misc", KERNEL=="fastrpc-*", ENV{ACCEL_MOUNT_MATRIX}="-1, 0, 0; 0, -1, 0; 0, 0, -1"
+SUBSYSTEM=="misc", KERNEL=="fastrpc-adsp", ENV{ACCEL_MOUNT_MATRIX}="-1, 0, 0; 0, -1, 0; 0, 0, -1"
 
-# Ensure all SSC sensor types are available
-SUBSYSTEM=="misc", KERNEL=="fastrpc-*", ENV{IIO_SENSOR_PROXY_TYPE}+="ssc-accel ssc-proximity"
+# Re-enable ssc-accel and ssc-proximity for iio-sensor-proxy.
+# The upstream COPR package disabled these in the default udev rules
+# (ssc-accel: libssc#98, ssc-proximity: libssc#111) but they work on FP5.
+SUBSYSTEM=="misc", KERNEL=="fastrpc-adsp", ENV{IIO_SENSOR_PROXY_TYPE}+="ssc-accel ssc-proximity"

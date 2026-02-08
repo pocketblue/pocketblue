@@ -228,8 +228,9 @@ not detect any sensors on the FP5.
 
 1. Verify the SSC-patched iio-sensor-proxy is installed:
    ```bash
-   rpm -q iio-sensor-proxy-ssc
-   # If not installed, the stock iio-sensor-proxy won't work
+   rpm -q iio-sensor-proxy
+   ldd /usr/libexec/iio-sensor-proxy | grep libssc
+   # Must show libssc.so — the stock Fedora package does NOT have SSC support
    ```
 
 2. Check if the ADSP fastrpc device is available:
@@ -255,28 +256,19 @@ not detect any sensors on the FP5.
 6. Restart the sensor stack:
    ```bash
    sudo systemctl restart hexagonrpcd-adsp-sensorspd.service
-   sudo systemctl restart fairphone-fp5-sensors.service
    sudo systemctl restart iio-sensor-proxy.service
    ```
 
 ### Audio Not Working (LPASS Clock Controller Error)
 
-The LPASS audio clock controller may fail to probe on first boot:
+The LPASS audio clock controller may fail to probe on first boot with
+`error -110` (ETIMEDOUT). This is a known issue where the ADSP
+remoteproc is not ready in time. A reboot usually resolves it.
 
-1. Check service status:
-   ```bash
-   sudo systemctl status fairphone-fp5-lpass-audio-rebind.service
-   ```
-
-2. Manually trigger rebind:
-   ```bash
-   sudo /usr/libexec/fairphone-fp5-lpass-audio-rebind
-   ```
-
-3. Restart audio services:
-   ```bash
-   sudo systemctl restart wireplumber.service pipewire.service
-   ```
+Restart audio services:
+```bash
+sudo systemctl restart wireplumber.service pipewire.service
+```
 
 ### GPU Firmware Errors
 
@@ -363,10 +355,6 @@ The following device-specific services are enabled:
 - `tqftpserv.service` - TFTP server for firmware loading
 - `qbootctl.service` - Qualcomm A/B boot control
 - `rmtfs.service` - Remote filesystem service for modem
-- `fairphone-fp5-usbc-rebind.service` - USB-C Type-C and DisplayPort Alt Mode initialization
-- `fairphone-fp5-sensors.service` - Sensor stack initialization after ADSP is ready
-- `fairphone-fp5-bluetooth.service` - Bluetooth initialization with WCN6750 recovery
-- `fairphone-fp5-lpass-audio-rebind.service` - LPASS audio clock controller rebind
 
 ### Kernel
 

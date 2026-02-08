@@ -31,7 +31,8 @@ dnf -y swap --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
     iio-sensor-proxy iio-sensor-proxy
 
 # install device-specific files (after packages to override defaults)
-# This includes our custom hexagonrpcd-adsp-sensorspd.service
+# This includes udev rules, systemd drop-ins, dracut config, modprobe/modules-load
+# config, SELinux policy source, hexagonrpcd config, and the debug script.
 cp -arfT files/usr /usr
 
 # Set executable permissions on helper scripts
@@ -131,7 +132,10 @@ fi
 # 3. Create a .tlv symlink (the QCA driver tries .tlv first, then .mbn)
 mkdir -p /usr/lib/firmware/qca
 
-# Remove any linux-firmware versions to avoid version conflicts
+# Remove any linux-firmware versions to avoid version conflicts.
+# This includes board-specific NVM variants (msnv11.b09, msnv11.b0a, etc.)
+# that linux-firmware ships compressed — the kernel firmware loader may
+# prefer these over our uncompressed msnv11.bin from FairBlobs.
 rm -f /usr/lib/firmware/qca/msbtfw11.mbn.xz \
       /usr/lib/firmware/qca/msbtfw11.mbn.zst \
       /usr/lib/firmware/qca/msbtfw11.tlv \
@@ -142,6 +146,8 @@ rm -f /usr/lib/firmware/qca/msbtfw11.mbn.xz \
       /usr/lib/firmware/qca/msnv11b.bin \
       /usr/lib/firmware/qca/msnv11b.bin.xz \
       /usr/lib/firmware/qca/msnv11b.bin.zst
+rm -f /usr/lib/firmware/qca/msnv11.b*.xz \
+      /usr/lib/firmware/qca/msnv11.b*.zst
 echo "  Removed any competing linux-firmware BT files"
 
 if [ -f "${FW_DIR}/msbtfw11.mbn" ]; then
@@ -219,7 +225,8 @@ fi
 
 # Verify no competing compressed firmware from linux-firmware remains
 for conflict in /usr/lib/firmware/qca/msbtfw11.mbn.xz /usr/lib/firmware/qca/msbtfw11.mbn.zst \
-                /usr/lib/firmware/qca/msnv11.bin.xz /usr/lib/firmware/qca/msnv11.bin.zst; do
+                /usr/lib/firmware/qca/msnv11.bin.xz /usr/lib/firmware/qca/msnv11.bin.zst \
+                /usr/lib/firmware/qca/msnv11.b*.xz /usr/lib/firmware/qca/msnv11.b*.zst; do
     if [ -f "$conflict" ]; then
         echo "  ⚠ WARNING: competing firmware file found: $conflict"
         echo "    Removing to avoid version mismatch with FairBlobs firmware"

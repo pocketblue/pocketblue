@@ -56,8 +56,12 @@ echo ""
 
 echo "--- BT firmware conflicts check ---"
 echo "  Compressed firmware that should NOT exist (conflicts with FairBlobs):"
-ls -la /usr/lib/firmware/qca/msbtfw11.*.xz /usr/lib/firmware/qca/msbtfw11.*.zst \
-      /usr/lib/firmware/qca/msnv11.*.xz /usr/lib/firmware/qca/msnv11.*.zst 2>/dev/null || echo "  none (good)"
+bt_conflicts=$(find /usr/lib/firmware/qca/ -maxdepth 1 \( -name 'msbtfw11.*.xz' -o -name 'msbtfw11.*.zst' -o -name 'msnv11.*.xz' -o -name 'msnv11.*.zst' \) 2>/dev/null)
+if [ -n "$bt_conflicts" ]; then
+    echo "$bt_conflicts" | while read -r f; do ls -la "$f"; done
+else
+    echo "  none (good)"
+fi
 echo "  .tlv symlink check:"
 ls -la /usr/lib/firmware/qca/msbtfw11.tlv 2>/dev/null || echo "  MISSING — driver tries .tlv first, should be symlink to .mbn"
 echo "  Firmware in initramfs:"
