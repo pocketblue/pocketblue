@@ -30,15 +30,8 @@ on:
         description: 'device'
         required: true
         options:
-          - 'all'
           - 'fairphone-fp5'
-          - 'nothing-spacewar'
-          - 'oneplus-sdm845'
-          - 'xiaomi-beryllium'
-          - 'xiaomi-nabu'
-          - 'xiaomi-pipa'
-          - 'xunlong-orangepi3-lts'
-        default: 'all'
+        default: 'fairphone-fp5'
       target_tag_override:
         type: string
         description: 'override target tag'

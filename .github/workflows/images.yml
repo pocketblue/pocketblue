@@ -9,12 +9,7 @@ on:
         required: true
         options:
           - fairphone-fp5
-          - nothing-spacewar
-          - oneplus-sdm845
-          - xiaomi-beryllium
-          - xiaomi-nabu
-          - xiaomi-pipa
-          - xunlong-orangepi3-lts
+        default: fairphone-fp5
       tag:
         type: string
         description: image tag
