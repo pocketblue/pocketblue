@@ -1,0 +1,159 @@
+#!/bin/bash
+
+echo "========================================"
+echo "Fairphone 5 Debug Report — $(date -Iseconds)"
+echo "========================================"
+echo ""
+
+echo "=== Kernel ==="
+uname -r
+echo ""
+
+echo "=== Systemd ==="
+systemctl --version | head -1
+echo ""
+
+echo "=== Key services ==="
+for svc in \
+    bluetooth.service \
+    hexagonrpcd-adsp-sensorspd.service \
+    iio-sensor-proxy.service \
+    rmtfs.service \
+    tqftpserv.service; do
+    state=$(systemctl is-active "$svc" 2>/dev/null)
+    enabled=$(systemctl is-enabled "$svc" 2>/dev/null)
+    printf "  %-45s active=%-10s enabled=%s\n" "$svc" "$state" "$enabled"
+done
+echo ""
+
+echo "=== Remoteproc ==="
+for rproc in /sys/class/remoteproc/remoteproc*/; do
+    [ -f "${rproc}name" ] && echo "  $(basename "$rproc"): $(cat "${rproc}name") — $(cat "${rproc}state")"
+done
+echo ""
+
+echo "=== PD mapper ==="
+lsmod | grep qcom_pd_mapper || echo "  qcom_pd_mapper module not loaded"
+echo ""
+
+echo "=== QRTR ==="
+if command -v qrtr-lookup &>/dev/null; then
+    qrtr-lookup 2>/dev/null | head -20
+else
+    echo "  qrtr-lookup not available"
+    ls /sys/bus/qrtr/devices/ 2>/dev/null || echo "  no QRTR devices"
+fi
+echo ""
+
+echo "==============================="
+echo "  BLUETOOTH"
+echo "==============================="
+echo ""
+
+echo "--- BT firmware files ---"
+ls -la /usr/lib/firmware/qca/msbtfw11.* /usr/lib/firmware/qca/msnv11.* 2>/dev/null || echo "  none"
+echo ""
+
+echo "--- BT devices ---"
+ls -la /sys/class/bluetooth/ 2>/dev/null || echo "  none"
+echo ""
+
+echo "--- BT modules ---"
+lsmod | grep -E "bluetooth|btqca|hci_uart|rfkill" || echo "  none loaded"
+echo ""
+
+echo "--- rfkill ---"
+rfkill list bluetooth 2>/dev/null || echo "  unavailable"
+echo ""
+
+echo "--- bluetoothctl ---"
+timeout 3 bluetoothctl show 2>/dev/null | grep -E "Powered|PowerState|Name|Controller" || echo "  no controller"
+echo ""
+
+echo "--- btmgmt (try power on) ---"
+sudo btmgmt --index 0 power on 2>&1 || true
+echo ""
+
+echo "--- BT dmesg ---"
+dmesg | grep -iE "bluetooth|qca.*setup|hci|btqca" | tail -20
+echo ""
+
+echo "--- BT service logs ---"
+journalctl -b 0 -u bluetooth.service --no-pager -n 15 2>/dev/null
+echo ""
+
+
+echo "==============================="
+echo "  SENSORS"
+echo "==============================="
+echo ""
+
+echo "--- fastrpc devices ---"
+ls -la /dev/fastrpc-* 2>/dev/null || echo "  none"
+echo ""
+
+echo "--- hexagonrpcd config ---"
+cat /usr/share/hexagonrpcd/hexagonrpcd-adsp-sensorspd.conf 2>/dev/null || echo "  MISSING"
+echo ""
+
+echo "--- hexagonrpcd status ---"
+systemctl status hexagonrpcd-adsp-sensorspd.service --no-pager -n 5 2>/dev/null
+echo ""
+
+echo "--- udev env on fastrpc-adsp ---"
+udevadm info /dev/fastrpc-adsp 2>/dev/null | grep -E "IIO_SENSOR_PROXY_TYPE|ACCEL_MOUNT_MATRIX|SYSTEMD_WANTS" || echo "  no env vars set"
+echo ""
+
+echo "--- iio-sensor-proxy binary ---"
+rpm -q iio-sensor-proxy 2>/dev/null
+ldd /usr/libexec/iio-sensor-proxy 2>/dev/null | grep -iE "ssc|qrtr" || echo "  no SSC/QRTR libs linked"
+echo ""
+
+echo "--- iio-sensor-proxy service config ---"
+systemctl cat iio-sensor-proxy.service 2>/dev/null | grep -E "RestrictAddress|ExecStart|BusName"
+echo ""
+
+echo "--- iio-sensor-proxy resolved RestrictAddressFamilies ---"
+systemctl show iio-sensor-proxy.service -p RestrictAddressFamilies 2>/dev/null
+echo ""
+
+echo "--- iio-sensor-proxy service logs ---"
+journalctl -b 0 -u iio-sensor-proxy.service --no-pager -n 20 2>/dev/null
+echo ""
+
+echo "--- iio-sensor-proxy direct run (5s) ---"
+echo "  (running outside systemd sandbox to test SSC connectivity)"
+sudo timeout 5 /usr/libexec/iio-sensor-proxy -v 2>&1 || true
+echo ""
+
+echo "==============================="
+echo "  CAMERA"
+echo "==============================="
+echo ""
+
+echo "--- camera modules ---"
+lsmod | grep -iE "camss|cci|s5k|imx|dw9719|camcc" || echo "  none loaded"
+echo ""
+
+echo "--- camera dmesg ---"
+dmesg | grep -iE "camss|cci|s5k|imx|pm8008|camcc" | head -30
+echo ""
+
+echo "--- media/video devices ---"
+ls -la /dev/video* 2>/dev/null || echo "  no video devices"
+ls -la /dev/media* 2>/dev/null || echo "  no media devices"
+ls -la /dev/v4l-subdev* 2>/dev/null || echo "  no v4l subdevices"
+echo ""
+
+echo "--- LPASS / audio CC dmesg ---"
+dmesg | grep -iE "lpass|audio_cc" | tail -10
+echo ""
+
+echo "==============================="
+echo "  DMESG ERRORS"
+echo "==============================="
+echo ""
+dmesg --level=emerg,alert,crit,err
+echo ""
+
+echo "======== Debug report complete ========"

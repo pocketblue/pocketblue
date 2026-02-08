@@ -1,16 +1,5 @@
 # Fairphone 5 udev rules
-
-# iio-sensor-proxy with libssc: accelerometer mount matrix
+#
+# Accelerometer mount matrix for iio-sensor-proxy with libssc
+# (matching PostmarketOS 81-libssc-fairphone-fp5.rules)
 SUBSYSTEM=="misc", KERNEL=="fastrpc-*", ENV{ACCEL_MOUNT_MATRIX}+="-1, 0, 0; 0, -1, 0; 0, 0, -1"
-
-# Re-enable SSC accel and proximity for FP5 (disabled by default in iio-sensor-proxy)
-SUBSYSTEM=="misc", KERNEL=="fastrpc-adsp*", ENV{IIO_SENSOR_PROXY_TYPE}+="ssc-accel ssc-proximity"
-
-# USB-C and DisplayPort Alt Mode
-SUBSYSTEM=="typec", MODE="0664"
-KERNEL=="ucsi*", MODE="0664"
-ACTION=="add", KERNEL=="a600000.usb", TAG+="systemd", ENV{SYSTEMD_WANTS}+="fairphone-fp5-usbc-rebind.service"
-
-# Camera (V4L2 / CAMSS)
-SUBSYSTEM=="video4linux", MODE="0660", GROUP="video"
-SUBSYSTEM=="media", MODE="0660", GROUP="video"

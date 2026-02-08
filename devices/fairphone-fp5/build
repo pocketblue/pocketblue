@@ -30,17 +30,13 @@ dnf -y install \
 dnf -y swap --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
     iio-sensor-proxy iio-sensor-proxy
 
-
 # install device-specific files (after packages to override defaults)
 # This includes our custom hexagonrpcd-adsp-sensorspd.service
 cp -arfT files/usr /usr
 
 # Set executable permissions on helper scripts
-chmod +x /usr/libexec/fairphone-fp5-usbc-rebind
-chmod +x /usr/libexec/fairphone-fp5-sensors-init
-chmod +x /usr/libexec/fairphone-fp5-bluetooth-init
 chmod +x /usr/libexec/fairphone-fp5-bluetooth-debug
-chmod +x /usr/libexec/fairphone-fp5-camera-init
+chmod +x /usr/libexec/fairphone-fp5-debug
 
 # fairphone-5-firmware (direct install)
 FW_COMMIT="a4908f548e6f88965e78b1478af1751b6a854fc9"
@@ -114,11 +110,16 @@ if [ -f "${FW_DIR}/aw882xx_acf.bin" ]; then
     echo "  Installed aw882xx audio amplifier firmware"
 fi
 
-# bluetooth NV config - device-specific calibration data from FairBlobs dump
-# The BT patch firmware (msbtfw11.tlv) is provided by Fedora's linux-firmware.
-# Only msnv11.bin (NV config) needs to come from the dump as it contains
-# device-specific calibration.
+# bluetooth firmware from FairBlobs dump
+# The kernel's serdev probe requests firmware very early at boot, before the
+# xz decompressor may be ready. Fedora's linux-firmware ships compressed
+# .mbn.xz/.tlv.xz which fail to load at this stage, leaving hci0 permanently
+# broken. Install uncompressed copies so the early probe succeeds.
 mkdir -p /usr/lib/firmware/qca
+if [ -f "${FW_DIR}/msbtfw11.mbn" ]; then
+    install -Dm644 "${FW_DIR}/msbtfw11.mbn" /usr/lib/firmware/qca/msbtfw11.mbn
+    echo "  Installed msbtfw11.mbn (uncompressed BT firmware)"
+fi
 if [ -f "${FW_DIR}/msnv11.bin" ]; then
     install -Dm644 "${FW_DIR}/msnv11.bin" /usr/lib/firmware/qca/msnv11.bin
     echo "  Installed msnv11.bin (device-specific NV config)"
@@ -178,10 +179,10 @@ for fw in adsp cdsp modem wpss a660_zap; do
     fi
 done
 
-if [ -f /usr/lib/firmware/qca/msnv11.bin ]; then
-    echo "  ✓ bluetooth NV config: OK"
+if [ -f /usr/lib/firmware/qca/msbtfw11.mbn ] && [ -f /usr/lib/firmware/qca/msnv11.bin ]; then
+    echo "  ✓ bluetooth: OK (msbtfw11.mbn + msnv11.bin)"
 else
-    echo "  ✗ bluetooth NV config (msnv11.bin): MISSING"
+    echo "  ✗ bluetooth: MISSING or incomplete"
     exit 1
 fi
 
@@ -214,11 +215,7 @@ systemctl enable \
     hexagonrpcd-adsp-sensorspd.service \
     tqftpserv.service \
     qbootctl.service \
-    rmtfs.service \
-    fairphone-fp5-usbc-rebind.service \
-    fairphone-fp5-sensors.service \
-    fairphone-fp5-bluetooth.service \
-    fairphone-fp5-camera.service
+    rmtfs.service
 
 KERNEL_SUFFIX=""
 QUALIFIED_KERNEL="$(rpm -qa | grep -P 'kernel-(|'"$KERNEL_SUFFIX"'-)(\d+\.\d+\.\d+)' | sed -E 's/kernel-(|'"$KERNEL_SUFFIX"'-)//')"
