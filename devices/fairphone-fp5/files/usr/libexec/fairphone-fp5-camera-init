@@ -2,99 +2,31 @@
 
 echo "Fairphone 5 Camera initialization..."
 
-# Wait for CAMSS (Camera Subsystem) driver to be loaded
-wait_for_camss() {
-    local timeout=30
-    local waited=0
-    
-    echo "Waiting for CAMSS driver..."
-    
-    while [ $waited -lt $timeout ]; do
-        if [ -d /sys/bus/platform/drivers/qcom-camss ]; then
-            echo "CAMSS driver loaded after ${waited}s"
-            return 0
-        fi
-        
-        # Check if any video devices are present
-        if ls /dev/video* 2>/dev/null | grep -q video; then
-            echo "Video devices found after ${waited}s"
-            return 0
-        fi
-        
-        sleep 1
-        ((waited++))
-    done
-    
-    echo "WARNING: CAMSS driver not loaded after ${timeout}s"
-    return 1
-}
+modprobe -q v4l2-cci 2>/dev/null || true
+modprobe -q qcom-camss 2>/dev/null || true
+modprobe -q s5kjn1 2>/dev/null || true
+modprobe -q imx858 2>/dev/null || true
+modprobe -q imx471 2>/dev/null || true
+modprobe -q dw9719 2>/dev/null || true
 
-# Check for camera sensor drivers
-check_camera_sensors() {
-    echo "Checking for camera sensors..."
-    
-    # Check I2C devices for camera sensors
-    for i2c in /sys/bus/i2c/devices/*/name; do
-        if [ -f "$i2c" ]; then
-            local name=$(cat "$i2c" 2>/dev/null)
-            if echo "$name" | grep -qiE "s5k|imx|ov"; then
-                echo "  Found camera sensor: $name"
-            fi
-        fi
-    done
-    
-    # Check for CCI (Camera Control Interface) devices
-    if ls /sys/bus/i2c/drivers/i2c-qcom-cci* 2>/dev/null | grep -q cci; then
-        echo "  CCI driver loaded"
+timeout=15
+waited=0
+while [ $waited -lt $timeout ]; do
+    if ls /dev/media* &>/dev/null; then
+        echo "Media devices found after ${waited}s"
+        break
     fi
-}
+    sleep 1
+    ((waited++))
+done
 
-# Load camera kernel modules if needed
-load_camera_modules() {
-    echo "Loading camera modules..."
-    
-    # Try to load CAMSS module if not built-in
-    modprobe qcom-camss 2>/dev/null || true
-    
-    # Load sensor drivers if available as modules
-    modprobe s5kjn1 2>/dev/null || true
-    modprobe s5k4h7 2>/dev/null || true
-}
+echo "=== Video devices ==="
+ls -la /dev/video* 2>/dev/null || echo "None"
 
-# Main execution
-echo ""
-echo "=== Phase 1: Load camera modules ==="
-load_camera_modules
+echo "=== Media devices ==="
+ls -la /dev/media* 2>/dev/null || echo "None"
 
-echo ""
-echo "=== Phase 2: Wait for CAMSS driver ==="
-wait_for_camss
-
-echo ""
-echo "=== Phase 3: Check camera sensors ==="
-check_camera_sensors
-
-echo ""
-echo "=== Phase 4: List video devices ==="
-if ls /dev/video* 2>/dev/null; then
-    ls -la /dev/video*
-else
-    echo "No video devices found"
-fi
-
-echo ""
-echo "=== Phase 5: Check media devices ==="
-if ls /dev/media* 2>/dev/null; then
-    ls -la /dev/media*
-else
-    echo "No media devices found"
-fi
-
-echo ""
-echo "Camera initialization complete"
-echo "Note: FP5 camera support requires:"
-echo "  - Samsung S5KJN1/S5K4H7 sensor drivers in kernel"
-echo "  - Device tree entries for camera nodes"
-echo "  - libcamera pipeline handler for CAMSS"
+echo "=== V4L sub-devices ==="
+ls -la /dev/v4l-subdev* 2>/dev/null || echo "None"
 
 exit 0

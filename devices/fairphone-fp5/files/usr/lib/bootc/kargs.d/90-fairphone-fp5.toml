@@ -1,10 +1,6 @@
-# Fairphone 5 kernel arguments
-# Prevent unused clocks and power domains from being disabled
-# This helps with hardware that isn't fully described in device tree
 kargs = [
     "clk_ignore_unused",
     "pd_ignore_unused",
     "fw_devlink=permissive",
     "deferred_probe_timeout=30",
-    "qca_bluetooth.nosuspend=1"
 ]

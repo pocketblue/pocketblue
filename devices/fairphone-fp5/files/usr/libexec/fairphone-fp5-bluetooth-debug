@@ -3,67 +3,55 @@
 echo "==================================="
 echo "Fairphone 5 Bluetooth Debug Report"
 echo "==================================="
-echo ""
 
+echo ""
 echo "1. Firmware Files:"
 echo "-------------------"
-ls -la /usr/lib/firmware/qca/ms* 2>/dev/null || echo "No QCA firmware files found"
-echo ""
+ls -la /usr/lib/firmware/qca/msbtfw11.* /usr/lib/firmware/qca/msnv11.* 2>/dev/null || echo "  No BT firmware found"
 
+echo ""
 echo "2. Remoteproc Status:"
 echo "----------------------"
 for rproc in /sys/class/remoteproc/remoteproc*/; do
-    if [ -f "${rproc}name" ]; then
-        name=$(cat "${rproc}name" 2>/dev/null)
-        state=$(cat "${rproc}state" 2>/dev/null)
-        echo "$(basename $rproc): $name - $state"
-    fi
+    [ -f "${rproc}name" ] && echo "$(basename $rproc): $(cat ${rproc}name) - $(cat ${rproc}state)"
 done
-echo ""
 
+echo ""
 echo "3. Bluetooth Devices:"
 echo "----------------------"
-ls -la /sys/class/bluetooth/ 2>/dev/null || echo "No Bluetooth devices found"
-echo ""
+ls -la /sys/class/bluetooth/ 2>/dev/null || echo "  None"
 
-echo "4. HCI Configuration:"
+echo ""
+echo "4. bluetoothctl info:"
 echo "----------------------"
-hciconfig -a 2>/dev/null || echo "hciconfig not available or no devices"
-echo ""
+timeout 3 bluetoothctl show 2>/dev/null || echo "  No controller available"
 
+echo ""
 echo "5. rfkill Status:"
 echo "------------------"
-rfkill list bluetooth 2>/dev/null || echo "rfkill not available"
-echo ""
+rfkill list bluetooth 2>/dev/null || echo "  rfkill not available"
 
+echo ""
 echo "6. Loaded Modules:"
 echo "-------------------"
-lsmod | grep -E "bluetooth|btqca|hci|ath11k|wcn" || echo "No relevant modules loaded"
-echo ""
+lsmod | grep -E "bluetooth|btqca|hci_uart|ath11k|cfg80211|mac80211" 2>/dev/null || echo "  None"
 
-echo "7. UART Devices:"
-echo "-----------------"
-ls -la /dev/ttyHS* 2>/dev/null || echo "No high-speed UART devices found"
 echo ""
-
-echo "8. Service Status:"
+echo "7. Service Status:"
 echo "-------------------"
-systemctl status fairphone-fp5-bluetooth.service --no-pager 2>/dev/null || true
+systemctl status bluetooth.service --no-pager 2>/dev/null | head -20
 echo ""
+systemctl status fairphone-fp5-bluetooth.service --no-pager 2>/dev/null | head -15
 
-echo "9. Recent dmesg (Bluetooth):"
+echo ""
+echo "8. Recent dmesg (Bluetooth):"
 echo "------------------------------"
-dmesg | grep -i bluetooth | tail -20
-echo ""
+dmesg | grep -i bluetooth | tail -15 2>/dev/null
 
-echo "10. Recent dmesg (WPSS):"
-echo "--------------------------"
-dmesg | grep -i wpss | tail -10
 echo ""
-
-echo "11. Recent dmesg (QCA/WCN):"
+echo "9. Recent dmesg (QCA/WCN):"
 echo "-----------------------------"
-dmesg | grep -iE "qca|wcn" | tail -10
-echo ""
+dmesg | grep -iE "qca|wcn|hci" | tail -10 2>/dev/null
 
+echo ""
 echo "Debug report complete."

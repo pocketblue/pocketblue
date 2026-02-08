@@ -1,7 +1,6 @@
 # Fairphone 5 udev rules
 
 # FastRPC devices for DSP subsystems (sensors and compute)
-# TAG+="systemd" creates device units that services can depend on
 SUBSYSTEM=="misc", KERNEL=="fastrpc-adsp", MODE="0666", GROUP="fastrpc", TAG+="systemd"
 SUBSYSTEM=="misc", KERNEL=="fastrpc-adsp-secure", MODE="0666", GROUP="fastrpc", TAG+="systemd", SYMLINK+="fastrpc-adsp"
 SUBSYSTEM=="misc", KERNEL=="fastrpc-cdsp", MODE="0666", GROUP="fastrpc", TAG+="systemd"
@@ -24,11 +23,6 @@ SUBSYSTEM=="iio", ATTR{name}=="*magn*", MODE="0666", GROUP="input"
 SUBSYSTEM=="iio", ATTR{name}=="*als*", MODE="0666", GROUP="input"
 SUBSYSTEM=="iio", ATTR{name}=="*prox*", MODE="0666", GROUP="input"
 
-# Bluetooth (WCN6750/QCA)
-ACTION=="add", SUBSYSTEM=="bluetooth", KERNEL=="hci*", TAG+="systemd", ENV{SYSTEMD_WANTS}+="fairphone-fp5-bluetooth.service"
-ACTION=="add", SUBSYSTEM=="tty", KERNEL=="ttyHS0", MODE="0660", GROUP="dialout"
-SUBSYSTEM=="bluetooth", MODE="0660"
-
 # USB-C and DisplayPort Alt Mode
 ACTION=="add", SUBSYSTEM=="typec", MODE="0664", GROUP="input"
 ACTION=="add", SUBSYSTEM=="typec", ATTR{svid}=="ff01", MODE="0664", GROUP="video"
@@ -41,21 +35,8 @@ ACTION=="bind", SUBSYSTEM=="i2c", KERNEL=="4-001a", TAG+="systemd"
 ACTION=="bind", SUBSYSTEM=="platform", KERNEL=="88e8000.phy", TAG+="systemd"
 
 # Camera (CAMSS - Camera Subsystem)
-# Video4Linux devices for camera capture
 SUBSYSTEM=="video4linux", MODE="0660", GROUP="video", TAG+="systemd"
 KERNEL=="video[0-9]*", MODE="0660", GROUP="video", TAG+="systemd"
 KERNEL=="v4l-subdev[0-9]*", MODE="0660", GROUP="video"
-
-# Media controller devices for camera pipeline configuration
 SUBSYSTEM=="media", MODE="0660", GROUP="video"
 KERNEL=="media[0-9]*", MODE="0660", GROUP="video"
-
-# Camera I2C and CCI devices
-SUBSYSTEM=="i2c", ATTR{name}=="*cci*", MODE="0660", GROUP="video"
-SUBSYSTEM=="i2c", ATTR{name}=="*s5k*", MODE="0660", GROUP="video"
-
-# Camera ISP and related devices
-KERNEL=="ispif", MODE="0660", GROUP="video"
-KERNEL=="vfe*", MODE="0660", GROUP="video"
-KERNEL=="csid*", MODE="0660", GROUP="video"
-KERNEL=="csiphy*", MODE="0660", GROUP="video"
