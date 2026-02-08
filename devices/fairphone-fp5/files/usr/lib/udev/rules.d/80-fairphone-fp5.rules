@@ -1,5 +1,7 @@
 # Fairphone 5 udev rules
-#
+
 # Accelerometer mount matrix for iio-sensor-proxy with libssc
-# (matching PostmarketOS 81-libssc-fairphone-fp5.rules)
-SUBSYSTEM=="misc", KERNEL=="fastrpc-*", ENV{ACCEL_MOUNT_MATRIX}+="-1, 0, 0; 0, -1, 0; 0, 0, -1"
+SUBSYSTEM=="misc", KERNEL=="fastrpc-*", ENV{ACCEL_MOUNT_MATRIX}="-1, 0, 0; 0, -1, 0; 0, 0, -1"
+
+# Ensure all SSC sensor types are available
+SUBSYSTEM=="misc", KERNEL=="fastrpc-*", ENV{IIO_SENSOR_PROXY_TYPE}+="ssc-accel ssc-proximity"
