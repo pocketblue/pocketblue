@@ -70,8 +70,8 @@ echo "--- bluetoothctl ---"
 timeout 3 bluetoothctl show 2>/dev/null | grep -E "Powered|PowerState|Name|Controller" || echo "  no controller"
 echo ""
 
-echo "--- btmgmt (try power on) ---"
-sudo btmgmt --index 0 power on 2>&1 || true
+echo "--- btmgmt info ---"
+btmgmt info 2>&1 || true
 echo ""
 
 echo "--- BT dmesg ---"
@@ -81,7 +81,6 @@ echo ""
 echo "--- BT service logs ---"
 journalctl -b 0 -u bluetooth.service --no-pager -n 15 2>/dev/null
 echo ""
-
 
 echo "==============================="
 echo "  SENSORS"
@@ -101,7 +100,7 @@ systemctl status hexagonrpcd-adsp-sensorspd.service --no-pager -n 5 2>/dev/null
 echo ""
 
 echo "--- udev env on fastrpc-adsp ---"
-udevadm info /dev/fastrpc-adsp 2>/dev/null | grep -E "IIO_SENSOR_PROXY_TYPE|ACCEL_MOUNT_MATRIX|SYSTEMD_WANTS" || echo "  no env vars set"
+udevadm info /dev/fastrpc-adsp 2>/dev/null | grep -E "IIO_SENSOR_PROXY_TYPE|ACCEL_MOUNT_MATRIX" || echo "  no env vars set"
 echo ""
 
 echo "--- iio-sensor-proxy binary ---"
@@ -121,9 +120,8 @@ echo "--- iio-sensor-proxy service logs ---"
 journalctl -b 0 -u iio-sensor-proxy.service --no-pager -n 20 2>/dev/null
 echo ""
 
-echo "--- iio-sensor-proxy direct run (5s) ---"
-echo "  (running outside systemd sandbox to test SSC connectivity)"
-sudo timeout 5 /usr/libexec/iio-sensor-proxy -v 2>&1 || true
+echo "--- monitor-sensor (5s) ---"
+timeout 5 monitor-sensor 2>&1 || true
 echo ""
 
 echo "==============================="

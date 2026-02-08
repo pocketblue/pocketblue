@@ -35,7 +35,6 @@ dnf -y swap --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
 cp -arfT files/usr /usr
 
 # Set executable permissions on helper scripts
-chmod +x /usr/libexec/fairphone-fp5-bluetooth-debug
 chmod +x /usr/libexec/fairphone-fp5-debug
 
 # fairphone-5-firmware (direct install)
