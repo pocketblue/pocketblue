@@ -30,14 +30,8 @@ on:
         description: 'device'
         required: true
         options:
-          - 'all'
-          - 'nothing-spacewar'
-          - 'oneplus-sdm845'
-          - 'xiaomi-beryllium'
-          - 'xiaomi-nabu'
-          - 'xiaomi-pipa'
-          - 'xunlong-orangepi3-lts'
-        default: 'all'
+          - 'fairphone-fp5'
+        default: 'fairphone-fp5'
       target_tag_override:
         type: string
         description: 'override target tag'
@@ -80,10 +74,7 @@ jobs:
           vars_registry: ${{ vars.REGISTRY }}
           device: ${{ inputs.device || '' }}
           device_list: |
-            oneplus-sdm845
-            xiaomi-beryllium
-            xiaomi-nabu
-            xiaomi-pipa
+            fairphone-fp5
 
   build:
     needs: config
@@ -94,7 +85,7 @@ jobs:
       fail-fast: false
       matrix:
         device: ${{ fromJson(needs.config.outputs.devices) }}
-        desktop: [tty, gnome-desktop, gnome-mobile, plasma-desktop, plasma-mobile, phosh]
+        desktop: [gnome-desktop]
     uses: ./.github/workflows/helper-build-container.yml
     with:
       fedora_branch: ${{ inputs.fedora_branch || 43 }}

@@ -1,0 +1,35 @@
+[copr:copr.fedorainfracloud.org:pocketblue:sc7280]
+name=Copr repo for sc7280 owned by pocketblue
+baseurl=https://download.copr.fedorainfracloud.org/results/pocketblue/sc7280/fedora-$releasever-$basearch/
+type=rpm-md
+skip_if_unavailable=True
+gpgcheck=1
+gpgkey=https://download.copr.fedorainfracloud.org/results/pocketblue/sc7280/pubkey.gpg
+repo_gpgcheck=0
+enabled=1
+enabled_metadata=1
+priority=90
+
+[copr:copr.fedorainfracloud.org:lorbus:misc]
+name=Copr repo for misc owned by lorbus
+baseurl=https://download.copr.fedorainfracloud.org/results/lorbus/misc/fedora-$releasever-$basearch/
+type=rpm-md
+skip_if_unavailable=True
+gpgcheck=1
+gpgkey=https://download.copr.fedorainfracloud.org/results/lorbus/misc/pubkey.gpg
+repo_gpgcheck=0
+enabled=0
+enabled_metadata=1
+priority=95
+
+[copr:copr.fedorainfracloud.org:pocketblue:sdm845]
+name=Copr repo for sdm845 owned by pocketblue
+baseurl=https://download.copr.fedorainfracloud.org/results/pocketblue/sdm845/fedora-$releasever-$basearch/
+type=rpm-md
+skip_if_unavailable=True
+gpgcheck=1
+gpgkey=https://download.copr.fedorainfracloud.org/results/pocketblue/sdm845/pubkey.gpg
+repo_gpgcheck=0
+enabled=0
+enabled_metadata=1
+priority=95
