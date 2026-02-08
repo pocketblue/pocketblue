@@ -9,12 +9,7 @@ echo "1. Firmware Files:"
 echo "-------------------"
 ls -la /usr/lib/firmware/qca/msbtfw11.* /usr/lib/firmware/qca/msnv11.* 2>/dev/null || echo "  No BT firmware found"
 echo ""
-echo "  Expected: msbtfw11.mbn, msbtfw11.tlv (symlink -> mbn), msnv11.bin"
-if [ -L /usr/lib/firmware/qca/msbtfw11.tlv ]; then
-    echo "  .tlv symlink: $(readlink -f /usr/lib/firmware/qca/msbtfw11.tlv)"
-else
-    echo "  WARNING: msbtfw11.tlv symlink MISSING - kernel may fail to load firmware"
-fi
+echo "  Expected: msbtfw11.tlv.xz (from linux-firmware), msnv11.bin (from FairBlobs dump)"
 
 echo ""
 echo "2. Remoteproc Status:"
