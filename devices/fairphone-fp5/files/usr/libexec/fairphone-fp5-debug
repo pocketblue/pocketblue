@@ -109,11 +109,17 @@ ldd /usr/libexec/iio-sensor-proxy 2>/dev/null | grep -iE "ssc|qrtr" || echo "  n
 echo ""
 
 echo "--- iio-sensor-proxy service config ---"
-systemctl cat iio-sensor-proxy.service 2>/dev/null | grep -E "RestrictAddress|ExecStart|BusName"
+systemctl cat iio-sensor-proxy.service 2>/dev/null | grep -E "RestrictAddress|ExecStart|BusName|PrivateNetwork|Restart"
 echo ""
 
-echo "--- iio-sensor-proxy resolved RestrictAddressFamilies ---"
-systemctl show iio-sensor-proxy.service -p RestrictAddressFamilies 2>/dev/null
+echo "--- iio-sensor-proxy resolved sandbox settings ---"
+systemctl show iio-sensor-proxy.service -p RestrictAddressFamilies -p PrivateNetwork 2>/dev/null
+echo ""
+
+echo "--- iio-sensor-proxy SELinux ---"
+echo "SELinux mode: $(getenforce 2>/dev/null || echo 'N/A')"
+semodule -l 2>/dev/null | grep -i qrtr || echo "  qrtr SELinux module not installed"
+ausearch -m avc --subject iiosensorproxy_t -ts boot 2>/dev/null | grep -c denied | xargs -I{} echo "  AVC denials this boot: {}"
 echo ""
 
 echo "--- iio-sensor-proxy service logs ---"

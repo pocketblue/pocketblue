@@ -36,6 +36,13 @@ cp -arfT files/usr /usr
 
 # Set executable permissions on helper scripts
 chmod +x /usr/libexec/fairphone-fp5-debug
+# Compile and install SELinux policy module for QRTR socket access
+# Fedora's iiosensorproxy_t domain lacks permission for qipcrtr_socket
+dnf -y install checkpolicy policycoreutils
+checkmodule -M -m -o /tmp/iio-sensor-proxy-qrtr.mod /usr/share/selinux/packages/iio-sensor-proxy-qrtr.te
+semodule_package -o /tmp/iio-sensor-proxy-qrtr.pp -m /tmp/iio-sensor-proxy-qrtr.mod
+semodule -i /tmp/iio-sensor-proxy-qrtr.pp
+rm -f /tmp/iio-sensor-proxy-qrtr.mod /tmp/iio-sensor-proxy-qrtr.pp
 
 # fairphone-5-firmware (direct install)
 FW_COMMIT="a4908f548e6f88965e78b1478af1751b6a854fc9"

@@ -1,0 +1,14 @@
+module iio-sensor-proxy-qrtr 1.0;
+
+require {
+    type iiosensorproxy_t;
+    type passwd_file_t;
+    type cache_home_t;
+    class qipcrtr_socket { create bind listen accept connect getattr setattr getopt setopt shutdown read write sendto recvfrom append lock ioctl };
+    class file { getattr open read };
+    class dir search;
+}
+
+allow iiosensorproxy_t self:qipcrtr_socket { create bind listen accept connect getattr setattr getopt setopt shutdown read write sendto recvfrom append lock ioctl };
+allow iiosensorproxy_t passwd_file_t:file { getattr open read };
+allow iiosensorproxy_t cache_home_t:dir search;
