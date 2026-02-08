@@ -136,8 +136,11 @@ echo "--- iio-sensor-proxy service logs ---"
 journalctl -b 0 -u iio-sensor-proxy.service --no-pager -n 20 2>/dev/null
 echo ""
 
-echo "--- monitor-sensor (5s) ---"
-timeout 5 monitor-sensor 2>&1 || true
+echo "--- SensorProxy D-Bus properties (read-only, does not claim sensors) ---"
+gdbus call --system --dest net.hadess.SensorProxy \
+    --object-path /net/hadess/SensorProxy \
+    --method org.freedesktop.DBus.Properties.GetAll \
+    net.hadess.SensorProxy 2>/dev/null || echo "  SensorProxy not available on D-Bus"
 echo ""
 
 echo "==============================="
@@ -146,17 +149,60 @@ echo "==============================="
 echo ""
 
 echo "--- camera modules ---"
-lsmod | grep -iE "camss|cci|s5k|imx|dw9719|camcc" || echo "  none loaded"
+lsmod | grep -iE "camss|cci|s5k|imx|dw9719|dw9719|venus|v4l2" || echo "  none loaded"
 echo ""
 
-echo "--- camera dmesg ---"
-dmesg | grep -iE "camss|cci|s5k|imx|pm8008|camcc" | head -30
+echo "--- try loading qcom-camss ---"
+if ! lsmod | grep -q qcom_camss; then
+    modprobe qcom-camss 2>&1 && echo "  loaded qcom-camss" || echo "  FAILED to load qcom-camss"
+else
+    echo "  already loaded"
+fi
+echo ""
+
+echo "--- PM8008 camera PMIC ---"
+dmesg | grep -iE "pm8008" | head -10
+echo ""
+
+echo "--- camera clock controller (camcc) ---"
+dmesg | grep -iE "camcc" | head -5
+ls /sys/kernel/debug/clk/ 2>/dev/null | grep -i cam | head -10 || true
+echo ""
+
+echo "--- CCI I2C buses ---"
+dmesg | grep -iE "qcom-cci|i2c.*cci" | head -10
+ls /sys/bus/i2c/devices/ 2>/dev/null | head -20
+echo ""
+
+echo "--- camera sensor dmesg ---"
+dmesg | grep -iE "s5kjn1|imx858|imx471|dw9719|camera|camss" | head -20
+echo ""
+
+echo "--- camera regulators ---"
+for reg in /sys/class/regulator/regulator.*/; do
+    name=$(cat "${reg}name" 2>/dev/null)
+    if echo "$name" | grep -qiE "cam|ldo|l[12345]p"; then
+        state=$(cat "${reg}state" 2>/dev/null)
+        printf "  %-40s %s\n" "$name" "$state"
+    fi
+done
 echo ""
 
 echo "--- media/video devices ---"
 ls -la /dev/video* 2>/dev/null || echo "  no video devices"
 ls -la /dev/media* 2>/dev/null || echo "  no media devices"
 ls -la /dev/v4l-subdev* 2>/dev/null || echo "  no v4l subdevices"
+echo ""
+
+echo "--- media-ctl topology ---"
+media-ctl -p 2>/dev/null | head -50 || echo "  media-ctl not available or no media devices"
+echo ""
+
+echo "--- camera DT nodes ---"
+for node in /sys/firmware/devicetree/base/soc@0/camss* \
+            /sys/firmware/devicetree/base/soc@0/*/camera-sensor@*; do
+    [ -e "$node" ] && echo "  $(echo $node | sed 's|/sys/firmware/devicetree/base/||')"
+done 2>/dev/null || echo "  no camera DT nodes found"
 echo ""
 
 echo "--- LPASS / audio CC dmesg ---"

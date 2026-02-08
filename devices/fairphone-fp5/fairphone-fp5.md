@@ -35,7 +35,7 @@ The Fairphone 5 is supported by Pocketblue with the following desktop environmen
 
 ### What May Not Work or Has Limited Support
 
-- Camera (requires Samsung S5KJN1/S5K4H7 sensor drivers not yet in mainline kernel)
+- Camera (drivers present but CAMSS pipeline and sensor autoloading may need manual intervention)
 - Some hardware-specific features
 
 ## Prerequisites
@@ -296,58 +296,52 @@ Camera support on the Fairphone 5 requires the Qualcomm CAMSS (Camera Subsystem)
 
 **Current Status:**
 - The kernel is configured with `CONFIG_VIDEO_QCOM_CAMSS=m` (CAMSS driver enabled)
-- The Fairphone 5 uses Samsung camera sensors (S5KJN1 50MP main, S5K4H7 ultrawide/front)
-- These Samsung sensor drivers may not yet be in mainline Linux
-- Device tree support for the camera pipeline may still be incomplete
+- All FP5 camera sensor and lens drivers are enabled as modules
+- Camera modules are loaded at boot via `modules-load.d/fairphone-fp5.conf`
+- Module load ordering is enforced via `modprobe.d/fairphone-fp5.conf` softdeps
 
 **Camera Hardware:**
-| Camera | Sensor | Resolution |
-|--------|--------|------------|
-| Main (rear) | Samsung S5KJN1 | 50MP |
-| Ultrawide (rear) | Samsung S5K4H7 | 8MP |
-| Front | Samsung S5K4H7 | 32MP |
+| Camera | Sensor | Driver | Resolution |
+|--------|--------|--------|------------|
+| Main (rear) | Samsung S5KJN1 | `s5kjn1` | 50MP |
+| Ultrawide (rear) | Sony IMX858 | `imx858` | 8MP |
+| Front | Sony IMX471 | `imx471` | 32MP |
+| Autofocus (rear) | Dongwoon DW9719 | `dw9719` | VCM |
 
 **To check camera hardware detection:**
 
-1. Check if any video devices are available:
+1. Verify camera modules are loaded:
+   ```bash
+   lsmod | grep -iE "camss|s5kjn1|imx858|imx471|dw9719|v4l2_cci"
+   ```
+
+2. Check if media and video devices are available:
    ```bash
    ls -la /dev/video*
    ls -la /dev/media*
+   ls -la /dev/v4l-subdev*
    ```
 
-2. Check kernel messages for camera-related drivers:
+3. Check kernel messages for camera-related drivers:
    ```bash
-   dmesg | grep -i camss
-   dmesg | grep -i camera
-   dmesg | grep -i cci
-   dmesg | grep -i s5k
+   dmesg | grep -iE "camss|s5kjn1|imx858|imx471|dw9719|cci|pm8008"
    ```
 
-3. List V4L2 devices:
-   ```bash
-   v4l2-ctl --list-devices
-   ```
-
-4. Check libcamera detection:
-   ```bash
-   cam -l
-   ```
-
-5. Inspect the media controller topology:
+4. Inspect the media controller topology:
    ```bash
    media-ctl -p
    ```
 
-**What's needed for camera support:**
-1. Samsung S5KJN1 and S5K4H7 sensor drivers in mainline kernel
-2. Device tree entries for camera nodes in the sc7280/qcm6490 DTS
-3. libcamera pipeline handler support for CAMSS
-4. Possibly camera firmware/tuning files
+5. Check libcamera detection:
+   ```bash
+   cam -l
+   ```
 
-**Resources for camera support progress:**
-- [Qualcomm CAMSS driver upstream patches](https://lore.kernel.org/linux-media/)
-- [postmarketOS Fairphone 5 camera status](https://wiki.postmarketos.org/wiki/Fairphone_5_(fairphone-fp5)#Camera)
-- [libcamera Qualcomm support](https://libcamera.org/)
+6. If no media devices appear, try manually loading CAMSS:
+   ```bash
+   sudo modprobe qcom-camss
+   dmesg | tail -20
+   ```
 
 ## Technical Details
 
