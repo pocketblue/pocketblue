@@ -180,8 +180,8 @@ If Bluetooth is not activatable, check the following:
 
 1. Verify firmware files are present:
    ```bash
-   ls -la /usr/lib/firmware/qca/
-   # Should show: msbtfw11.mbn, msbtfw11.tlv (symlink), msnv11.bin
+   ls -la /usr/lib/firmware/qca/msbtfw11.* /usr/lib/firmware/qca/msnv11.*
+   # Should show: msbtfw11.mbn, msbtfw11.tlv (symlink → msbtfw11.mbn), msnv11.bin
    ```
 
 2. Check kernel messages for firmware loading errors:

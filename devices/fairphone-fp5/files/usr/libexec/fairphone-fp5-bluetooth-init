@@ -1,41 +1,45 @@
 #!/bin/bash
 
 HCI_DEV="hci0"
+TIMEOUT=30
 
 echo "Fairphone 5 Bluetooth initialization (WCN6750)..."
 
-wait_for_hci_device() {
-    local timeout=30
-    local waited=0
+for hci in /sys/class/bluetooth/hci*; do
+    if [ -d "$hci" ]; then
+        HCI_DEV=$(basename "$hci")
+        break
+    fi
+done
 
-    while [ $waited -lt $timeout ]; do
-        if [ -d "/sys/class/bluetooth/$HCI_DEV" ]; then
-            echo "Bluetooth device $HCI_DEV appeared after ${waited}s"
-            return 0
-        fi
-        for hci in /sys/class/bluetooth/hci*; do
-            if [ -d "$hci" ]; then
-                HCI_DEV=$(basename "$hci")
-                echo "Bluetooth device $HCI_DEV appeared after ${waited}s"
-                return 0
-            fi
-        done
-        sleep 1
-        ((waited++))
-    done
-
-    echo "ERROR: No Bluetooth HCI device found after ${timeout}s"
-    return 1
-}
-
-if ! wait_for_hci_device; then
-    echo "Bluetooth HCI device not available. Check firmware and dmesg."
+if [ ! -d "/sys/class/bluetooth/$HCI_DEV" ]; then
+    echo "ERROR: No Bluetooth HCI device found"
     exit 1
 fi
+
+echo "Found $HCI_DEV"
 
 if command -v rfkill &>/dev/null; then
     rfkill unblock bluetooth 2>/dev/null || true
 fi
+
+waited=0
+while [ $waited -lt $TIMEOUT ]; do
+    if dmesg 2>/dev/null | grep -q "QCA setup on UART is completed"; then
+        echo "QCA firmware loaded after ${waited}s"
+        break
+    fi
+    sleep 1
+    ((waited++))
+done
+
+if [ $waited -ge $TIMEOUT ]; then
+    echo "WARNING: Timed out waiting for QCA firmware (${TIMEOUT}s)"
+    echo "Check dmesg for bluetooth firmware errors"
+    exit 1
+fi
+
+sleep 1
 
 echo "Bluetooth $HCI_DEV ready — handing off to bluetoothd"
 exit 0

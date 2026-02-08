@@ -46,7 +46,6 @@ curl -L "${FW_URL}" | tar xz -C /tmp
 
 mkdir -p /usr/lib/firmware/qcom/qcm6490/fairphone5 \
          /usr/lib/firmware/awinic \
-         /usr/lib/firmware/ath11k/WCN6855/hw2.1 \
          /usr/share/qcom/qcm6490/fairphone5/acdb \
          /usr/share/qcom/qcm6490/fairphone5/dsp \
          /usr/share/qcom/qcm6490/fairphone5/sensors \
@@ -112,25 +111,18 @@ fi
 
 # bluetooth firmware - install to qca/ path where kernel expects it
 # WCN6750 on FP5 requires specific firmware files
+# The QCA bluetooth driver (btqca) requests firmware with .tlv extension
+# (e.g. qca/msbtfw11.tlv) but the FairBlobs repo provides .mbn files.
+# Install the .mbn and create .tlv symlinks so both names work.
 mkdir -p /usr/lib/firmware/qca
 if [ -f "${FW_DIR}/msbtfw11.mbn" ]; then
     install -Dm644 "${FW_DIR}/msbtfw11.mbn" /usr/lib/firmware/qca/msbtfw11.mbn
-    echo "  Installed msbtfw11.mbn"
+    ln -sf msbtfw11.mbn /usr/lib/firmware/qca/msbtfw11.tlv
+    echo "  Installed msbtfw11.mbn (+ .tlv symlink)"
 fi
 if [ -f "${FW_DIR}/msnv11.bin" ]; then
     install -Dm644 "${FW_DIR}/msnv11.bin" /usr/lib/firmware/qca/msnv11.bin
     echo "  Installed msnv11.bin"
-fi
-
-# Additional WCN6750 firmware files that may be needed
-# The kernel may request different names depending on the driver version
-if [ -f "${FW_DIR}/hpbtfw11.tlv" ]; then
-    install -Dm644 "${FW_DIR}/hpbtfw11.tlv" /usr/lib/firmware/qca/hpbtfw11.tlv
-    echo "  Installed hpbtfw11.tlv"
-fi
-if [ -f "${FW_DIR}/hpnv11.bin" ]; then
-    install -Dm644 "${FW_DIR}/hpnv11.bin" /usr/lib/firmware/qca/hpnv11.bin
-    echo "  Installed hpnv11.bin"
 fi
 
 # GPU firmware (a660_sqe.fw, a660_gmu.bin)
@@ -187,8 +179,17 @@ for fw in adsp cdsp modem wpss a660_zap; do
     fi
 done
 
+if [ -f /usr/lib/firmware/qca/msbtfw11.mbn ] && [ -L /usr/lib/firmware/qca/msbtfw11.tlv ]; then
+    echo "  ✓ bluetooth: OK (msbtfw11.mbn + .tlv symlink)"
+else
+    echo "  ✗ bluetooth: MISSING or incomplete"
+    exit 1
+fi
+
 echo "Firmware installation complete."
 ls -la "${FW_DEST}/"
+echo "Bluetooth firmware:"
+ls -la /usr/lib/firmware/qca/msbtfw11.* /usr/lib/firmware/qca/msnv11.* 2>/dev/null || true
 
 rm -rf "${FW_DIR}"
 
