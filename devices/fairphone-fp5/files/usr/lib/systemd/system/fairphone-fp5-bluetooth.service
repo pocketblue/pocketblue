@@ -1,12 +1,13 @@
 [Unit]
 Description=Fairphone 5 Bluetooth Initialization (WCN6750)
-Before=bluetooth.service
 After=sys-subsystem-bluetooth-devices-hci0.device
+Before=bluetooth.service
 
 [Service]
 Type=oneshot
 RemainAfterExit=yes
 ExecStart=/usr/libexec/fairphone-fp5-bluetooth-init
+ExecStartPost=/bin/sh -c 'systemctl try-restart bluetooth.service 2>/dev/null || true'
 TimeoutStartSec=60
 
 [Install]

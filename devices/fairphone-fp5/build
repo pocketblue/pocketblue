@@ -11,7 +11,6 @@ dnf -y install \
     bluez \
     bluez-tools \
     hexagonrpc \
-    iio-sensor-proxy \
     libcamera \
     libcamera-tools \
     libssc \
@@ -25,6 +24,11 @@ dnf -y install \
     usb_modeswitch \
     v4l-utils \
     media-ctl
+
+# Install iio-sensor-proxy with Qualcomm SSC support (from COPR)
+# https://gitlab.freedesktop.org/hadess/iio-sensor-proxy/-/merge_requests/381
+dnf -y install --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
+    iio-sensor-proxy-ssc
 
 # install device-specific files (after packages to override defaults)
 # This includes our custom hexagonrpcd-adsp-sensorspd.service

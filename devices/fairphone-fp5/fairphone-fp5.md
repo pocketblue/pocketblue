@@ -27,7 +27,7 @@ The Fairphone 5 is supported by Pocketblue with the following desktop environmen
 - Touchscreen
 - GPU acceleration
 - Audio (via ALSA UCM configuration for Qualcomm SC7280)
-- Sensors (via libssc and iio-sensor-proxy)
+- Sensors (via libssc, hexagonrpcd, and iio-sensor-proxy-ssc)
 - USB
 - Modem/Telephony (via hexagonrpc, rmtfs, qrtr)
 - WiFi
@@ -204,29 +204,41 @@ If Bluetooth is not activatable, check the following:
 
 ### Orientation Sensor Not Working
 
-Sensors on the Fairphone 5 are accessed via the ADSP (Audio DSP) subsystem using libssc:
+Sensors on the Fairphone 5 are accessed via the ADSP (Audio DSP) subsystem
+using Qualcomm's SSC (Sensor See Client) protocol through libssc. This
+requires a patched version of iio-sensor-proxy with SSC support
+(`iio-sensor-proxy-ssc` package from the pocketblue sc7280 COPR).
 
-1. Check if the ADSP fastrpc device is available:
+The stock Fedora `iio-sensor-proxy` does NOT have SSC support and will
+not detect any sensors on the FP5.
+
+1. Verify the SSC-patched iio-sensor-proxy is installed:
+   ```bash
+   rpm -q iio-sensor-proxy-ssc
+   # If not installed, the stock iio-sensor-proxy won't work
+   ```
+
+2. Check if the ADSP fastrpc device is available:
    ```bash
    ls -la /dev/fastrpc-adsp
    ```
 
-2. Check hexagonrpcd service status:
+3. Check hexagonrpcd service status:
    ```bash
    sudo systemctl status hexagonrpcd-adsp-sensorspd.service
    ```
 
-3. Verify sensor firmware is present:
+4. Verify sensor firmware is present:
    ```bash
    ls -la /usr/share/qcom/qcm6490/fairphone5/sensors/
    ```
 
-4. Check iio-sensor-proxy status:
+5. Check iio-sensor-proxy status:
    ```bash
    sudo systemctl status iio-sensor-proxy.service
    ```
 
-5. Restart the sensor stack:
+6. Restart the sensor stack:
    ```bash
    sudo systemctl restart hexagonrpcd-adsp-sensorspd.service
    sudo systemctl restart fairphone-fp5-sensors.service
