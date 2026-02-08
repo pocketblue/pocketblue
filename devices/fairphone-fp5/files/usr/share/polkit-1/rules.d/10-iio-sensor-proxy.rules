@@ -1,8 +1,5 @@
 polkit.addRule(function(action, subject) {
     if (action.id == "net.hadess.SensorProxy.claim-sensor") {
-        if (subject.local && subject.active) {
-            return polkit.Result.YES;
-        }
-        return polkit.Result.NO;
+        return polkit.Result.YES;
     }
 });
