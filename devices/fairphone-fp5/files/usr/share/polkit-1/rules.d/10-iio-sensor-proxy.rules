@@ -1,0 +1,5 @@
+polkit.addRule(function(action, subject) {
+    if (action.id == "net.hadess.SensorProxy.claim-sensor") {
+        return polkit.Result.YES;
+    }
+});
