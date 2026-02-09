@@ -38,13 +38,6 @@ cp -arfT files/usr /usr
 # Set executable permissions on helper scripts
 chmod +x /usr/libexec/fairphone-fp5-debug
 
-# Create persist directory for ADSP sensor calibration data.
-# The Qualcomm ADSP firmware expects /mnt/vendor/persist/sensors/registry/
-# for storing sensor calibration. Without this, the accelerometer may not
-# return data, causing display auto-rotation to fail.
-# A tmpfiles.d config also recreates this at boot (see fairphone-fp5-sensors.conf).
-mkdir -p /mnt/vendor/persist/sensors/registry/registry
-chmod -R 0777 /mnt/vendor/persist/sensors
 # Compile and install SELinux policy module for QRTR socket access
 # Fedora's iiosensorproxy_t domain lacks permission for qipcrtr_socket
 dnf -y install checkpolicy policycoreutils
