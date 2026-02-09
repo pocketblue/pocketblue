@@ -4,6 +4,5 @@
 SUBSYSTEM=="misc", KERNEL=="fastrpc-adsp", ENV{ACCEL_MOUNT_MATRIX}="-1, 0, 0; 0, -1, 0; 0, 0, -1"
 
 # Re-enable ssc-accel and ssc-proximity for iio-sensor-proxy.
-# The upstream COPR package disabled these in the default udev rules
-# (ssc-accel: libssc#98, ssc-proximity: libssc#111) but they work on FP5.
+# ssc-accel (libssc#98) and ssc-proximity (libssc#111) are disabled by default.
 SUBSYSTEM=="misc", KERNEL=="fastrpc-adsp", ENV{IIO_SENSOR_PROXY_TYPE}+="ssc-accel ssc-proximity"

@@ -92,6 +92,10 @@ echo "--- BT dmesg ---"
 dmesg | grep -iE "bluetooth|qca.*setup|hci|btqca" | tail -20
 echo ""
 
+echo "--- BT systemd drop-ins ---"
+ls -la /usr/lib/systemd/system/bluetooth.service.d/ 2>/dev/null || echo "  none"
+echo ""
+
 echo "--- BT service logs ---"
 journalctl -b 0 -u bluetooth.service --no-pager -n 15 2>/dev/null
 echo ""
@@ -113,6 +117,11 @@ echo "--- hexagonrpcd status ---"
 systemctl status hexagonrpcd-adsp-sensorspd.service --no-pager -n 5 2>/dev/null
 echo ""
 
+echo "--- sensor persist directory ---"
+ls -la /mnt/vendor/persist/sensors/registry/ 2>/dev/null || echo "  MISSING — ADSP sensor calibration will fail"
+ls -la /mnt/vendor/persist/sensors/registry/registry/ 2>/dev/null || echo "  MISSING — ADSP temp.json writes will fail"
+echo ""
+
 echo "--- udev env on fastrpc-adsp ---"
 udevadm info /dev/fastrpc-adsp 2>/dev/null | grep -E "IIO_SENSOR_PROXY_TYPE|ACCEL_MOUNT_MATRIX" || echo "  no env vars set"
 echo ""
@@ -122,8 +131,12 @@ rpm -q iio-sensor-proxy 2>/dev/null
 ldd /usr/libexec/iio-sensor-proxy 2>/dev/null | grep -iE "ssc|qrtr" || echo "  no SSC/QRTR libs linked"
 echo ""
 
+echo "--- iio-sensor-proxy systemd drop-ins ---"
+ls -la /usr/lib/systemd/system/iio-sensor-proxy.service.d/ 2>/dev/null || echo "  none"
+echo ""
+
 echo "--- iio-sensor-proxy service config ---"
-systemctl cat iio-sensor-proxy.service 2>/dev/null | grep -E "RestrictAddress|ExecStart|BusName|PrivateNetwork|Restart"
+systemctl cat iio-sensor-proxy.service 2>/dev/null | grep -E "RestrictAddress|ExecStart|BusName|PrivateNetwork|Restart|After|Wants"
 echo ""
 
 echo "--- iio-sensor-proxy resolved sandbox settings ---"
@@ -203,10 +216,23 @@ media-ctl -p 2>/dev/null | head -50 || echo "  media-ctl not available or no med
 echo ""
 
 echo "--- camera DT nodes ---"
+cam_dt_found=false
 for node in /sys/firmware/devicetree/base/soc@0/camss* \
-            /sys/firmware/devicetree/base/soc@0/*/camera-sensor@*; do
-    [ -e "$node" ] && echo "  $(echo $node | sed 's|/sys/firmware/devicetree/base/||')"
-done 2>/dev/null || echo "  no camera DT nodes found"
+            /sys/firmware/devicetree/base/soc@0/*/camera-sensor@* \
+            /sys/firmware/devicetree/base/soc@0/*/i2c@*/camera@* \
+            /sys/firmware/devicetree/base/soc@0/*/i2c@*/lens@*; do
+    if [ -e "$node" ]; then
+        echo "  $(echo $node | sed 's|/sys/firmware/devicetree/base/||')"
+        cam_dt_found=true
+    fi
+done 2>/dev/null
+if [ "$cam_dt_found" = false ]; then
+    echo "  no camera DT nodes found"
+fi
+echo ""
+
+echo "--- deferred probe ---"
+cat /sys/kernel/debug/devices_deferred 2>/dev/null | head -20 || echo "  unavailable (debugfs not mounted or no access)"
 echo ""
 
 echo "--- LPASS / audio CC dmesg ---"

@@ -27,15 +27,15 @@ The Fairphone 5 is supported by Pocketblue with the following desktop environmen
 - Touchscreen
 - GPU acceleration
 - Audio (via ALSA UCM configuration for Qualcomm SC7280)
-- Sensors (via libssc, hexagonrpcd, and iio-sensor-proxy-ssc)
 - USB
 - Modem/Telephony (via hexagonrpc, rmtfs, qrtr)
 - WiFi
-- Bluetooth (WCN6750 with WPSS firmware dependency)
 
-### What May Not Work or Has Limited Support
+### What May Need Configuration or Has Known Issues
 
-- Camera (drivers present but CAMSS pipeline and sensor autoloading may need manual intervention)
+- Bluetooth (WCN6750 — may require service restart after boot; see Troubleshooting)
+- Display auto-rotation (via libssc, hexagonrpcd, and iio-sensor-proxy-ssc — requires ADSP persist directory)
+- Camera (drivers present but CAMSS pipeline depends on DTB support from the sc7280-mainline kernel)
 - Some hardware-specific features
 
 ## Prerequisites
@@ -211,12 +211,30 @@ If Bluetooth is not activatable, check the following:
    rfkill unblock bluetooth
    ```
 
-5. Restart the Bluetooth service:
+5. Check the systemd drop-in for bluetooth:
+   ```bash
+   systemctl cat bluetooth.service
+   # Should show the FP5 drop-in with hci0 device dependency and restart config
+   ```
+
+6. Restart the Bluetooth service:
    ```bash
    sudo systemctl restart bluetooth.service
    ```
 
-### Orientation Sensor Not Working
+7. If the controller still doesn't appear, the WCN6750 may need a full reset:
+   ```bash
+   # Check if hci0 exists in sysfs but not in btmgmt
+   ls /sys/class/bluetooth/hci0  # Should exist
+   btmgmt info                    # Should show hci0
+   # If hci0 exists in sysfs but not btmgmt, try:
+   sudo modprobe -r hci_uart btqca
+   sudo modprobe hci_uart
+   sleep 3
+   sudo systemctl restart bluetooth.service
+   ```
+
+### Orientation Sensor / Auto-Rotation Not Working
 
 Sensors on the Fairphone 5 are accessed via the ADSP (Audio DSP) subsystem
 using Qualcomm's SSC (Sensor See Client) protocol through libssc. This
@@ -248,12 +266,23 @@ not detect any sensors on the FP5.
    ls -la /usr/share/qcom/qcm6490/fairphone5/sensors/
    ```
 
-5. Check iio-sensor-proxy status:
+5. Verify the ADSP sensor calibration directory exists:
+   ```bash
+   ls -la /mnt/vendor/persist/sensors/registry/
+   # Should exist and be writable. If missing, create it:
+   sudo mkdir -p /mnt/vendor/persist/sensors/registry/registry
+   sudo chmod -R 0777 /mnt/vendor/persist/sensors
+   ```
+   The ADSP firmware writes sensor calibration data here. Without this
+   directory, sensors may detect but not return valid data.
+
+6. Check iio-sensor-proxy status and systemd dependencies:
    ```bash
    sudo systemctl status iio-sensor-proxy.service
+   systemctl cat iio-sensor-proxy.service  # Should show hexagonrpcd dependency
    ```
 
-6. Restart the sensor stack:
+7. Restart the sensor stack:
    ```bash
    sudo systemctl restart hexagonrpcd-adsp-sensorspd.service
    sudo systemctl restart iio-sensor-proxy.service
@@ -351,10 +380,23 @@ Camera support on the Fairphone 5 requires the Qualcomm CAMSS (Camera Subsystem)
 
 The following device-specific services are enabled:
 
+- `bluetooth.service` - BlueZ daemon (with FP5 drop-in for WCN6750 timing)
 - `hexagonrpcd-adsp-sensorspd.service` - ADSP sensors protection domain for sensor access via libssc
 - `tqftpserv.service` - TFTP server for firmware loading
 - `qbootctl.service` - Qualcomm A/B boot control
 - `rmtfs.service` - Remote filesystem service for modem
+
+### Device Configuration Files
+
+| File | Purpose |
+|------|--------|
+| `/usr/lib/udev/rules.d/80-fairphone-fp5.rules` | Accelerometer mount matrix and SSC sensor types |
+| `/usr/lib/modprobe.d/fairphone-fp5.conf` | Camera module softdeps for load ordering |
+| `/usr/lib/modules-load.d/fairphone-fp5.conf` | Explicit module loading (camera, BT) |
+| `/usr/lib/dracut/dracut.conf.d/50-fairphone-fp5.conf` | Initramfs firmware and driver inclusion |
+| `/usr/lib/tmpfiles.d/fairphone-fp5-sensors.conf` | ADSP sensor calibration persist directory |
+| `/usr/lib/systemd/system/bluetooth.service.d/10-fairphone-fp5.conf` | BT service timing and restart config |
+| `/usr/lib/systemd/system/iio-sensor-proxy.service.d/10-fairphone-fp5.conf` | Sensor proxy dependency ordering |
 
 ### Kernel
 
