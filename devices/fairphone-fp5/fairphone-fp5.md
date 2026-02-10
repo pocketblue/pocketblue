@@ -299,6 +299,25 @@ Restart audio services:
 sudo systemctl restart wireplumber.service pipewire.service
 ```
 
+### CCI I2C Timeout (Camera Bus)
+
+You may see errors like:
+```
+i2c-qcom-cci ac4a000.cci: master 0 queue 0 timeout
+```
+
+This is **harmless** and occurs when the CCI (Camera Control Interface)
+I2C bus tries to enumerate devices before the PM8008 camera PMIC has
+initialized the I2C pull-up voltage (`vreg_l6p`). The CCI driver
+recovers automatically by resetting and reinitializing the controller.
+
+This timeout is most commonly seen on CCI0 master 0, which connects to
+the main rear camera (IMX800) EEPROM. Since the IMX800 driver is not
+yet upstream (it uses C-PHY), its associated devices may not respond.
+
+The cameras that ARE supported (IMX858 wide, S5KJN1 front) use different
+CCI buses and are not affected by this timeout.
+
 ### GPU Firmware Errors
 
 If you see `failed to load a660_sqe.fw` errors:

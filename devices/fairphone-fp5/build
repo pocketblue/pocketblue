@@ -13,6 +13,7 @@ dnf -y install --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
     alsa-ucm-conf-qcom-sc7280 \
     hexagonrpc
 dnf -y install \
+    alsa-utils \
     bluez \
     bluez-tools \
     libcamera \
@@ -40,6 +41,9 @@ cp -arfT files/usr /usr
 
 # Set executable permissions on helper scripts
 chmod +x /usr/libexec/fairphone-fp5-debug
+
+# Create UCM symlink - ALSA card ID is "F5" but UCM config is in Fairphone/fp5
+ln -sf Fairphone/fp5 /usr/share/alsa/ucm2/F5
 
 # Compile and install SELinux policy module for QRTR socket access
 # Fedora's iiosensorproxy_t domain lacks permission for qipcrtr_socket
