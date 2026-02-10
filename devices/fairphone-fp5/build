@@ -5,12 +5,12 @@ set -uexo pipefail
 cp -arfT files/etc /etc
 
 # packages
-dnf -y remove gnome-shell-extension-background-logo
-rpm --erase gnome-shell --nodeps
-rpm --erase mutter --nodeps
-dnf -y install --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
-    mutter \
-    gnome-shell
+#dnf -y remove gnome-shell-extension-background-logo
+#rpm --erase gnome-shell --nodeps
+#rpm --erase mutter --nodeps
+#dnf -y install --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
+#    mutter \
+#    gnome-shell
 
 dnf -y remove alsa-ucm # conflicts with alsa-ucm-conf-qcom-sc7280
 dnf -y install \
