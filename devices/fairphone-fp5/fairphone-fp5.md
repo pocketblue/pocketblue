@@ -176,7 +176,25 @@ To return to the original Fairphone OS:
 
 ### Bluetooth Not Working
 
-If Bluetooth is not activatable, check the following:
+The Fairphone 5 uses the WCN6750 Bluetooth controller connected via UART (serdev).
+Bluetooth initialization requires:
+1. Proper power sequencing via GPIO 85 (BT_EN) and regulators
+2. Firmware download (msbtfw11.mbn) to the controller
+3. NVM configuration (msnv11.bin) for RF calibration
+
+**Known Issue: Double-Probe Scenario**
+
+The WCN6750 may fail on the first initialization attempt and require a second
+probe. This manifests in btmon as:
+- First hci0 appears with invalid MAC (e.g., `00:00:00:00:5A:AD`)
+- "Unconfigured Index Removed" event
+- Second hci0 appears with MAC `00:00:00:00:00:00`
+- Firmware download starts but may fail
+
+This is typically caused by timing issues between the serdev driver probe and
+the controller power-on sequence.
+
+**Troubleshooting Steps:**
 
 1. Verify firmware files are present (must be FairBlobs versions, not linux-firmware):
    ```bash
@@ -193,46 +211,61 @@ If Bluetooth is not activatable, check the following:
 2. Check firmware is in initramfs (serdev probe fires at t=2.9s before ostree pivot):
    ```bash
    lsinitrd | grep -E "msbtfw|msnv"
+   # Both msbtfw11.mbn and msnv11.bin MUST be present in initramfs
    ```
 
 3. Check kernel messages for firmware loading errors:
    ```bash
-   dmesg | grep -iE "bluetooth|qca|hci|btqca"
+   dmesg | grep -iE "bluetooth|qca|hci|btqca|wcn"
    # Look for:
-   #   "QCA Downloading qca/msbtfw11.mbn"  (or .tlv) -> good
+   #   "QCA Downloading qca/msbtfw11.mbn"  (or .tlv) -> firmware found
    #   "QCA setup on UART is completed"     -> firmware loaded OK
-   #   "Frame reassembly failed"            -> early probe failure
-   #   "unexpected event for opcode"        -> HCI setup issue
+   #   "Frame reassembly failed"            -> UART communication error
+   #   "Unknown HCI Command"                -> controller not in EDL mode
+   #   "QCA Failed to download patch"       -> firmware download failed
    ```
 
-4. Ensure rfkill is not blocking Bluetooth:
+4. Check the Bluetooth controller state:
    ```bash
+   # Is hci0 registered?
+   ls /sys/class/bluetooth/hci0
+   
+   # Is it visible to BlueZ?
+   btmgmt info
+   
+   # Check rfkill state
    rfkill list bluetooth
+   ```
+
+5. Ensure rfkill is not blocking Bluetooth:
+   ```bash
    rfkill unblock bluetooth
    ```
 
-5. Check the systemd drop-in for bluetooth:
+6. Check the systemd drop-in for bluetooth:
    ```bash
    systemctl cat bluetooth.service
-   # Should show the FP5 drop-in with hci0 device dependency and restart config
+   # Should show the FP5 drop-in with hci0 device dependency
    ```
 
-6. Restart the Bluetooth service:
+7. Try the BT recovery script:
    ```bash
-   sudo systemctl restart bluetooth.service
+   sudo /usr/libexec/fairphone-fp5-bt-setup
    ```
 
-7. If the controller still doesn't appear, the WCN6750 may need a full reset:
+8. If the controller still doesn't work, perform a full reset:
    ```bash
-   # Check if hci0 exists in sysfs but not in btmgmt
-   ls /sys/class/bluetooth/hci0  # Should exist
-   btmgmt info                    # Should show hci0
-   # If hci0 exists in sysfs but not btmgmt, try:
-   sudo modprobe -r hci_uart btqca
+   sudo modprobe -r hci_uart btqca bluetooth
+   sleep 2
+   sudo modprobe bluetooth
+   sudo modprobe btqca
    sudo modprobe hci_uart
    sleep 3
    sudo systemctl restart bluetooth.service
    ```
+
+9. For persistent issues, try a cold reboot (power off completely, wait 10 seconds).
+   Warm reboots may not fully reset the WCN6750 power state.
 
 ### Orientation Sensor / Auto-Rotation Not Working
 
