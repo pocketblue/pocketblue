@@ -63,7 +63,7 @@ mkdir -p /usr/lib/firmware/qcom/qcm6490/Fairphone/fp5 \
          /usr/share/qcom/qcm6490/Fairphone/fp5/sensors \
          /usr/share/qcom/qcm6490/Fairphone/fp5/socinfo
 
-FW_DEST="/usr/lib/firmware/qcom/qcm6490/fairphone5"
+FW_DEST="/usr/lib/firmware/qcom/qcm6490/Fairphone/fp5"
 
 # Install split firmware files (.mdt + .bXX) - do NOT use pil-squasher
 # The kernel's qcom_mdt_loader handles split format natively and it's more reliable
@@ -207,7 +207,7 @@ fi
 [ -d "${FW_DIR}/hexagonfs/sensors" ] && cp -a "${FW_DIR}/hexagonfs/sensors/"* /usr/share/qcom/qcm6490/Fairphone/fp5/sensors/ 2>/dev/null || true
 [ -d "${FW_DIR}/hexagonfs/socinfo" ] && cp -a "${FW_DIR}/hexagonfs/socinfo" /usr/share/qcom/qcm6490/Fairphone/fp5/
 
-find /usr/lib/firmware/qcom/qcm6490/fairphone5 -type f -exec chmod 0644 {} \;
+find /usr/lib/firmware/qcom/qcm6490/Fairphone/fp5 -type f -exec chmod 0644 {} \;
 find /usr/share/qcom/qcm6490/Fairphone/fp5 -type f -exec chmod 0644 {} \;
 
 # Verify critical firmware files are installed
