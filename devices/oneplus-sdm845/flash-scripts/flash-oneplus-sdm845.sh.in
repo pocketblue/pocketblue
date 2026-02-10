@@ -15,7 +15,6 @@ echo 'waiting for device appear in fastboot'
 fastboot getvar product 2>&1 | grep sdm845
 fastboot erase dtbo_a
 fastboot erase dtbo_b
-fastboot erase op2 2> /dev/null || true
 fastboot flash boot     images/uboot-$device.img --slot=all
 fastboot flash system_a images/fedora_boot.raw
 fastboot flash system_b images/fedora_esp.raw
