@@ -5,9 +5,6 @@ set -uexo pipefail
 cp -arfT files/etc /etc
 
 # packages
-dnf -y swap --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
-    mutter mutter
-
 dnf -y install \
     alsa-utils \
     bluez \
@@ -25,10 +22,14 @@ dnf -y install \
     v4l-utils \
     media-ctl
 
-dnf -y remove alsa-ucm # conflicts with alsa-ucm-conf-qcom-sc7280
 dnf -y install --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
-    alsa-ucm-conf-qcom-sc7280 \
     hexagonrpc
+
+dnf -y swap --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
+    mutter mutter
+
+dnf -y swap --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
+    alsa-ucm alsa-ucm-conf-qcom-sc7280
 
 # Re-Install iio-sensor-proxy with Qualcomm SSC support (from COPR)
 # https://gitlab.freedesktop.org/hadess/iio-sensor-proxy/-/merge_requests/381
