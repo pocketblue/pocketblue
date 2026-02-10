@@ -20,7 +20,8 @@ dnf -y install \
     tqftpserv \
     usb_modeswitch \
     v4l-utils \
-    media-ctl
+    media-ctl \
+    snapshot
 
 dnf -y install --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
     hexagonrpc
