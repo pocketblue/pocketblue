@@ -177,95 +177,62 @@ To return to the original Fairphone OS:
 ### Bluetooth Not Working
 
 The Fairphone 5 uses the WCN6750 Bluetooth controller connected via UART (serdev).
-Bluetooth initialization requires:
-1. Proper power sequencing via GPIO 85 (BT_EN) and regulators
-2. Firmware download (msbtfw11.mbn) to the controller
-3. NVM configuration (msnv11.bin) for RF calibration
 
-**Known Issue: Double-Probe Scenario**
+**Known Issue: Invalid BD Address**
 
-The WCN6750 may fail on the first initialization attempt and require a second
-probe. This manifests in btmon as:
-- First hci0 appears with invalid MAC (e.g., `00:00:00:00:5A:AD`)
-- "Unconfigured Index Removed" event
-- Second hci0 appears with MAC `00:00:00:00:00:00`
-- Firmware download starts but may fail
+The WCN6750 may report an invalid BD address (e.g., `00:00:00:00:5A:AD` or
+`00:00:00:00:00:00`) if the NVM configuration doesn't contain a valid address.
+BlueZ rejects controllers with invalid addresses, causing the "Unconfigured
+Index Removed" event in btmon.
 
-This is typically caused by timing issues between the serdev driver probe and
-the controller power-on sequence.
+The `fairphone-fp5-bt-setup` script runs before BlueZ starts and sets a stable
+BD address derived from the device serial number (similar to postmarketOS's
+bootmac).
 
 **Troubleshooting Steps:**
 
-1. Verify firmware files are present (must be FairBlobs versions, not linux-firmware):
+1. Check the current BD address:
+   ```bash
+   cat /sys/class/bluetooth/hci0/address
+   # If it shows 00:00:00:00:00:00 or similar, the address needs to be set
+   ```
+
+2. Verify firmware files are present:
    ```bash
    ls -la /usr/lib/firmware/qca/msbtfw11.* /usr/lib/firmware/qca/msnv11.*
-   # Should show:
-   #   msbtfw11.mbn      (FairBlobs BT firmware, uncompressed)
-   #   msbtfw11.tlv      (symlink -> msbtfw11.mbn)
-   #   msnv11.bin        (FP5-specific NVM config from FairBlobs)
-   #
-   # Should NOT show any .xz or .zst compressed variants (those are from
-   # linux-firmware and may be a different version, causing mismatch)
+   # Should show msbtfw11.mbn, msbtfw11.tlv (symlink), and msnv11.bin
    ```
 
-2. Check firmware is in initramfs (serdev probe fires at t=2.9s before ostree pivot):
+3. Check firmware is in initramfs:
    ```bash
    lsinitrd | grep -E "msbtfw|msnv"
-   # Both msbtfw11.mbn and msnv11.bin MUST be present in initramfs
    ```
 
-3. Check kernel messages for firmware loading errors:
+4. Check kernel messages:
    ```bash
-   dmesg | grep -iE "bluetooth|qca|hci|btqca|wcn"
-   # Look for:
-   #   "QCA Downloading qca/msbtfw11.mbn"  (or .tlv) -> firmware found
-   #   "QCA setup on UART is completed"     -> firmware loaded OK
-   #   "Frame reassembly failed"            -> UART communication error
-   #   "Unknown HCI Command"                -> controller not in EDL mode
-   #   "QCA Failed to download patch"       -> firmware download failed
+   dmesg | grep -iE "bluetooth|qca|hci|btqca"
+   # Look for "QCA setup on UART is completed" -> success
    ```
 
-4. Check the Bluetooth controller state:
+5. Check rfkill:
    ```bash
-   # Is hci0 registered?
-   ls /sys/class/bluetooth/hci0
-   
-   # Is it visible to BlueZ?
-   btmgmt info
-   
-   # Check rfkill state
    rfkill list bluetooth
-   ```
-
-5. Ensure rfkill is not blocking Bluetooth:
-   ```bash
    rfkill unblock bluetooth
    ```
 
-6. Check the systemd drop-in for bluetooth:
-   ```bash
-   systemctl cat bluetooth.service
-   # Should show the FP5 drop-in with hci0 device dependency
-   ```
-
-7. Try the BT recovery script:
+6. Manually run the BD address setup:
    ```bash
    sudo /usr/libexec/fairphone-fp5-bt-setup
+   sudo systemctl restart bluetooth.service
    ```
 
-8. If the controller still doesn't work, perform a full reset:
+7. If issues persist, reload the modules:
    ```bash
-   sudo modprobe -r hci_uart btqca bluetooth
-   sleep 2
-   sudo modprobe bluetooth
-   sudo modprobe btqca
+   sudo modprobe -r pwrseq_core hci_uart btqca
    sudo modprobe hci_uart
    sleep 3
    sudo systemctl restart bluetooth.service
    ```
-
-9. For persistent issues, try a cold reboot (power off completely, wait 10 seconds).
-   Warm reboots may not fully reset the WCN6750 power state.
 
 ### Orientation Sensor / Auto-Rotation Not Working
 
@@ -464,7 +431,7 @@ The following device-specific services are enabled:
 | `/usr/lib/modules-load.d/fairphone-fp5.conf` | Explicit module loading (camera, BT) |
 | `/usr/lib/dracut/dracut.conf.d/50-fairphone-fp5.conf` | Initramfs firmware and driver inclusion |
 | `/usr/lib/tmpfiles.d/fairphone-fp5.conf` | tmpfiles configuration (runtime dirs, ADSP sensor calibration persist directory) |
-| `/usr/libexec/fairphone-fp5-bt-setup` | WCN6750 BT HCI recovery script (reloads hci_uart if controller not registered) |
+| `/usr/libexec/fairphone-fp5-bt-setup` | WCN6750 BD address setup script (sets stable address before BlueZ starts) |
 | `/usr/lib/systemd/system/bluetooth.service.d/10-fairphone-fp5.conf` | BT service drop-in (hci0 dependency, pre-start HCI recovery) |
 | `/usr/lib/systemd/system/iio-sensor-proxy.service.d/10-fairphone-fp5.conf` | Sensor proxy dependency ordering |
 
