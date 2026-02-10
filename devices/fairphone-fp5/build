@@ -13,8 +13,9 @@ cp -arfT files/etc /etc
 #    gnome-shell
 
 dnf -y remove alsa-ucm # conflicts with alsa-ucm-conf-qcom-sc7280
+dnf -y install --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
+    alsa-ucm-conf-qcom-sc7280
 dnf -y install \
-    alsa-ucm-conf-qcom-sc7280 \
     bluez \
     bluez-tools \
     hexagonrpc \
