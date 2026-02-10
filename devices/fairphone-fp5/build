@@ -56,14 +56,14 @@ FW_DIR="/tmp/FP5-firmware-${FW_COMMIT}"
 
 curl -L "${FW_URL}" | tar xz -C /tmp
 
-mkdir -p /usr/lib/firmware/qcom/qcm6490/Fairphone/fp5 \
+mkdir -p /usr/lib/firmware/qcom/qcm6490/fairphone5 \
          /usr/lib/firmware/awinic \
          /usr/share/qcom/qcm6490/Fairphone/fp5/acdb \
          /usr/share/qcom/qcm6490/Fairphone/fp5/dsp \
          /usr/share/qcom/qcm6490/Fairphone/fp5/sensors \
          /usr/share/qcom/qcm6490/Fairphone/fp5/socinfo
 
-FW_DEST="/usr/lib/firmware/qcom/qcm6490/Fairphone/fp5"
+FW_DEST="/usr/lib/firmware/qcom/qcm6490/fairphone5"
 
 # Install split firmware files (.mdt + .bXX) - do NOT use pil-squasher
 # The kernel's qcom_mdt_loader handles split format natively and it's more reliable

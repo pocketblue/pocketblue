@@ -305,7 +305,7 @@ If you see `failed to load a660_sqe.fw` errors:
 
 1. Verify GPU firmware:
    ```bash
-   ls -la /usr/lib/firmware/qcom/qcm6490/Fairphone/fp5/a660_*
+   ls -la /usr/lib/firmware/qcom/qcm6490/fairphone5/a660_*
    ls -la /usr/lib/firmware/qcom/a660_*
    ```
 
