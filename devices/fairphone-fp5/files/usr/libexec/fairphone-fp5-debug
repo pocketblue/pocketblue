@@ -1,16 +1,42 @@
 #!/bin/bash
 
+set -uo pipefail
+
+log_run() {
+    echo "+ $*" >&2
+    "$@"
+}
+
+section() {
+    echo ""
+    echo "==============================="
+    echo "  $1"
+    echo "==============================="
+    echo ""
+}
+
+heading() {
+    echo "--- $1 ---"
+}
+
+get_session_bus_address() {
+    local uid
+    uid=$(log_run id -u "$1" 2>/dev/null) || return 1
+    local bus="/run/user/${uid}/bus"
+    [ -S "$bus" ] && echo "unix:path=$bus"
+}
+
 echo "========================================"
 echo "Fairphone 5 Debug Report — $(date -Iseconds)"
 echo "========================================"
 echo ""
 
 echo "=== Kernel ==="
-uname -r
+log_run uname -r
 echo ""
 
 echo "=== Systemd ==="
-systemctl --version | head -1
+log_run systemctl --version | head -1
 echo ""
 
 echo "=== Key services ==="
@@ -20,8 +46,8 @@ for svc in \
     iio-sensor-proxy.service \
     rmtfs.service \
     tqftpserv.service; do
-    state=$(systemctl is-active "$svc" 2>/dev/null)
-    enabled=$(systemctl is-enabled "$svc" 2>/dev/null)
+    state=$(log_run systemctl is-active "$svc" 2>/dev/null)
+    enabled=$(log_run systemctl is-enabled "$svc" 2>/dev/null)
     printf "  %-45s active=%-10s enabled=%s\n" "$svc" "$state" "$enabled"
 done
 echo ""
@@ -33,163 +59,177 @@ done
 echo ""
 
 echo "=== PD mapper ==="
-lsmod | grep qcom_pd_mapper || echo "  qcom_pd_mapper module not loaded"
+log_run lsmod | grep qcom_pd_mapper || echo "  qcom_pd_mapper module not loaded"
 echo ""
 
 echo "=== QRTR ==="
 if command -v qrtr-lookup &>/dev/null; then
-    qrtr-lookup 2>/dev/null | head -20
+    log_run qrtr-lookup 2>/dev/null | head -20
 else
     echo "  qrtr-lookup not available"
-    ls /sys/bus/qrtr/devices/ 2>/dev/null || echo "  no QRTR devices"
 fi
+
+section "BLUETOOTH"
+
+heading "BT firmware files"
+log_run ls -la /usr/lib/firmware/qca/msbtfw11.* /usr/lib/firmware/qca/msnv11.* 2>/dev/null || echo "  none"
 echo ""
 
-echo "==============================="
-echo "  BLUETOOTH"
-echo "==============================="
-echo ""
-
-echo "--- BT firmware files ---"
-ls -la /usr/lib/firmware/qca/msbtfw11.* /usr/lib/firmware/qca/msnv11.* 2>/dev/null || echo "  none"
-echo ""
-
-echo "--- BT firmware conflicts check ---"
+heading "BT firmware conflicts check"
 echo "  Compressed firmware that should NOT exist (conflicts with FairBlobs):"
 bt_conflicts=$(find /usr/lib/firmware/qca/ -maxdepth 1 \( -name 'msbtfw11.*.xz' -o -name 'msbtfw11.*.zst' -o -name 'msnv11.*.xz' -o -name 'msnv11.*.zst' \) 2>/dev/null)
 if [ -n "$bt_conflicts" ]; then
-    echo "$bt_conflicts" | while read -r f; do ls -la "$f"; done
+    echo "$bt_conflicts"
 else
     echo "  none (good)"
 fi
 echo "  .tlv symlink check:"
-ls -la /usr/lib/firmware/qca/msbtfw11.tlv 2>/dev/null || echo "  MISSING — driver tries .tlv first, should be symlink to .mbn"
+log_run ls -la /usr/lib/firmware/qca/msbtfw11.tlv 2>/dev/null || echo "  MISSING — driver tries .tlv first, should be symlink to .mbn"
 echo "  Firmware in initramfs:"
-lsinitrd 2>/dev/null | grep -E "msbtfw|msnv" || echo "  not found in initramfs (check dracut config)"
+log_run lsinitrd 2>/dev/null | grep -E "msbtfw|msnv" || echo "  not found in initramfs"
 echo ""
 
-echo "--- BT devices ---"
-ls -la /sys/class/bluetooth/ 2>/dev/null || echo "  none"
+heading "BT devices"
+log_run ls -la /sys/class/bluetooth/ 2>/dev/null || echo "  none"
 echo ""
 
-echo "--- BT modules ---"
-lsmod | grep -E "bluetooth|btqca|hci_uart|rfkill" || echo "  none loaded"
+heading "BT modules"
+log_run lsmod | grep -E "bluetooth|btqca|hci_uart|rfkill" || echo "  none loaded"
 echo ""
 
-echo "--- rfkill ---"
-rfkill list bluetooth 2>/dev/null || echo "  unavailable"
+heading "rfkill"
+log_run rfkill list bluetooth 2>/dev/null || echo "  unavailable"
 echo ""
 
-echo "--- bluetoothctl ---"
-timeout 3 bluetoothctl show 2>/dev/null | grep -E "Powered|PowerState|Name|Controller" || echo "  no controller"
+heading "bluetoothctl"
+log_run timeout 3 bluetoothctl show 2>/dev/null | grep -E "Powered|PowerState|Name|Controller" || echo "  no controller"
 echo ""
 
-echo "--- btmgmt info ---"
-btmgmt info 2>&1 || true
+heading "btmgmt info"
+log_run btmgmt info 2>&1 || true
 echo ""
 
-echo "--- BT dmesg ---"
-dmesg | grep -iE "bluetooth|qca.*setup|hci|btqca" | tail -20
+heading "BT dmesg"
+log_run dmesg | grep -iE "bluetooth|qca.*setup|hci|btqca" | tail -20
 echo ""
 
-echo "--- BT systemd drop-ins ---"
-ls -la /usr/lib/systemd/system/bluetooth.service.d/ 2>/dev/null || echo "  none"
+heading "BT systemd drop-ins"
+log_run ls -la /usr/lib/systemd/system/bluetooth.service.d/ 2>/dev/null || echo "  none"
 echo ""
 
-echo "--- BT service logs ---"
-journalctl -b 0 -u bluetooth.service --no-pager -n 15 2>/dev/null
+heading "BT service logs"
+log_run journalctl -b 0 -u bluetooth.service --no-pager -n 15 2>/dev/null
+
+section "SENSORS & AUTO-ROTATION"
+
+heading "fastrpc devices"
+log_run ls -la /dev/fastrpc-* 2>/dev/null || echo "  none"
 echo ""
 
-echo "==============================="
-echo "  SENSORS & AUTO-ROTATION"
-echo "==============================="
+heading "hexagonrpcd config"
+log_run cat /usr/share/hexagonrpcd/hexagonrpcd-adsp-sensorspd.conf 2>/dev/null || echo "  MISSING"
 echo ""
 
-echo "--- fastrpc devices ---"
-ls -la /dev/fastrpc-* 2>/dev/null || echo "  none"
+heading "hexagonrpcd status"
+log_run systemctl status hexagonrpcd-adsp-sensorspd.service --no-pager -n 5 2>/dev/null
 echo ""
 
-echo "--- hexagonrpcd config ---"
-cat /usr/share/hexagonrpcd/hexagonrpcd-adsp-sensorspd.conf 2>/dev/null || echo "  MISSING"
+heading "sensor persist directory"
+log_run ls -la /mnt/vendor/persist/sensors/registry/ 2>/dev/null || echo "  MISSING — ADSP sensor calibration will fail"
+log_run ls -la /mnt/vendor/persist/sensors/registry/registry/ 2>/dev/null || echo "  MISSING — ADSP temp.json writes will fail"
 echo ""
 
-echo "--- hexagonrpcd status ---"
-systemctl status hexagonrpcd-adsp-sensorspd.service --no-pager -n 5 2>/dev/null
+heading "udev env on fastrpc-adsp"
+log_run udevadm info /dev/fastrpc-adsp 2>/dev/null | grep -E "IIO_SENSOR_PROXY_TYPE|ACCEL_MOUNT_MATRIX" || echo "  no env vars set"
 echo ""
 
-echo "--- sensor persist directory ---"
-ls -la /mnt/vendor/persist/sensors/registry/ 2>/dev/null || echo "  MISSING — ADSP sensor calibration will fail"
-ls -la /mnt/vendor/persist/sensors/registry/registry/ 2>/dev/null || echo "  MISSING — ADSP temp.json writes will fail"
+heading "iio-sensor-proxy binary"
+log_run rpm -q iio-sensor-proxy 2>/dev/null
+log_run ldd /usr/libexec/iio-sensor-proxy 2>/dev/null | grep -iE "ssc|qrtr" || echo "  no SSC/QRTR libs linked"
 echo ""
 
-echo "--- udev env on fastrpc-adsp ---"
-udevadm info /dev/fastrpc-adsp 2>/dev/null | grep -E "IIO_SENSOR_PROXY_TYPE|ACCEL_MOUNT_MATRIX" || echo "  no env vars set"
+heading "iio-sensor-proxy systemd drop-ins"
+log_run ls -la /usr/lib/systemd/system/iio-sensor-proxy.service.d/ 2>/dev/null || echo "  none"
 echo ""
 
-echo "--- iio-sensor-proxy binary ---"
-rpm -q iio-sensor-proxy 2>/dev/null
-ldd /usr/libexec/iio-sensor-proxy 2>/dev/null | grep -iE "ssc|qrtr" || echo "  no SSC/QRTR libs linked"
+heading "iio-sensor-proxy service config"
+log_run systemctl cat iio-sensor-proxy.service 2>/dev/null | grep -E "RestrictAddress|ExecStart|BusName|PrivateNetwork|Restart|After|Wants"
 echo ""
 
-echo "--- iio-sensor-proxy systemd drop-ins ---"
-ls -la /usr/lib/systemd/system/iio-sensor-proxy.service.d/ 2>/dev/null || echo "  none"
+heading "iio-sensor-proxy resolved sandbox settings"
+log_run systemctl show iio-sensor-proxy.service -p RestrictAddressFamilies -p PrivateNetwork 2>/dev/null
 echo ""
 
-echo "--- iio-sensor-proxy service config ---"
-systemctl cat iio-sensor-proxy.service 2>/dev/null | grep -E "RestrictAddress|ExecStart|BusName|PrivateNetwork|Restart|After|Wants"
-echo ""
-
-echo "--- iio-sensor-proxy resolved sandbox settings ---"
-systemctl show iio-sensor-proxy.service -p RestrictAddressFamilies -p PrivateNetwork 2>/dev/null
-echo ""
-
-echo "--- iio-sensor-proxy SELinux ---"
+heading "iio-sensor-proxy SELinux"
 echo "SELinux mode: $(getenforce 2>/dev/null || echo 'N/A')"
-semodule -lfull 2>/dev/null | grep -i qrtr || echo "  qrtr SELinux module not installed"
-ausearch -m avc --subject iiosensorproxy_t -ts boot 2>/dev/null | grep -c denied | xargs -I{} echo "  AVC denials this boot: {}"
+log_run semodule -lfull 2>/dev/null | grep -i qrtr || echo "  qrtr SELinux module not installed"
+log_run ausearch -m avc --subject iiosensorproxy_t -ts boot 2>/dev/null | grep -c denied | xargs -I{} echo "  AVC denials this boot: {}"
 echo ""
 
-echo "--- iio-sensor-proxy service logs ---"
-journalctl -b 0 -u iio-sensor-proxy.service --no-pager -n 20 2>/dev/null
+heading "iio-sensor-proxy service logs"
+log_run journalctl -b 0 -u iio-sensor-proxy.service --no-pager -n 20 2>/dev/null
 echo ""
 
-echo "--- SensorProxy D-Bus properties ---"
-gdbus call --system --dest net.hadess.SensorProxy \
+heading "SensorProxy D-Bus properties"
+log_run gdbus call --system --dest net.hadess.SensorProxy \
     --object-path /net/hadess/SensorProxy \
     --method org.freedesktop.DBus.Properties.GetAll \
     net.hadess.SensorProxy 2>/dev/null || echo "  SensorProxy not available on D-Bus"
 echo ""
 
-echo "--- Boot timing: sensor discovery vs GNOME Shell ---"
+heading "Boot timing: sensor discovery vs GNOME Shell"
 echo "  iio-sensor-proxy:"
-journalctl -b0 -u iio-sensor-proxy.service -o short-monotonic --no-pager 2>/dev/null | head -5
+log_run journalctl -b0 -u iio-sensor-proxy.service -o short-monotonic --no-pager 2>/dev/null | head -5
 echo "  GNOME Shell:"
-journalctl -b0 -o short-monotonic --no-pager 2>/dev/null | grep "gnome-shell\[.*\]: GNOME Shell started" | head -2
-echo ""
-echo "  If iio-sensor-proxy discovers sensors AFTER GNOME Shell starts,"
-echo "  Mutter may not detect the accelerometer. A restart of"
-echo "  iio-sensor-proxy.service after login can work around this."
+log_run journalctl -b0 -o short-monotonic --no-pager 2>/dev/null | grep "gnome-shell\[.*\]: GNOME Shell started" | head -2
 echo ""
 
-echo "--- Mutter orientation manager ---"
-if [ -n "$DISPLAY" ] || [ -n "$WAYLAND_DISPLAY" ] || [ -S "/run/user/$(id -u)/bus" ]; then
-    echo "  PanelOrientationManaged: $(gdbus call --session \
+heading "Mutter orientation & touch-mode (via session bus)"
+session_user=""
+session_bus=""
+while IFS= read -r line; do
+    u=$(echo "$line" | awk '{print $3}')
+    addr=$(get_session_bus_address "$u")
+    if [ -n "$addr" ]; then
+        session_user="$u"
+        session_bus="$addr"
+        break
+    fi
+done < <(log_run loginctl list-sessions --no-legend --no-pager 2>/dev/null | grep seat0)
+
+if [ -n "$session_bus" ]; then
+    export DBUS_SESSION_BUS_ADDRESS="$session_bus"
+
+    echo "  orientation-lock gsetting:"
+    log_run gsettings get org.gnome.settings-daemon.peripherals.touchscreen orientation-lock 2>/dev/null || echo "    unavailable"
+
+    echo "  PanelOrientationManaged:"
+    log_run gdbus call --session \
         --dest org.gnome.Mutter.DisplayConfig \
         --object-path /org/gnome/Mutter/DisplayConfig \
         --method org.freedesktop.DBus.Properties.Get \
-        org.gnome.Mutter.DisplayConfig PanelOrientationManaged 2>/dev/null || echo 'unavailable')"
-    echo "  orientation-lock: $(gsettings get org.gnome.settings-daemon.peripherals.touchscreen orientation-lock 2>/dev/null || echo 'unavailable')"
-    echo "  Display transform: $(gdbus call --session \
+        org.gnome.Mutter.DisplayConfig PanelOrientationManaged 2>/dev/null || echo "    unavailable"
+
+    echo "  touch-mode (ClutterSeat):"
+    log_run gdbus call --session \
+        --dest org.gnome.Shell \
+        --object-path /org/gnome/Shell \
+        --method org.freedesktop.DBus.Properties.Get \
+        org.gnome.Shell TouchMode 2>/dev/null || echo "    unavailable"
+
+    echo "  Display transform (current state):"
+    log_run gdbus call --session \
         --dest org.gnome.Mutter.DisplayConfig \
         --object-path /org/gnome/Mutter/DisplayConfig \
         --method org.gnome.Mutter.DisplayConfig.GetCurrentState 2>&1 | \
-        grep -oP 'uint32 \d+' | head -4 | tr '\n' ' ' || echo 'unavailable')"
+        grep -oP 'uint32 \d+' | head -4 | tr '\n' ' '
+    echo ""
 else
-    echo "  (no session bus — run as logged-in user or set DBUS_SESSION_BUS_ADDRESS)"
+    echo "  (no graphical session found — run as logged-in user or set DBUS_SESSION_BUS_ADDRESS)"
 fi
 echo ""
 
-echo "--- gpio-keys input device (hall effect sensor / lid switch) ---"
+heading "gpio-keys input device (hall effect / lid switch)"
 gpio_ev=""
 for ev in /sys/class/input/event*/device/name; do
     if [ "$(cat "$ev" 2>/dev/null)" = "gpio-keys" ]; then
@@ -199,135 +239,92 @@ for ev in /sys/class/input/event*/device/name; do
         echo "  Capabilities SW: $(cat "$gpio_ev/device/capabilities/sw" 2>/dev/null)"
         echo "  Capabilities KEY: $(cat "$gpio_ev/device/capabilities/key" 2>/dev/null)"
         echo "  udev properties:"
-        udevadm info "$gpio_dev" 2>/dev/null | grep -E "ID_INPUT_SWITCH|TAGS" | sed 's/^/    /'
-        id_input_switch=$(udevadm info --query=property "$gpio_dev" 2>/dev/null | grep '^ID_INPUT_SWITCH=' | cut -d= -f2)
-        if [ -z "$id_input_switch" ] || [ "$id_input_switch" = "0" ]; then
-            echo "  SW_LID workaround: ACTIVE (ID_INPUT_SWITCH cleared by udev rule)"
-        else
-            echo "  ⚠ SW_LID workaround: NOT APPLIED — lid switch is visible to UPower/logind"
-        fi
+        log_run udevadm info "$gpio_dev" 2>/dev/null | grep -E "ID_INPUT|TAGS" | sed 's/^/    /'
         break
     fi
 done
 [ -z "$gpio_ev" ] && echo "  gpio-keys device not found"
 echo ""
 
-echo "--- UPower lid state (read by Mutter) ---"
-busctl get-property org.freedesktop.UPower /org/freedesktop/UPower \
+heading "UPower lid state"
+log_run busctl get-property org.freedesktop.UPower /org/freedesktop/UPower \
     org.freedesktop.UPower LidIsClosed 2>/dev/null | sed 's/^/  /' || echo "  UPower not available"
-busctl get-property org.freedesktop.UPower /org/freedesktop/UPower \
+log_run busctl get-property org.freedesktop.UPower /org/freedesktop/UPower \
     org.freedesktop.UPower LidIsPresent 2>/dev/null | sed 's/^/  /' || true
 echo ""
 
-echo "--- logind lid switch state ---"
-busctl get-property org.freedesktop.login1 /org/freedesktop/login1 \
+heading "logind lid switch handling"
+log_run busctl get-property org.freedesktop.login1 /org/freedesktop/login1 \
     org.freedesktop.login1.Manager LidClosed 2>/dev/null | sed 's/^/  /'
-busctl get-property org.freedesktop.login1 /org/freedesktop/login1 \
+log_run busctl get-property org.freedesktop.login1 /org/freedesktop/login1 \
     org.freedesktop.login1.Manager HandleLidSwitch 2>/dev/null | sed 's/^/  /'
 echo ""
 
-echo "--- logind.conf.d drop-ins ---"
+heading "logind.conf.d drop-ins"
 for f in /usr/lib/systemd/logind.conf.d/*.conf /etc/systemd/logind.conf.d/*.conf; do
     [ -f "$f" ] && echo "  $f:" && grep -v '^#' "$f" | grep -v '^$' | sed 's/^/    /'
 done 2>/dev/null || echo "  none"
 echo ""
 
-echo "--- logind sessions ---"
-loginctl list-sessions --no-pager 2>/dev/null | head -5
+heading "logind sessions"
+log_run loginctl list-sessions --no-pager 2>/dev/null | head -5
 echo ""
 
-echo "--- polkit rule ---"
-cat /usr/share/polkit-1/rules.d/10-iio-sensor-proxy.rules 2>/dev/null || echo "  not present"
+heading "polkit rule"
+log_run cat /usr/share/polkit-1/rules.d/10-iio-sensor-proxy.rules 2>/dev/null || echo "  not present"
 echo ""
 
-echo "--- monitor-sensor (5s live test) ---"
-timeout 5 monitor-sensor 2>&1 || echo "  monitor-sensor not available"
+heading "monitor-sensor (5s live test)"
+log_run timeout 5 monitor-sensor 2>&1 || echo "  monitor-sensor not available"
+
+section "CAMERA"
+
+heading "camera modules"
+log_run lsmod | grep -iE "camss|cci|s5k|imx|dw9719|venus|v4l2" || echo "  none loaded"
 echo ""
 
-echo "==============================="
-echo "  CAMERA"
-echo "==============================="
-echo ""
-
-echo "--- camera modules ---"
-lsmod | grep -iE "camss|cci|s5k|imx|dw9719|dw9719|venus|v4l2" || echo "  none loaded"
-echo ""
-
-echo "--- try loading qcom-camss ---"
+heading "try loading qcom-camss"
 if ! lsmod | grep -q qcom_camss; then
-    modprobe qcom-camss 2>&1 && echo "  loaded qcom-camss" || echo "  FAILED to load qcom-camss"
+    log_run modprobe qcom-camss 2>&1 && echo "  loaded qcom-camss" || echo "  FAILED to load qcom-camss"
 else
     echo "  already loaded"
 fi
 echo ""
 
-echo "--- PM8008 camera PMIC ---"
-dmesg | grep -iE "pm8008" | head -10
+heading "camera clock controller (camcc)"
+log_run dmesg | grep -iE "camcc" | head -5
+log_run ls /sys/kernel/debug/clk/ 2>/dev/null | grep -i cam | head -10 || true
 echo ""
 
-echo "--- camera clock controller (camcc) ---"
-dmesg | grep -iE "camcc" | head -5
-ls /sys/kernel/debug/clk/ 2>/dev/null | grep -i cam | head -10 || true
+heading "CCI I2C buses"
+log_run dmesg | grep -iE "qcom-cci|i2c.*cci" | head -10
+log_run ls /sys/bus/i2c/devices/ 2>/dev/null | head -20
 echo ""
 
-echo "--- CCI I2C buses ---"
-dmesg | grep -iE "qcom-cci|i2c.*cci" | head -10
-ls /sys/bus/i2c/devices/ 2>/dev/null | head -20
+heading "camera sensor dmesg"
+log_run dmesg | grep -iE "s5kjn1|imx858|imx471|dw9719|camera|camss" | head -20
 echo ""
 
-echo "--- camera sensor dmesg ---"
-dmesg | grep -iE "s5kjn1|imx858|imx471|dw9719|camera|camss" | head -20
+heading "media/video devices"
+log_run ls -la /dev/video* 2>/dev/null || echo "  no video devices"
+log_run ls -la /dev/media* 2>/dev/null || echo "  no media devices"
+log_run ls -la /dev/v4l-subdev* 2>/dev/null || echo "  no v4l subdevices"
 echo ""
 
-echo "--- camera regulators ---"
-for reg in /sys/class/regulator/regulator.*/; do
-    name=$(cat "${reg}name" 2>/dev/null)
-    if echo "$name" | grep -qiE "cam|ldo|l[12345]p"; then
-        state=$(cat "${reg}state" 2>/dev/null)
-        printf "  %-40s %s\n" "$name" "$state"
-    fi
-done
+heading "media-ctl topology"
+log_run media-ctl -p 2>/dev/null | head -50 || echo "  media-ctl not available or no media devices"
 echo ""
 
-echo "--- media/video devices ---"
-ls -la /dev/video* 2>/dev/null || echo "  no video devices"
-ls -la /dev/media* 2>/dev/null || echo "  no media devices"
-ls -la /dev/v4l-subdev* 2>/dev/null || echo "  no v4l subdevices"
+heading "deferred probe"
+log_run cat /sys/kernel/debug/devices_deferred 2>/dev/null | head -20 || echo "  unavailable"
 echo ""
 
-echo "--- media-ctl topology ---"
-media-ctl -p 2>/dev/null | head -50 || echo "  media-ctl not available or no media devices"
-echo ""
+heading "LPASS / audio CC dmesg"
+log_run dmesg | grep -iE "lpass|audio_cc" | tail -10
 
-echo "--- camera DT nodes ---"
-cam_dt_found=false
-for node in /sys/firmware/devicetree/base/soc@0/camss* \
-            /sys/firmware/devicetree/base/soc@0/*/camera-sensor@* \
-            /sys/firmware/devicetree/base/soc@0/*/i2c@*/camera@* \
-            /sys/firmware/devicetree/base/soc@0/*/i2c@*/lens@*; do
-    if [ -e "$node" ]; then
-        echo "  $(echo $node | sed 's|/sys/firmware/devicetree/base/||')"
-        cam_dt_found=true
-    fi
-done 2>/dev/null
-if [ "$cam_dt_found" = false ]; then
-    echo "  no camera DT nodes found"
-fi
-echo ""
+section "DMESG ERRORS"
 
-echo "--- deferred probe ---"
-cat /sys/kernel/debug/devices_deferred 2>/dev/null | head -20 || echo "  unavailable (debugfs not mounted or no access)"
-echo ""
-
-echo "--- LPASS / audio CC dmesg ---"
-dmesg | grep -iE "lpass|audio_cc" | tail -10
-echo ""
-
-echo "==============================="
-echo "  DMESG ERRORS"
-echo "==============================="
-echo ""
-dmesg --level=emerg,alert,crit,err
+log_run dmesg --level=emerg,alert,crit,err
 echo ""
 
 echo "======== Debug report complete ========"
