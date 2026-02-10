@@ -51,11 +51,18 @@ ln -sf Fairphone/fp5 /usr/share/alsa/ucm2/F5
 
 # Compile and install SELinux policy module for QRTR socket access
 # Fedora's iiosensorproxy_t domain lacks permission for qipcrtr_socket
-# Use priority 300 (-X 300) to ensure the module persists in bootc images
+# Use priority 400 (-X 400) to ensure the module persists in bootc images
+# Create lang_ext file to fix ostree-finalize-staged SELinux policy refresh
 dnf -y install checkpolicy policycoreutils
 checkmodule -M -m -o /tmp/iio-sensor-proxy-qrtr.mod /usr/share/selinux/packages/iio-sensor-proxy-qrtr.te
 semodule_package -o /tmp/iio-sensor-proxy-qrtr.pp -m /tmp/iio-sensor-proxy-qrtr.mod
-semodule -X 300 -i /tmp/iio-sensor-proxy-qrtr.pp
+semodule -X 400 -i /tmp/iio-sensor-proxy-qrtr.pp
+
+# Create the lang_ext file that semanage expects during ostree finalization
+# This file indicates the module's source language (pp = policy package)
+mkdir -p /var/lib/selinux/targeted/active/modules/400/iio-sensor-proxy-qrtr
+echo 'pp' > /var/lib/selinux/targeted/active/modules/400/iio-sensor-proxy-qrtr/lang_ext
+
 rm -f /tmp/iio-sensor-proxy-qrtr.mod /tmp/iio-sensor-proxy-qrtr.pp
 
 # fairphone-5-firmware (direct install)
