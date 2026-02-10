@@ -263,7 +263,7 @@ not detect any sensors on the FP5.
 
 4. Verify sensor firmware is present:
    ```bash
-   ls -la /usr/share/qcom/qcm6490/fairphone5/sensors/
+   ls -la /usr/share/qcom/qcm6490/Fairphone/fp5/sensors/
    ```
 
 5. Verify the ADSP sensor calibration directory exists:

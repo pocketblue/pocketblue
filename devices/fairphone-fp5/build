@@ -14,16 +14,15 @@ cp -arfT files/etc /etc
 
 dnf -y remove alsa-ucm # conflicts with alsa-ucm-conf-qcom-sc7280
 dnf -y install --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
-    alsa-ucm-conf-qcom-sc7280
+    alsa-ucm-conf-qcom-sc7280 \
+    hexagonrpc
 dnf -y install \
     bluez \
     bluez-tools \
-    hexagonrpc \
     libcamera \
     libcamera-tools \
     libssc \
     libiio-utils \
-    mobility-tweaks \
     qbootctl \
     qcom-firmware \
     qrtr \
@@ -40,7 +39,7 @@ dnf -y swap --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
 
 # install device-specific files (after packages to override defaults)
 # This includes udev rules, systemd drop-ins, dracut config, modprobe/modules-load
-# config, SELinux policy source, hexagonrpcd config, and the debug script.
+# config, SELinux policy source and the debug script.
 cp -arfT files/usr /usr
 
 # Set executable permissions on helper scripts
@@ -61,12 +60,12 @@ FW_DIR="/tmp/FP5-firmware-${FW_COMMIT}"
 
 curl -L "${FW_URL}" | tar xz -C /tmp
 
-mkdir -p /usr/lib/firmware/qcom/qcm6490/fairphone5 \
+mkdir -p /usr/lib/firmware/qcom/qcm6490/Fairphone/fp5 \
          /usr/lib/firmware/awinic \
-         /usr/share/qcom/qcm6490/fairphone5/acdb \
-         /usr/share/qcom/qcm6490/fairphone5/dsp \
-         /usr/share/qcom/qcm6490/fairphone5/sensors \
-         /usr/share/qcom/qcm6490/fairphone5/socinfo
+         /usr/share/qcom/qcm6490/Fairphone/fp5/acdb \
+         /usr/share/qcom/qcm6490/Fairphone/fp5/dsp \
+         /usr/share/qcom/qcm6490/Fairphone/fp5/sensors \
+         /usr/share/qcom/qcm6490/Fairphone/fp5/socinfo
 
 FW_DEST="/usr/lib/firmware/qcom/qcm6490/fairphone5"
 
@@ -207,13 +206,13 @@ else
 fi
 
 # hexagon filesystem
-[ -d "${FW_DIR}/hexagonfs/acdb" ] && cp -a "${FW_DIR}/hexagonfs/acdb/"* /usr/share/qcom/qcm6490/fairphone5/acdb/ 2>/dev/null || true
-[ -d "${FW_DIR}/hexagonfs/dsp" ] && cp -a "${FW_DIR}/hexagonfs/dsp/"* /usr/share/qcom/qcm6490/fairphone5/dsp/ 2>/dev/null || true
-[ -d "${FW_DIR}/hexagonfs/sensors" ] && cp -a "${FW_DIR}/hexagonfs/sensors/"* /usr/share/qcom/qcm6490/fairphone5/sensors/ 2>/dev/null || true
-[ -d "${FW_DIR}/hexagonfs/socinfo" ] && cp -a "${FW_DIR}/hexagonfs/socinfo" /usr/share/qcom/qcm6490/fairphone5/
+[ -d "${FW_DIR}/hexagonfs/acdb" ] && cp -a "${FW_DIR}/hexagonfs/acdb/"* /usr/share/qcom/qcm6490/Fairphone/fp5/acdb/ 2>/dev/null || true
+[ -d "${FW_DIR}/hexagonfs/dsp" ] && cp -a "${FW_DIR}/hexagonfs/dsp/"* /usr/share/qcom/qcm6490/Fairphone/fp5/dsp/ 2>/dev/null || true
+[ -d "${FW_DIR}/hexagonfs/sensors" ] && cp -a "${FW_DIR}/hexagonfs/sensors/"* /usr/share/qcom/qcm6490/Fairphone/fp5/sensors/ 2>/dev/null || true
+[ -d "${FW_DIR}/hexagonfs/socinfo" ] && cp -a "${FW_DIR}/hexagonfs/socinfo" /usr/share/qcom/qcm6490/Fairphone/fp5/
 
 find /usr/lib/firmware/qcom/qcm6490/fairphone5 -type f -exec chmod 0644 {} \;
-find /usr/share/qcom/qcm6490/fairphone5 -type f -exec chmod 0644 {} \;
+find /usr/share/qcom/qcm6490/Fairphone/fp5 -type f -exec chmod 0644 {} \;
 
 # Verify critical firmware files are installed
 echo "Verifying firmware installation..."
@@ -267,18 +266,11 @@ dnf -y remove \
 dnf -y install --refresh --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
     kernel
 
-# services
-# Mask generic/unused hexagonrpcd services
-# Note: hexagonrpcd-adsp-sensorspd is enabled (needed for sensors via libssc)
-# The others require fastrpc devices that may not be available on this SoC
-systemctl mask \
-    hexagonrpcd-adsp.service \
-    hexagonrpcd-adsp-rootpd.service \
-    hexagonrpcd-sdsp.service
-
 systemctl enable \
-    bluetooth.service \
     hexagonrpcd-adsp-sensorspd.service \
+    hexagonrpcd-adsp-rootpd.service \
+    hexagonrpcd-sdsp.service \
+    bluetooth.service \
     tqftpserv.service \
     qbootctl.service \
     rmtfs.service
