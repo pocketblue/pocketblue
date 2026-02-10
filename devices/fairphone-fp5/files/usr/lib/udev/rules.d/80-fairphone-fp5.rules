@@ -4,13 +4,6 @@
 SUBSYSTEM=="misc", KERNEL=="fastrpc-adsp", ENV{ACCEL_MOUNT_MATRIX}="-1, 0, 0; 0, -1, 0; 0, 0, -1"
 
 # Re-enable ssc-accel and ssc-proximity for iio-sensor-proxy.
-# ssc-accel (libssc#98) and ssc-proximity (libssc#111) are disabled by default.
+# ssc-accel and ssc-proximity are disabled by default.
 SUBSYSTEM=="misc", KERNEL=="fastrpc-adsp", ENV{IIO_SENSOR_PROXY_TYPE}+="ssc-accel ssc-proximity"
 
-# Hall effect sensor is for proximity detection (?), not a laptop lid.
-# Without this override, Mutter treats the device as a clamshell laptop
-# and disables auto-rotation.
-ACTION=="remove", GOTO="fairphone_fp5_end"
-SUBSYSTEM=="input", ATTRS{name}=="gpio-keys", TAG-="power-switch", ENV{ID_INPUT_SWITCH}=""
-
-LABEL="fairphone_fp5_end"

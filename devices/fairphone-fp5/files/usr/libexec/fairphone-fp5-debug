@@ -101,7 +101,7 @@ journalctl -b 0 -u bluetooth.service --no-pager -n 15 2>/dev/null
 echo ""
 
 echo "==============================="
-echo "  SENSORS"
+echo "  SENSORS & AUTO-ROTATION"
 echo "==============================="
 echo ""
 
@@ -153,11 +153,81 @@ echo "--- iio-sensor-proxy service logs ---"
 journalctl -b 0 -u iio-sensor-proxy.service --no-pager -n 20 2>/dev/null
 echo ""
 
-echo "--- SensorProxy D-Bus properties (read-only, does not claim sensors) ---"
+echo "--- SensorProxy D-Bus properties ---"
 gdbus call --system --dest net.hadess.SensorProxy \
     --object-path /net/hadess/SensorProxy \
     --method org.freedesktop.DBus.Properties.GetAll \
     net.hadess.SensorProxy 2>/dev/null || echo "  SensorProxy not available on D-Bus"
+echo ""
+
+echo "--- Boot timing: sensor discovery vs GNOME Shell ---"
+echo "  iio-sensor-proxy:"
+journalctl -b0 -u iio-sensor-proxy.service -o short-monotonic --no-pager 2>/dev/null | head -5
+echo "  GNOME Shell:"
+journalctl -b0 -o short-monotonic --no-pager 2>/dev/null | grep "gnome-shell\[.*\]: GNOME Shell started" | head -2
+echo ""
+echo "  If iio-sensor-proxy discovers sensors AFTER GNOME Shell starts,"
+echo "  Mutter may not detect the accelerometer. A restart of"
+echo "  iio-sensor-proxy.service after login can work around this."
+echo ""
+
+echo "--- Mutter orientation manager ---"
+if [ -n "$DISPLAY" ] || [ -n "$WAYLAND_DISPLAY" ] || [ -S "/run/user/$(id -u)/bus" ]; then
+    echo "  PanelOrientationManaged: $(gdbus call --session \
+        --dest org.gnome.Mutter.DisplayConfig \
+        --object-path /org/gnome/Mutter/DisplayConfig \
+        --method org.freedesktop.DBus.Properties.Get \
+        org.gnome.Mutter.DisplayConfig PanelOrientationManaged 2>/dev/null || echo 'unavailable')"
+    echo "  orientation-lock: $(gsettings get org.gnome.settings-daemon.peripherals.touchscreen orientation-lock 2>/dev/null || echo 'unavailable')"
+    echo "  Display transform: $(gdbus call --session \
+        --dest org.gnome.Mutter.DisplayConfig \
+        --object-path /org/gnome/Mutter/DisplayConfig \
+        --method org.gnome.Mutter.DisplayConfig.GetCurrentState 2>&1 | \
+        grep -oP 'uint32 \d+' | head -4 | tr '\n' ' ' || echo 'unavailable')"
+else
+    echo "  (no session bus — run as logged-in user or set DBUS_SESSION_BUS_ADDRESS)"
+fi
+echo ""
+
+echo "--- gpio-keys input device (hall effect sensor / lid switch) ---"
+gpio_ev=""
+for ev in /sys/class/input/event*/device/name; do
+    if [ "$(cat "$ev" 2>/dev/null)" = "gpio-keys" ]; then
+        gpio_ev="$(dirname "$(dirname "$ev")")"
+        gpio_dev="/dev/input/$(basename "$(dirname "$ev")")"
+        echo "  Device: $gpio_dev"
+        echo "  Capabilities SW: $(cat "$gpio_ev/device/capabilities/sw" 2>/dev/null)"
+        echo "  Capabilities KEY: $(cat "$gpio_ev/device/capabilities/key" 2>/dev/null)"
+        udevadm info "$gpio_dev" 2>/dev/null | grep -E "ID_INPUT_SWITCH|TAGS" | sed 's/^/  /'
+        break
+    fi
+done
+[ -z "$gpio_ev" ] && echo "  gpio-keys device not found"
+echo ""
+echo "  The gpio-keys device includes a hall effect sensor (for flip cover"
+echo "  detection) mapped as SW_LID. This makes Mutter classify the device"
+echo "  as a clamshell laptop. On a clamshell, Mutter only enables auto-rotation"
+echo "  when a tablet-mode switch (SW_TABLET_MODE) is active. Since this device"
+echo "  has no tablet-mode switch, auto-rotation may be permanently blocked."
+echo ""
+
+echo "--- logind lid switch state ---"
+busctl get-property org.freedesktop.login1 /org/freedesktop/login1 \
+    org.freedesktop.login1.Manager LidClosed 2>/dev/null | sed 's/^/  /'
+busctl get-property org.freedesktop.login1 /org/freedesktop/login1 \
+    org.freedesktop.login1.Manager HandleLidSwitch 2>/dev/null | sed 's/^/  /'
+echo ""
+
+echo "--- logind sessions ---"
+loginctl list-sessions --no-pager 2>/dev/null | head -5
+echo ""
+
+echo "--- polkit rule ---"
+cat /usr/share/polkit-1/rules.d/10-iio-sensor-proxy.rules 2>/dev/null || echo "  not present"
+echo ""
+
+echo "--- monitor-sensor (5s live test) ---"
+timeout 5 monitor-sensor 2>&1 || echo "  monitor-sensor not available"
 echo ""
 
 echo "==============================="
