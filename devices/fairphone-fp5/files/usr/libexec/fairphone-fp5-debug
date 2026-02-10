@@ -126,12 +126,12 @@ heading "fastrpc devices"
 log_run ls -la /dev/fastrpc-* 2>/dev/null || echo "  none"
 echo ""
 
-heading "hexagonrpcd config"
-log_run cat /usr/share/hexagonrpcd/hexagonrpcd-adsp-sensorspd.conf 2>/dev/null || echo "  MISSING"
+heading "hexagonrpcd-adsp-sensorspd status"
+log_run systemctl status hexagonrpcd-adsp-sensorspd.service --no-pager -n 5 2>/dev/null
 echo ""
 
-heading "hexagonrpcd status"
-log_run systemctl status hexagonrpcd-adsp-sensorspd.service --no-pager -n 5 2>/dev/null
+heading "hexagonrpcd-adsp-rootpd status"
+log_run systemctl status hexagonrpcd-adsp-rootpd.service --no-pager -n 5 2>/dev/null
 echo ""
 
 heading "sensor persist directory"
@@ -317,6 +317,18 @@ echo ""
 
 heading "deferred probe"
 log_run cat /sys/kernel/debug/devices_deferred 2>/dev/null | head -20 || echo "  unavailable"
+echo ""
+
+heading "LPASS / audio CC status"
+echo "  LPASS device bound:"
+if [ -L /sys/bus/platform/devices/3300000.clock-controller/driver ]; then
+    log_run readlink /sys/bus/platform/devices/3300000.clock-controller/driver
+else
+    echo "    NOT BOUND"
+    echo "  Deferred probe check:"
+    grep -q "3300000.clock-controller" /sys/kernel/debug/devices_deferred 2>/dev/null && \
+        echo "    in deferred list" || echo "    not in deferred list"
+fi
 echo ""
 
 heading "LPASS / audio CC dmesg"
