@@ -43,6 +43,7 @@ echo "=== Key services ==="
 for svc in \
     bluetooth.service \
     hexagonrpcd-adsp-sensorspd.service \
+    hexagonrpcd-adsp-rootpd.service \
     iio-sensor-proxy.service \
     rmtfs.service \
     tqftpserv.service; do
