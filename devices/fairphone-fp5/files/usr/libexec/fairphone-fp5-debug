@@ -198,17 +198,25 @@ for ev in /sys/class/input/event*/device/name; do
         echo "  Device: $gpio_dev"
         echo "  Capabilities SW: $(cat "$gpio_ev/device/capabilities/sw" 2>/dev/null)"
         echo "  Capabilities KEY: $(cat "$gpio_ev/device/capabilities/key" 2>/dev/null)"
-        udevadm info "$gpio_dev" 2>/dev/null | grep -E "ID_INPUT_SWITCH|TAGS" | sed 's/^/  /'
+        echo "  udev properties:"
+        udevadm info "$gpio_dev" 2>/dev/null | grep -E "ID_INPUT_SWITCH|TAGS" | sed 's/^/    /'
+        id_input_switch=$(udevadm info --query=property "$gpio_dev" 2>/dev/null | grep '^ID_INPUT_SWITCH=' | cut -d= -f2)
+        if [ -z "$id_input_switch" ] || [ "$id_input_switch" = "0" ]; then
+            echo "  SW_LID workaround: ACTIVE (ID_INPUT_SWITCH cleared by udev rule)"
+        else
+            echo "  ⚠ SW_LID workaround: NOT APPLIED — lid switch is visible to UPower/logind"
+        fi
         break
     fi
 done
 [ -z "$gpio_ev" ] && echo "  gpio-keys device not found"
 echo ""
-echo "  The gpio-keys device includes a hall effect sensor (for flip cover"
-echo "  detection) mapped as SW_LID. This makes Mutter classify the device"
-echo "  as a clamshell laptop. On a clamshell, Mutter only enables auto-rotation"
-echo "  when a tablet-mode switch (SW_TABLET_MODE) is active. Since this device"
-echo "  has no tablet-mode switch, auto-rotation may be permanently blocked."
+
+echo "--- UPower lid state (read by Mutter) ---"
+busctl get-property org.freedesktop.UPower /org/freedesktop/UPower \
+    org.freedesktop.UPower LidIsClosed 2>/dev/null | sed 's/^/  /' || echo "  UPower not available"
+busctl get-property org.freedesktop.UPower /org/freedesktop/UPower \
+    org.freedesktop.UPower LidIsPresent 2>/dev/null | sed 's/^/  /' || true
 echo ""
 
 echo "--- logind lid switch state ---"
@@ -216,6 +224,12 @@ busctl get-property org.freedesktop.login1 /org/freedesktop/login1 \
     org.freedesktop.login1.Manager LidClosed 2>/dev/null | sed 's/^/  /'
 busctl get-property org.freedesktop.login1 /org/freedesktop/login1 \
     org.freedesktop.login1.Manager HandleLidSwitch 2>/dev/null | sed 's/^/  /'
+echo ""
+
+echo "--- logind.conf.d drop-ins ---"
+for f in /usr/lib/systemd/logind.conf.d/*.conf /etc/systemd/logind.conf.d/*.conf; do
+    [ -f "$f" ] && echo "  $f:" && grep -v '^#' "$f" | grep -v '^$' | sed 's/^/    /'
+done 2>/dev/null || echo "  none"
 echo ""
 
 echo "--- logind sessions ---"
