@@ -394,8 +394,9 @@ The following device-specific services are enabled:
 | `/usr/lib/modprobe.d/fairphone-fp5.conf` | Camera module softdeps for load ordering |
 | `/usr/lib/modules-load.d/fairphone-fp5.conf` | Explicit module loading (camera, BT) |
 | `/usr/lib/dracut/dracut.conf.d/50-fairphone-fp5.conf` | Initramfs firmware and driver inclusion |
-| `/usr/lib/tmpfiles.d/fairphone-fp5-sensors.conf` | ADSP sensor calibration persist directory |
-| `/usr/lib/systemd/system/bluetooth.service.d/10-fairphone-fp5.conf` | BT service timing and restart config |
+| `/usr/lib/tmpfiles.d/fairphone-fp5.conf` | tmpfiles configuration (runtime dirs, ADSP sensor calibration persist directory) |
+| `/usr/libexec/fairphone-fp5-bt-setup` | WCN6750 BT HCI recovery script (reloads hci_uart if controller not registered) |
+| `/usr/lib/systemd/system/bluetooth.service.d/10-fairphone-fp5.conf` | BT service drop-in (hci0 dependency, pre-start HCI recovery) |
 | `/usr/lib/systemd/system/iio-sensor-proxy.service.d/10-fairphone-fp5.conf` | Sensor proxy dependency ordering |
 
 ### Kernel

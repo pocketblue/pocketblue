@@ -1,10 +1,12 @@
 [Unit]
 Description=Hexagon ADSP Sensors Protection Domain Daemon
-After=tqftpserv.service
 After=dev-fastrpc\x2dadsp.device
 After=sys-devices-platform-soc\x400-3700000.remoteproc.device
-Requires=tqftpserv.service
+After=tqftpserv.service
+After=systemd-tmpfiles-setup.service
 Wants=dev-fastrpc\x2dadsp.device
+Wants=systemd-tmpfiles-setup.service
+Requires=tqftpserv.service
 ConditionPathExists=/dev/fastrpc-adsp
 StartLimitIntervalSec=300
 StartLimitBurst=5
