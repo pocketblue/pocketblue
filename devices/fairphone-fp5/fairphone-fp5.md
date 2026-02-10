@@ -35,7 +35,7 @@ The Fairphone 5 is supported by Pocketblue with the following desktop environmen
 
 - Bluetooth (WCN6750 — may require service restart after boot; see Troubleshooting)
 - Display auto-rotation (via libssc, hexagonrpcd, and iio-sensor-proxy-ssc — requires ADSP persist directory)
-- Camera (drivers present but CAMSS pipeline depends on DTB support from the sc7280-mainline kernel)
+- Camera (see [Camera Status](#camera-status) section below for details on why cameras do not currently work and what needs to change)
 - Some hardware-specific features
 
 ## Prerequisites
@@ -313,27 +313,32 @@ If you see `failed to load a660_sqe.fw` errors:
 
 ### Camera Not Working
 
-Camera support on the Fairphone 5 requires the Qualcomm CAMSS (Camera Subsystem) driver and sensor-specific drivers.
+Camera support on the Fairphone 5 requires the Qualcomm CAMSS (Camera Subsystem) driver, sensor-specific drivers, and libcamera with appropriate tuning files.
 
-**Current Status:**
-- The kernel is configured with `CONFIG_VIDEO_QCOM_CAMSS=m` (CAMSS driver enabled)
-- All FP5 camera sensor and lens drivers are enabled as modules
-- Camera modules are loaded at boot via `modules-load.d/fairphone-fp5.conf`
-- Module load ordering is enforced via `modprobe.d/fairphone-fp5.conf` softdeps
 
 **Camera Hardware:**
-| Camera | Sensor | Driver | Resolution |
-|--------|--------|--------|------------|
-| Main (rear) | Samsung S5KJN1 | `s5kjn1` | 50MP |
-| Ultrawide (rear) | Sony IMX858 | `imx858` | 8MP |
-| Front | Sony IMX471 | `imx471` | 32MP |
-| Autofocus (rear) | Dongwoon DW9719 | `dw9719` | VCM |
 
-**To check camera hardware detection:**
+All three cameras must be physically installed in the device for any of them
+to work (they share power rails via the PM8008 camera PMIC).
+
+| Purpose | Sensor | PHY | Driver | Status |
+|---------|--------|-----|--------|--------|
+| Front (selfie) | Samsung S5KJN1SQ03 | D-PHY | `s5kjn1` | Working on pmOS |
+| Rear (wide) | Sony IMX858 | D-PHY | `imx858` | Working on pmOS |
+| Rear (main) | Sony IMX800 | C-PHY | — | No upstream driver |
+| Wide autofocus | Dongwoon DW9800K | — | `dw9719` | Working on pmOS |
+
+The device tree (`qcm6490-fairphone-fp5.dts`) defines the selfie camera on
+CCI1/CSIPHY3 and the wide camera on CCI0/CSIPHY1. The main rear camera
+(IMX800) is commented out in the DTS — it uses C-PHY (not D-PHY) and has
+no upstream Linux driver or CAMSS C-PHY support yet. Its actuators
+(AK7377, DW9784 OIS) also lack upstream drivers.
+
+#### Debugging Camera Issues
 
 1. Verify camera modules are loaded:
    ```bash
-   lsmod | grep -iE "camss|s5kjn1|imx858|imx471|dw9719|v4l2_cci"
+   lsmod | grep -iE "camss|s5kjn1|imx858|dw9719|v4l2_cci"
    ```
 
 2. Check if media and video devices are available:
@@ -345,20 +350,32 @@ Camera support on the Fairphone 5 requires the Qualcomm CAMSS (Camera Subsystem)
 
 3. Check kernel messages for camera-related drivers:
    ```bash
-   dmesg | grep -iE "camss|s5kjn1|imx858|imx471|dw9719|cci|pm8008"
+   dmesg | grep -iE "camss|s5kjn1|imx858|dw9719|cci|pm8008"
    ```
 
-4. Inspect the media controller topology:
+4. Check for deferred probes (common with PMIC/regulator dependencies):
+   ```bash
+   cat /sys/kernel/debug/devices_deferred
+   ```
+
+5. Inspect the media controller topology:
    ```bash
    media-ctl -p
    ```
 
-5. Check libcamera detection:
+6. Check libcamera detection and available pipelines:
    ```bash
    cam -l
+   LIBCAMERA_LOG_LEVELS=*:DEBUG cam -l 2>&1 | head -50
    ```
 
-6. If no media devices appear, try manually loading CAMSS:
+7. Check if libcamera tuning files are present:
+   ```bash
+   ls -la /usr/share/libcamera/ipa/simple/imx858.yaml
+   ls -la /usr/share/libcamera/ipa/simple/s5kjn1.yaml
+   ```
+
+8. If no media devices appear, try manually loading CAMSS:
    ```bash
    sudo modprobe qcom-camss
    dmesg | tail -20

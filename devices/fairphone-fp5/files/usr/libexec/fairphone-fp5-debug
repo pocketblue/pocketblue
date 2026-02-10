@@ -280,7 +280,7 @@ log_run timeout 5 monitor-sensor 2>&1 || echo "  monitor-sensor not available"
 section "CAMERA"
 
 heading "camera modules"
-log_run lsmod | grep -iE "camss|cci|s5k|imx|dw9719|venus|v4l2" || echo "  none loaded"
+log_run lsmod | grep -iE "camss|cci|s5kjn1|imx858|dw9719|venus|v4l2" || echo "  none loaded"
 echo ""
 
 heading "try loading qcom-camss"
@@ -302,7 +302,7 @@ log_run ls /sys/bus/i2c/devices/ 2>/dev/null | head -20
 echo ""
 
 heading "camera sensor dmesg"
-log_run dmesg | grep -iE "s5kjn1|imx858|imx471|dw9719|camera|camss" | head -20
+log_run dmesg | grep -iE "s5kjn1|imx858|dw9719|dw9800|camera|camss" | head -20
 echo ""
 
 heading "media/video devices"
