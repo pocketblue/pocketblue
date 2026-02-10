@@ -5,6 +5,13 @@ set -uexo pipefail
 cp -arfT files/etc /etc
 
 # packages
+dnf -y remove gnome-shell-extension-background-logo
+rpm --erase gnome-shell --nodeps
+rpm --erase mutter --nodeps
+dnf -y install --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
+    mutter \
+    gnome-shell
+
 dnf -y remove alsa-ucm # conflicts with alsa-ucm-conf-qcom-sc7280
 dnf -y install \
     alsa-ucm-conf-qcom-sc7280 \
@@ -29,9 +36,6 @@ dnf -y install \
 # https://gitlab.freedesktop.org/hadess/iio-sensor-proxy/-/merge_requests/381
 dnf -y swap --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
     iio-sensor-proxy iio-sensor-proxy
-
-dnf -y swap --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
-    mutter mutter
 
 # install device-specific files (after packages to override defaults)
 # This includes udev rules, systemd drop-ins, dracut config, modprobe/modules-load
