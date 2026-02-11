@@ -5,7 +5,7 @@
 # The WCN6750 may report an invalid BD address (00:00:00:00:00:00 or similar)
 # if the NVM configuration doesn't contain a valid address. This script generates
 # a stable BD address derived from the device's serial number and attempts to
-# set it via btmgmt.
+# set it via bluetoothctl's mgmt interface.
 #
 # Called from udev when hci0 appears, runs asynchronously so it won't block boot.
 #
@@ -72,12 +72,12 @@ else
 fi
 
 # Try to set the BD address with a timeout
-if command -v btmgmt >/dev/null 2>&1; then
+if command -v bluetoothctl >/dev/null 2>&1; then
     log "Setting BD address to $new_addr"
-    if timeout 5s btmgmt --index 0 public-addr "$new_addr" 2>&1; then
+    if timeout 5s bluetoothctl mgmt.public-addr 0 "$new_addr" 2>&1; then
         log "BD address set successfully"
     else
-        log "btmgmt failed or timed out"
+        log "bluetoothctl mgmt.public-addr failed or timed out"
     fi
 fi
 

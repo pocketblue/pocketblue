@@ -106,8 +106,8 @@ heading "bluetoothctl"
 log_run timeout 3 bluetoothctl show 2>/dev/null | grep -E "Powered|PowerState|Name|Controller" || echo "  no controller"
 echo ""
 
-heading "btmgmt info"
-log_run btmgmt info 2>&1 || true
+heading "bluetoothctl mgmt.info"
+log_run bluetoothctl mgmt.info 0 2>&1 || true
 echo ""
 
 heading "BT dmesg"

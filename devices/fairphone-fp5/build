@@ -8,7 +8,6 @@ cp -arfT files/etc /etc
 dnf -y install \
     alsa-utils \
     bluez \
-    bluez-tools \
     libcamera \
     libcamera-tools \
     libssc \
