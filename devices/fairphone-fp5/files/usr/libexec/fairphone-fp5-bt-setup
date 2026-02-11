@@ -3,31 +3,33 @@
 # Fairphone 5 Bluetooth BD Address Setup
 #
 # The WCN6750 may report an invalid BD address (00:00:00:00:00:00 or similar)
-# if the NVM configuration doesn't contain a valid address. This script sets
-# a stable BD address derived from the device's serial number before BlueZ
-# starts, similar to postmarketOS's bootmac.
+# if the NVM configuration doesn't contain a valid address. This script generates
+# a stable BD address derived from the device's serial number and attempts to
+# set it via btmgmt.
+#
+# Called from udev when hci0 appears, runs asynchronously so it won't block boot.
 #
 
-set -euo pipefail
-
 BDADDR_FILE="/var/lib/bluetooth/.bdaddr"
+LOG_TAG="fairphone-fp5-bt-setup"
+
+log() {
+    echo "$LOG_TAG: $*" >&2
+    logger -t "$LOG_TAG" "$*" 2>/dev/null || true
+}
 
 get_serial() {
-    # Try to get device serial from various sources
     if [ -f /sys/firmware/devicetree/base/serial-number ]; then
         tr -d '\0' < /sys/firmware/devicetree/base/serial-number
     elif [ -f /sys/class/dmi/id/product_serial ]; then
         cat /sys/class/dmi/id/product_serial
     elif [ -f /proc/cmdline ]; then
-        # Extract androidboot.serialno if present
         grep -oP 'androidboot\.serialno=\K[^ ]+' /proc/cmdline 2>/dev/null || true
     fi
 }
 
 generate_bdaddr() {
     local serial="$1"
-    # Generate a stable BD address from serial using md5
-    # Use OUI 00:00:5A (placeholder - ideally use Fairphone's OUI if known)
     local hash
     hash=$(echo -n "$serial" | md5sum | cut -c1-6)
     echo "00:00:5A:${hash:0:2}:${hash:2:2}:${hash:4:2}" | tr '[:lower:]' '[:upper:]'
@@ -35,42 +37,47 @@ generate_bdaddr() {
 
 # Check if hci0 exists
 if [ ! -d /sys/class/bluetooth/hci0 ]; then
-    echo "fairphone-fp5-bt-setup: hci0 not found, skipping BD address setup" >&2
+    log "hci0 not found, exiting"
     exit 0
 fi
 
 # Read current BD address
 current_addr=$(cat /sys/class/bluetooth/hci0/address 2>/dev/null || echo "00:00:00:00:00:00")
 
-# Check if address is valid (not all zeros or obviously invalid)
-if [[ "$current_addr" =~ ^00:00:00:00 ]] || [[ "$current_addr" == "00:00:00:00:00:00" ]]; then
-    echo "fairphone-fp5-bt-setup: Invalid BD address detected: $current_addr" >&2
-    
-    # Try to use a previously generated address
-    if [ -f "$BDADDR_FILE" ]; then
-        new_addr=$(cat "$BDADDR_FILE")
-        echo "fairphone-fp5-bt-setup: Using stored BD address: $new_addr" >&2
+# Check if address is valid
+if [[ ! "$current_addr" =~ ^00:00:00:00 ]] && [[ "$current_addr" != "00:00:00:00:00:00" ]]; then
+    log "BD address already valid: $current_addr"
+    exit 0
+fi
+
+log "Invalid BD address detected: $current_addr"
+
+# Get or generate the BD address
+if [ -f "$BDADDR_FILE" ]; then
+    new_addr=$(cat "$BDADDR_FILE")
+    log "Using stored BD address: $new_addr"
+else
+    serial=$(get_serial)
+    if [ -n "$serial" ]; then
+        new_addr=$(generate_bdaddr "$serial")
+        log "Generated BD address from serial: $new_addr"
+        mkdir -p "$(dirname "$BDADDR_FILE")"
+        echo "$new_addr" > "$BDADDR_FILE"
     else
-        # Generate new address from serial
-        serial=$(get_serial)
-        if [ -n "$serial" ]; then
-            new_addr=$(generate_bdaddr "$serial")
-            echo "fairphone-fp5-bt-setup: Generated BD address from serial: $new_addr" >&2
-            mkdir -p "$(dirname "$BDADDR_FILE")"
-            echo "$new_addr" > "$BDADDR_FILE"
-        else
-            echo "fairphone-fp5-bt-setup: Cannot determine serial, using random address" >&2
-            # Generate random address with locally administered bit set
-            new_addr=$(printf "02:%02X:%02X:%02X:%02X:%02X" $((RANDOM%256)) $((RANDOM%256)) $((RANDOM%256)) $((RANDOM%256)) $((RANDOM%256)))
-            mkdir -p "$(dirname "$BDADDR_FILE")"
-            echo "$new_addr" > "$BDADDR_FILE"
-        fi
+        log "Cannot determine serial, using random address"
+        new_addr=$(printf "02:%02X:%02X:%02X:%02X:%02X" $((RANDOM%256)) $((RANDOM%256)) $((RANDOM%256)) $((RANDOM%256)) $((RANDOM%256)))
+        mkdir -p "$(dirname "$BDADDR_FILE")"
+        echo "$new_addr" > "$BDADDR_FILE"
     fi
-    
-    # Set the BD address using btmgmt
-    if command -v btmgmt >/dev/null 2>&1; then
-        echo "fairphone-fp5-bt-setup: Setting BD address to $new_addr" >&2
-        btmgmt --index 0 public-addr "$new_addr" 2>/dev/null || true
+fi
+
+# Try to set the BD address with a timeout
+if command -v btmgmt >/dev/null 2>&1; then
+    log "Setting BD address to $new_addr"
+    if timeout 5s btmgmt --index 0 public-addr "$new_addr" 2>&1; then
+        log "BD address set successfully"
+    else
+        log "btmgmt failed or timed out"
     fi
 fi
 
