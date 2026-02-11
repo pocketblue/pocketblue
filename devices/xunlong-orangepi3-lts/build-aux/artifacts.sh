@@ -12,16 +12,8 @@ podman run --rm quay.io/fedora/fedora-minimal:latest \
         1>&3 bsdtar -xOf /tmp/u-boot-*.aarch64.rpm '*/u-boot-sunxi-with-spl.bin'
     " > $uboot_bin
 
-if [ -f "$uboot_bin" ]; then
-    if [ -f "$OUT_PATH/disk.raw" ]; then
-        if [ -f "$OUT_PATH/sgdisk" ]; then
-            chmod +x "$OUT_PATH/sgdisk"
-            "$OUT_PATH/sgdisk" --resize-table 56 "$OUT_PATH/disk.raw"
-            rm -f "$OUT_PATH/sgdisk"
-        fi
-        start_lba=16
-        ss=512
-        start_bytes=$(( start_lba * ss ))
-        dd if="$uboot_bin" of="$OUT_PATH/disk.raw" oflag=seek_bytes seek="$start_bytes" conv=notrunc
-    fi
-fi
+sgdisk --resize-table 56 "$OUT_PATH/disk.raw"
+start_lba=16
+ss=512
+start_bytes=$(( start_lba * ss ))
+dd if="$uboot_bin" of="$OUT_PATH/disk.raw" oflag=seek_bytes seek="$start_bytes" conv=notrunc
