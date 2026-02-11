@@ -27,9 +27,6 @@ dnf -y install --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
     hexagonrpc
 
 dnf -y swap --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
-    mutter mutter
-
-dnf -y swap --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
     alsa-ucm alsa-ucm-conf-qcom-sc7280
 
 # Re-Install iio-sensor-proxy with Qualcomm SSC support (from COPR)
