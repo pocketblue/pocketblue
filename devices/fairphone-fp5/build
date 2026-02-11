@@ -122,86 +122,6 @@ if [ -f "${FW_DIR}/aw882xx_acf.bin" ]; then
     echo "  Installed aw882xx audio amplifier firmware"
 fi
 
-# bluetooth firmware from FairBlobs dump
-#
-# The FairBlobs firmware is extracted from the stock Fairphone 5 ROM and
-# contains device-specific NVM configuration (msnv11.bin) with correct RF
-# calibration for FP5 hardware. Fedora's linux-firmware ships generic
-# Qualcomm-provided versions that may differ.
-#
-# We must:
-# 1. Remove any competing firmware from linux-firmware (compressed or not)
-#    to ensure the FairBlobs version is used exclusively
-# 2. Install uncompressed copies (the serdev probe fires at t=2.9s during
-#    initramfs, before xz/zstd decompressors may be ready)
-# 3. Create a .tlv symlink (the QCA driver tries .tlv first, then .mbn)
-mkdir -p /usr/lib/firmware/qca
-
-# Remove any linux-firmware versions to avoid version conflicts.
-# This includes board-specific NVM variants (msnv11.b09, msnv11.b0a, etc.)
-# that linux-firmware ships compressed — the kernel firmware loader may
-# prefer these over our uncompressed msnv11.bin from FairBlobs.
-rm -f /usr/lib/firmware/qca/msbtfw11.mbn.xz \
-      /usr/lib/firmware/qca/msbtfw11.mbn.zst \
-      /usr/lib/firmware/qca/msbtfw11.tlv \
-      /usr/lib/firmware/qca/msbtfw11.tlv.xz \
-      /usr/lib/firmware/qca/msbtfw11.tlv.zst \
-      /usr/lib/firmware/qca/msnv11.bin.xz \
-      /usr/lib/firmware/qca/msnv11.bin.zst \
-      /usr/lib/firmware/qca/msnv11b.bin \
-      /usr/lib/firmware/qca/msnv11b.bin.xz \
-      /usr/lib/firmware/qca/msnv11b.bin.zst
-rm -f /usr/lib/firmware/qca/msnv11.b*.xz \
-      /usr/lib/firmware/qca/msnv11.b*.zst
-echo "  Removed any competing linux-firmware BT files"
-
-if [ -f "${FW_DIR}/msbtfw11.mbn" ]; then
-    install -Dm644 "${FW_DIR}/msbtfw11.mbn" /usr/lib/firmware/qca/msbtfw11.mbn
-    # The QCA driver tries .tlv first, then falls back to .mbn.
-    # Create symlink so the first lookup succeeds immediately.
-    ln -sf msbtfw11.mbn /usr/lib/firmware/qca/msbtfw11.tlv
-    echo "  Installed msbtfw11.mbn + .tlv symlink (BT firmware)"
-fi
-if [ -f "${FW_DIR}/msnv11.bin" ]; then
-    install -Dm644 "${FW_DIR}/msnv11.bin" /usr/lib/firmware/qca/msnv11.bin
-    echo "  Installed msnv11.bin (FP5-specific NV config from FairBlobs)"  
-fi
-
-# GPU firmware (a660_sqe.fw, a660_gmu.bin)
-# The msm DRM driver requests firmware as "qcom/a660_sqe.fw", which resolves
-# to /usr/lib/firmware/qcom/a660_sqe.fw — NOT the device-specific subdirectory.
-GPU_FW_DIR="/usr/lib/firmware/qcom"
-GPU_FW_INSTALLED=false
-if [ ! -f "${GPU_FW_DIR}/a660_sqe.fw" ]; then
-    echo "  a660_sqe.fw not found, downloading from linux-firmware..."
-    curl -sL "https://gitlab.com/kernel-firmware/linux-firmware/-/raw/main/qcom/a660_sqe.fw" \
-        -o "${GPU_FW_DIR}/a660_sqe.fw" && \
-        chmod 0644 "${GPU_FW_DIR}/a660_sqe.fw" && \
-        echo "  Downloaded a660_sqe.fw" && \
-        GPU_FW_INSTALLED=true || \
-        echo "  WARNING: Failed to download a660_sqe.fw"
-else
-    echo "  ✓ a660_sqe.fw already present"
-    GPU_FW_INSTALLED=true
-fi
-
-if [ ! -f "${GPU_FW_DIR}/a660_gmu.bin" ]; then
-    echo "  a660_gmu.bin not found, downloading from linux-firmware..."
-    curl -sL "https://gitlab.com/kernel-firmware/linux-firmware/-/raw/main/qcom/a660_gmu.bin" \
-        -o "${GPU_FW_DIR}/a660_gmu.bin" && \
-        chmod 0644 "${GPU_FW_DIR}/a660_gmu.bin" && \
-        echo "  Downloaded a660_gmu.bin" || \
-        echo "  WARNING: Failed to download a660_gmu.bin"
-else
-    echo "  ✓ a660_gmu.bin already present"
-fi
-
-if [ "$GPU_FW_INSTALLED" = true ] && [ -f "${GPU_FW_DIR}/a660_sqe.fw" ]; then
-    echo "  ✓ GPU firmware: OK"
-else
-    echo "  ⚠ GPU firmware: may be incomplete (display may still work with fallback)"
-fi
-
 # hexagon filesystem
 [ -d "${FW_DIR}/hexagonfs/acdb" ] && cp -a "${FW_DIR}/hexagonfs/acdb/"* /usr/share/qcom/qcm6490/Fairphone/fp5/acdb/ 2>/dev/null || true
 [ -d "${FW_DIR}/hexagonfs/dsp" ] && cp -a "${FW_DIR}/hexagonfs/dsp/"* /usr/share/qcom/qcm6490/Fairphone/fp5/dsp/ 2>/dev/null || true
@@ -222,37 +142,8 @@ for fw in adsp cdsp modem wpss a660_zap; do
     fi
 done
 
-if [ -f /usr/lib/firmware/qca/msbtfw11.mbn ] && [ -L /usr/lib/firmware/qca/msbtfw11.tlv ] && [ -f /usr/lib/firmware/qca/msnv11.bin ]; then
-    echo "  ✓ bluetooth: OK (msbtfw11.mbn + .tlv symlink + msnv11.bin from FairBlobs)"
-else
-    echo "  ✗ bluetooth: MISSING or incomplete"
-    exit 1
-fi
-
-if [ -f /usr/lib/firmware/qcom/a660_sqe.fw ]; then
-    echo "  ✓ gpu: OK (a660_sqe.fw)"
-else
-    echo "  ✗ gpu: a660_sqe.fw MISSING"
-    exit 1
-fi
-
-# Verify no competing compressed firmware from linux-firmware remains
-for conflict in /usr/lib/firmware/qca/msbtfw11.mbn.xz /usr/lib/firmware/qca/msbtfw11.mbn.zst \
-                /usr/lib/firmware/qca/msnv11.bin.xz /usr/lib/firmware/qca/msnv11.bin.zst \
-                /usr/lib/firmware/qca/msnv11.b*.xz /usr/lib/firmware/qca/msnv11.b*.zst; do
-    if [ -f "$conflict" ]; then
-        echo "  ⚠ WARNING: competing firmware file found: $conflict"
-        echo "    Removing to avoid version mismatch with FairBlobs firmware"
-        rm -f "$conflict"
-    fi
-done
-
-echo "Firmware installation complete."
-ls -la "${FW_DEST}/"
-echo "Bluetooth firmware:"
-ls -la /usr/lib/firmware/qca/msbtfw11.* /usr/lib/firmware/qca/msnv11.* 2>/dev/null || true
-
 rm -rf "${FW_DIR}"
+echo "Firmware installation complete."
 
 # kernel (from lorbus/misc copr)
 dnf -y remove \
