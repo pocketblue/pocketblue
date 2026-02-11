@@ -21,10 +21,10 @@ on:
         description: 'fedora branch'
         required: true
         options:
-          - '42'
           - '43'
+          - '44'
           - 'rawhide'
-        default: '43'
+        default: '44'
       device:
         type: choice
         description: 'device'
@@ -52,7 +52,7 @@ on:
 
 run-name: >
   containers:
-  fedora ${{ inputs.fedora_branch || 43 }}
+  fedora ${{ inputs.fedora_branch || 44 }}
   ${{ inputs.device && inputs.device != 'all' && format(' | {0}', inputs.device) || '' }}
   ${{ github.event_name == 'push' && format(' | {0}', github.event.head_commit.message) || '' }}
 
@@ -70,7 +70,7 @@ jobs:
         id: config
         uses: pocketblue/actions/container-config@main
         with:
-          from_tag: ${{ inputs.fedora_branch || 43 }}
+          from_tag: ${{ inputs.fedora_branch || 44 }}
           vars_registry: ${{ vars.REGISTRY }}
           device: ${{ inputs.device || '' }}
           device_list: |
@@ -88,7 +88,7 @@ jobs:
         desktop: [gnome-desktop]
     uses: ./.github/workflows/helper-build-container.yml
     with:
-      fedora_branch: ${{ inputs.fedora_branch || 43 }}
+      fedora_branch: ${{ inputs.fedora_branch || 44 }}
       registry: ${{ needs.config.outputs.registry }}
       device: ${{ matrix.device }}
       desktop: ${{ matrix.desktop }}

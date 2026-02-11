@@ -4,11 +4,11 @@ silverblue := env("PB_SILVERBLUE", "quay.io/fedora/fedora-silverblue")
 kinoite := env("PB_KINOITE", "quay.io/fedora/fedora-kinoite")
 base_atomic := env("PB_BASE_ATOMIC", "quay.io/fedora-ostree-desktops/base-atomic")
 
-branch := env("PB_BRANCH", "43")
+branch := env("PB_BRANCH", "44")
 tag := env("PB_TAG", branch)
 
-device := env("PB_DEVICE", "oneplus-sdm845")
-desktop := env("PB_DESKTOP", "phosh")
+device := env("PB_DEVICE", "fp5")
+desktop := env("PB_DESKTOP", "gnome-desktop")
 
 base := env("PB_BASE",
     if desktop == "gnome-desktop" {
