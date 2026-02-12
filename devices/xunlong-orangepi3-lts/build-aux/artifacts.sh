@@ -17,3 +17,4 @@ start_lba=16
 ss=512
 start_bytes=$(( start_lba * ss ))
 dd if="$uboot_bin" of="$OUT_PATH/disk.raw" oflag=seek_bytes seek="$start_bytes" conv=notrunc
+rm $uboot_bin
