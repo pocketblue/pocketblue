@@ -37,7 +37,6 @@ arch := env("PB_ARCH", "arm64")
 pull:
     sudo podman pull {{base}}:{{branch}}
     sudo podman pull {{base_bootc}}
-    sudo podman pull {{registry}}/{{device}}-{{desktop}}:{{tag}} || true
 
 build *ARGS:
     sudo buildah bud \
