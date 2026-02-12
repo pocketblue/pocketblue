@@ -61,6 +61,8 @@ jobs:
           EOF
       - uses: actions/checkout@v6
       - uses: extractions/setup-just@v3
+        with:
+          just-version: '1.46.0'
 
       - name: Pull
         id: pull

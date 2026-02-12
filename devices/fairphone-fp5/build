@@ -6,10 +6,17 @@ cp -arfT files/etc /etc
 
 # packages
 dnf -y install \
+    gnome-text-editor \
     alsa-utils \
+    alsa-ucm-utils \
+    alsa-topology-utils \
+    alsabat \
     bluez \
     libcamera \
     libcamera-tools \
+    libcamera-ipa \
+    libcamera-gstreamer \
+    libcamera-qcam \
     libssc \
     libiio-utils \
     qbootctl \
@@ -160,6 +167,11 @@ systemctl enable \
     tqftpserv.service \
     qbootctl.service \
     rmtfs.service
+
+# Mask services that don't apply to mobile ARM devices:
+# - bootloader-update: uses bootupd for EFI systems; FP5 uses Android A/B boot
+systemctl mask \
+    bootloader-update.service
 
 KERNEL_SUFFIX=""
 QUALIFIED_KERNEL="$(rpm -qa | grep -P 'kernel-(|'"$KERNEL_SUFFIX"'-)(\d+\.\d+\.\d+)' | sed -E 's/kernel-(|'"$KERNEL_SUFFIX"'-)//')"

@@ -26,10 +26,8 @@ ADDITIONAL_FEDORA_PACKAGES=(
     #gnome-network-displays
     #gnome-shell-extension-network-displays
     libcamera-qcam
-    nextcloud-client-nautilus
     pmbootstrap
     v4l-utils
-    wireshark
     gnome-shell-extension-appindicator
     #gnome-shell-extension-apps-menu
     gnome-shell-extension-auto-move-windows
