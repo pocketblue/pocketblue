@@ -56,8 +56,7 @@ jobs:
           device=${{ inputs.device }} \
           desktop=${{ inputs.desktop }} \
           registry=${INPUT_REGISTRY,,} \
-          ${{ inputs.expires && 'expires_after=1w' || '' }} \
-          rechunk_suffix=-build
+          ${{ inputs.expires && 'expires_after=1w' || '' }}
           EOF
       - uses: actions/checkout@v6
       - name: Maximize build space
@@ -88,10 +87,6 @@ jobs:
         run: |
           just $JUST_ARGS build \
             --build-arg xiaomi_nabu_samsung_ufs=${{ inputs.xiaomi_nabu_samsung_ufs }}
-
-      - name: Rechunk
-        id: rechunk
-        run: just $JUST_ARGS rechunk
 
       - name: Push
         id: push
