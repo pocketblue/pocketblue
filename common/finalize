@@ -4,7 +4,10 @@ set -uexo pipefail
 
 dnf5 clean all
 
-find /var/* -maxdepth 0 -type d \! -name cache -exec rm -fr {} \;
+find /var/* -maxdepth 0 -type d \! -name cache \! -name lib -exec rm -fr {} \;
+if [ -d /var/lib ]; then
+    find /var/lib/* -maxdepth 0 -type d \! -name selinux -exec rm -fr {} \;
+fi
 
 mkdir -p /var/tmp
 chmod -R 1777 /var/tmp

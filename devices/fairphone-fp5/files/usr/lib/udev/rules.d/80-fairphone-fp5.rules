@@ -1,0 +1,8 @@
+# Fairphone 5 udev rules
+
+# Accelerometer mount matrix for iio-sensor-proxy with libssc
+SUBSYSTEM=="misc", KERNEL=="fastrpc-adsp", ENV{ACCEL_MOUNT_MATRIX}="-1, 0, 0; 0, -1, 0; 0, 0, -1"
+
+# Enable additional SSC sensor types for iio-sensor-proxy.
+# ssc-accel and ssc-proximity are disabled by default in iio-sensor-proxy.
+SUBSYSTEM=="misc", KERNEL=="fastrpc-adsp", ENV{IIO_SENSOR_PROXY_TYPE}+="ssc-accel ssc-proximity"

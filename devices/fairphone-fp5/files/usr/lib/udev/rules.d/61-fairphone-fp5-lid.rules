@@ -1,0 +1,10 @@
+# Prevent the gpio-keys hall effect sensor (SW_LID) from being treated as a
+# laptop lid switch. The FP5 has a hall sensor for magnetic flip-cover detection
+# mapped as SW_LID in the device tree. Without this override:
+# - UPower reports LidIsPresent/LidIsClosed, which Mutter reads via D-Bus
+# - Mutter may skip orientation changes when it thinks the lid is closed
+# - logind's default HandleLidSwitch=suspend would suspend the device when
+#   a magnetic case is closed
+# Clearing ID_INPUT_SWITCH prevents UPower and logind from monitoring this
+# device for switch events, while preserving key events (volume, wakeup).
+ACTION!="remove", SUBSYSTEM=="input", ATTR{name}=="gpio-keys", ENV{ID_INPUT_SWITCH}=""

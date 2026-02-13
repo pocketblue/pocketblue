@@ -21,23 +21,17 @@ on:
         description: 'fedora branch'
         required: true
         options:
-          - '42'
           - '43'
+          - '44'
           - 'rawhide'
-        default: '43'
+        default: '44'
       device:
         type: choice
         description: 'device'
         required: true
         options:
-          - 'all'
-          - 'nothing-spacewar'
-          - 'oneplus-sdm845'
-          - 'xiaomi-beryllium'
-          - 'xiaomi-nabu'
-          - 'xiaomi-pipa'
-          - 'xunlong-orangepi3-lts'
-        default: 'all'
+          - 'fairphone-fp5'
+        default: 'fairphone-fp5'
       target_tag_override:
         type: string
         description: 'override target tag'
@@ -58,7 +52,7 @@ on:
 
 run-name: >
   containers:
-  fedora ${{ inputs.fedora_branch || 43 }}
+  fedora ${{ inputs.fedora_branch || 44 }}
   ${{ inputs.device && inputs.device != 'all' && format(' | {0}', inputs.device) || '' }}
   ${{ github.event_name == 'push' && format(' | {0}', github.event.head_commit.message) || '' }}
 
@@ -76,14 +70,11 @@ jobs:
         id: config
         uses: pocketblue/actions/container-config@main
         with:
-          from_tag: ${{ inputs.fedora_branch || 43 }}
+          from_tag: ${{ inputs.fedora_branch || 44 }}
           vars_registry: ${{ vars.REGISTRY }}
           device: ${{ inputs.device || '' }}
           device_list: |
-            oneplus-sdm845
-            xiaomi-beryllium
-            xiaomi-nabu
-            xiaomi-pipa
+            fairphone-fp5
 
   build:
     needs: config
@@ -94,10 +85,10 @@ jobs:
       fail-fast: false
       matrix:
         device: ${{ fromJson(needs.config.outputs.devices) }}
-        desktop: [tty, gnome-desktop, gnome-mobile, plasma-desktop, plasma-mobile, phosh]
+        desktop: [gnome-desktop]
     uses: ./.github/workflows/helper-build-container.yml
     with:
-      fedora_branch: ${{ inputs.fedora_branch || 43 }}
+      fedora_branch: ${{ inputs.fedora_branch || 44 }}
       registry: ${{ needs.config.outputs.registry }}
       device: ${{ matrix.device }}
       desktop: ${{ matrix.desktop }}

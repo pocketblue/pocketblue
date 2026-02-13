@@ -2,16 +2,59 @@
 
 set -uexo pipefail
 
-dnf -y install default-flatpaks
+# Install additional fedora packages
+ADDITIONAL_FEDORA_PACKAGES=(
+    #calls
+    chromium # for WebUSB
+    feedbackd # for gnome-calls
+    fedora-packager
+    fedora-packager-kerberos
+    firefox # as RPM for GSConnect
+    parted
+    git-credential-libsecret
+    git-evtag
+    gdb
+    nodejs
+    yarnpkg
+    npx
+    pipx
+    meson
+    ninja
+    gettext
+    rust
+    dvb-tools
+    #gnome-network-displays
+    #gnome-shell-extension-network-displays
+    libcamera-qcam
+    pmbootstrap
+    v4l-utils
+    gnome-shell-extension-appindicator
+    #gnome-shell-extension-apps-menu
+    gnome-shell-extension-auto-move-windows
+    gnome-shell-extension-caffeine
+    gnome-shell-extension-dash-to-dock
+    gnome-shell-extension-drive-menu
+    #gnome-shell-extension-gsconnect
+    #gnome-shell-extension-launch-new-instance
+    gnome-shell-extension-light-style
+    gnome-shell-extension-native-window-placement
+    #gnome-shell-extension-places-menu
+    gnome-shell-extension-screenshot-window-sizer
+    gnome-shell-extension-status-icons
+    gnome-shell-extension-system-monitor
+    gnome-shell-extension-user-theme
+    gnome-shell-extension-windowsNavigator
+    #gnome-shell-extension-window-list
+    gnome-shell-extension-workspace-indicator
+)
 
-dnf -y remove \
-    firefox \
-    firefox-langpacks
+dnf -y install --skip-unavailable \
+    "${ADDITIONAL_FEDORA_PACKAGES[@]}"
 
-dnf -y remove \
-    gnome-classic-session \
-    gnome-system-monitor \
-    gnome-user-docs \
-    gnome-tour \
-    malcontent-control \
-    yelp
+dnf -y copr enable lorbus/calls
+dnf -y install calls
+dnf -y copr disable lorbus/calls
+
+dnf -y copr enable lorbus/network-displays
+dnf -y install gnome-network-displays gnome-network-displays-extension
+dnf -y copr disable lorbus/network-displays

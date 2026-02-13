@@ -35,25 +35,47 @@ on:
         required: true
         type: boolean
 
-env:
-  JUST_ARGS: >
-    branch=${{ inputs.fedora_branch }}
-    tag=${{ inputs.tag }}
-    device=${{ inputs.device }}
-    desktop=${{ inputs.desktop }}
-    registry=${{ inputs.registry }}
-    ${{ inputs.expires && 'expires_after=1w' || '' }}
-    rechunk_suffix=-build
-
 jobs:
   build:
     name: ${{ inputs.device }}-${{ inputs.desktop }}
     runs-on: ubuntu-24.04-arm
     permissions:
       packages: write
+    env:
+      INPUT_REGISTRY: ${{ inputs.registry }}
+      REGISTRY_USERNAME: ${{ vars.REGISTRY_USERNAME || github.repository_owner }}
     steps:
+      - name: Prepare environment
+        run: |
+          echo "INPUT_REGISTRY=${INPUT_REGISTRY,,}" >> ${GITHUB_ENV}
+          echo "REGISTRY_USERNAME=${REGISTRY_USERNAME,,}" >> ${GITHUB_ENV}
+          cat >> ${GITHUB_ENV} << EOF
+          JUST_ARGS=\
+          branch=${{ inputs.fedora_branch }} \
+          tag=${{ inputs.tag }} \
+          device=${{ inputs.device }} \
+          desktop=${{ inputs.desktop }} \
+          registry=${INPUT_REGISTRY,,} \
+          ${{ inputs.expires && 'expires_after=1w' || '' }}
+          EOF
       - uses: actions/checkout@v6
+      - name: Maximize build space
+        uses: ublue-os/remove-unwanted-software@695eb75bc387dbcd9685a8e72d23439d8686cba6
+        with:
+          extra-squeeze: true
+      - name: Mount BTRFS for podman storage
+        id: container-storage-action
+        uses: ublue-os/container-storage-action@911baca08baf30c8654933e9e9723cb399892140
+
+        # Fallback to the remove-unwanted-software-action if github doesn't allocate enough space
+        # See: https://github.com/ublue-os/container-storage-action/pull/11
+        continue-on-error: true 
+        with:
+          target-dir: /var/lib/containers
+          mount-opts: compress-force=zstd:2
       - uses: extractions/setup-just@v3
+        with:
+          just-version: '1.46.0'
 
       - name: Pull
         id: pull
@@ -62,20 +84,17 @@ jobs:
 
       - name: Build
         id: build
-        run: just $JUST_ARGS build --build-arg xiaomi_nabu_samsung_ufs=${{ inputs.xiaomi_nabu_samsung_ufs }}
-
-      - name: Rechunk
-        id: rechunk
         run: |
-          just $JUST_ARGS rechunk
+          just $JUST_ARGS build \
+            --build-arg xiaomi_nabu_samsung_ufs=${{ inputs.xiaomi_nabu_samsung_ufs }}
 
       - name: Push
         id: push
         uses: pocketblue/actions/container-push@main
         env:
           latest: ${{ inputs.latest }}
-          username: ${{ vars.REGISTRY_USERNAME != '' && vars.REGISTRY_USERNAME || github.repository_owner }}
-          password: ${{ secrets.REGISTRY_TOKEN != '' && secrets.REGISTRY_TOKEN || secrets.GITHUB_TOKEN }}
-          registry: ${{ inputs.registry }}
+          username: ${{ env.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_TOKEN || secrets.GITHUB_TOKEN }}
+          registry: ${{ env.INPUT_REGISTRY }}
           name: ${{ inputs.device }}-${{ inputs.desktop }}
           tag: ${{ inputs.tag }}
