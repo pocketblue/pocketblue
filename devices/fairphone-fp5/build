@@ -84,17 +84,6 @@ FW_DEST="/usr/lib/firmware/qcom/qcm6490/fairphone5"
 # The kernel's qcom_mdt_loader handles split format natively and it's more reliable
 # than squashed .mbn format which can produce corrupt files
 
-# GPU firmware (a660_sqe.fw and a660_gmu.bin)
-# These are needed for the Adreno 660 GPU and display controller
-if [ -f "${FW_DIR}/a660_sqe.fw" ]; then
-    install -Dm644 "${FW_DIR}/a660_sqe.fw" /usr/lib/firmware/qcom/a660_sqe.fw
-    echo "  Installed a660_sqe.fw GPU firmware"
-fi
-if [ -f "${FW_DIR}/a660_gmu.bin" ]; then
-    install -Dm644 "${FW_DIR}/a660_gmu.bin" /usr/lib/firmware/qcom/a660_gmu.bin
-    echo "  Installed a660_gmu.bin GMU firmware"
-fi
-
 # qcom firmware - copy split firmware files (.mdt + .b* segments)
 for fw in adsp cdsp modem wpss a660_zap; do
     if [ -f "${FW_DIR}/${fw}.mdt" ]; then
