@@ -20,7 +20,6 @@ dnf -y install \
     libssc \
     libiio-utils \
     qbootctl \
-    qcom-firmware \
     qrtr \
     rmtfs \
     tqftpserv \
@@ -39,6 +38,15 @@ dnf -y swap --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
 # https://gitlab.freedesktop.org/hadess/iio-sensor-proxy/-/merge_requests/381
 dnf -y swap --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
     iio-sensor-proxy iio-sensor-proxy
+
+# kernel (from lorbus/misc copr)
+dnf -y remove \
+    kernel \
+    kernel-core \
+    kernel-modules \
+    kernel-modules-core
+dnf -y install --refresh --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
+    kernel
 
 # install device-specific files (after packages to override defaults)
 # This includes udev rules, systemd drop-ins, dracut config, modprobe/modules-load
@@ -75,6 +83,17 @@ FW_DEST="/usr/lib/firmware/qcom/qcm6490/fairphone5"
 # Install split firmware files (.mdt + .bXX) - do NOT use pil-squasher
 # The kernel's qcom_mdt_loader handles split format natively and it's more reliable
 # than squashed .mbn format which can produce corrupt files
+
+# GPU firmware (a660_sqe.fw and a660_gmu.bin)
+# These are needed for the Adreno 660 GPU and display controller
+if [ -f "${FW_DIR}/a660_sqe.fw" ]; then
+    install -Dm644 "${FW_DIR}/a660_sqe.fw" /usr/lib/firmware/qcom/a660_sqe.fw
+    echo "  Installed a660_sqe.fw GPU firmware"
+fi
+if [ -f "${FW_DIR}/a660_gmu.bin" ]; then
+    install -Dm644 "${FW_DIR}/a660_gmu.bin" /usr/lib/firmware/qcom/a660_gmu.bin
+    echo "  Installed a660_gmu.bin GMU firmware"
+fi
 
 # qcom firmware - copy split firmware files (.mdt + .b* segments)
 for fw in adsp cdsp modem wpss a660_zap; do
@@ -150,15 +169,6 @@ done
 
 rm -rf "${FW_DIR}"
 echo "Firmware installation complete."
-
-# kernel (from lorbus/misc copr)
-dnf -y remove \
-    kernel \
-    kernel-core \
-    kernel-modules \
-    kernel-modules-core
-dnf -y install --refresh --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
-    kernel
 
 systemctl enable \
     hexagonrpcd-adsp-sensorspd.service \
