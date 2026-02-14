@@ -10,6 +10,9 @@ cp -arfT files/usr /usr
 cp -arfT files/fwload/etc /etc
 cp -arfT files/fwload/usr /usr
 
+cp -arfT files/q6voiced/etc /etc
+cp -arfT files/q6voiced/usr /usr
+
 # Qualcomm tools and libs
 
 dnf -y install \
@@ -51,7 +54,9 @@ dnf -y install \
     q6voiced
 
 systemctl enable \
-    q6voiced.service
+    q6voiced@$(systemd-escape oneplus,fajita).service \
+    q6voiced@$(systemd-escape oneplus,enchilada).service \
+    q6voiced@$(systemd-escape xiaomi,beryllium).service
 
 systemctl mask \
     alsa-state.service \
