@@ -2,11 +2,13 @@
 
 set -uexo pipefail
 
+SCRIPT_DIR="$(dirname "$0")"
+
 uboot_bin="$OUT_PATH/u-boot-sunxi-with-spl.bin"
 disk_raw="$OUT_PATH/disk.raw"
 
 podman run --rm -i quay.io/fedora/fedora-minimal:latest \
-    bash -s < "$OUT_PATH/extract-uboot.sh" > "$uboot_bin"
+    bash -s < "$SCRIPT_DIR/extract-uboot.sh" > "$uboot_bin"
 
 sgdisk --resize-table 56 "$disk_raw"
 start_lba=16
