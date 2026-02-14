@@ -14,14 +14,6 @@ ADDITIONAL_FEDORA_PACKAGES=(
     git-credential-libsecret
     git-evtag
     gdb
-    nodejs
-    yarnpkg
-    npx
-    pipx
-    meson
-    ninja
-    gettext
-    rust
     dvb-tools
     #gnome-network-displays
     #gnome-shell-extension-network-displays
