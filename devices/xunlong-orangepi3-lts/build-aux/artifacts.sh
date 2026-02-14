@@ -2,23 +2,16 @@
 
 set -uexo pipefail
 
-uboot_deb="$OUT_PATH/linux-u-boot-orangepi3-lts-current.deb"
-if [ -f "$uboot_deb" ]; then
-    tmp_dir="$(mktemp -d)"
-    7z x -o"$tmp_dir" "$uboot_deb"
-    data_tar="$(find "$tmp_dir" -maxdepth 1 -name 'data.tar.*' -print -quit)"
-    7z x -o"$tmp_dir/data" "$data_tar"
-    if [ -f "$tmp_dir/data/data.tar" ]; then
-        7z x -o"$tmp_dir/data" "$tmp_dir/data/data.tar"
-    fi
-    uboot_bin="$(find "$tmp_dir/data" -name 'u-boot-sunxi-with-spl.bin' -print -quit)"
-    if [ -z "$uboot_bin" ]; then
-        echo "u-boot-sunxi-with-spl.bin not found in $uboot_deb" >&2
-        exit 1
-    fi
-    cp "$uboot_bin" "$OUT_PATH/images/u-boot-sunxi-with-spl.bin"
-    dd if="$uboot_bin" of="$OUT_PATH/images/disk.raw" bs=1024 seek=8 conv=notrunc
-    rm -r "$tmp_dir"
-fi
+SCRIPT_DIR="$(dirname "$0")"
 
-install -Dm 0755 "$DEVICE_PATH/build-aux/flash-sd.sh" "$OUT_PATH/flash-orangepi3-lts.sh"
+uboot_bin="/tmp/u-boot-sunxi-with-spl.bin"
+disk_raw="$OUT_PATH/disk.raw"
+
+podman run --rm -i quay.io/fedora/fedora-minimal:latest \
+    bash -s < "$SCRIPT_DIR/extract-uboot.sh" > "$uboot_bin"
+
+sgdisk --resize-table 56 "$disk_raw"
+start_lba=16
+ss=512
+start_bytes=$(( start_lba * ss ))
+dd if="$uboot_bin" of="$disk_raw" oflag=seek_bytes seek="$start_bytes" conv=notrunc

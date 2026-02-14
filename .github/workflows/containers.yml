@@ -84,6 +84,7 @@ jobs:
             xiaomi-beryllium
             xiaomi-nabu
             xiaomi-pipa
+            xunlong-orangepi3-lts
 
   build:
     needs: config
