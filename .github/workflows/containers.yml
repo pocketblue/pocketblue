@@ -33,6 +33,7 @@ on:
           - 'all'
           - 'nothing-spacewar'
           - 'oneplus-sdm845'
+          - 'qualcomm-sdm845'
           - 'xiaomi-beryllium'
           - 'xiaomi-nabu'
           - 'xiaomi-pipa'
@@ -81,6 +82,7 @@ jobs:
           device: ${{ inputs.device || '' }}
           device_list: |
             oneplus-sdm845
+            qualcomm-sdm845
             xiaomi-beryllium
             xiaomi-nabu
             xiaomi-pipa

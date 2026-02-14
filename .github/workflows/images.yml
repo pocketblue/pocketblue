@@ -10,6 +10,7 @@ on:
         options:
           - nothing-spacewar
           - oneplus-sdm845
+          - qualcomm-sdm845
           - xiaomi-beryllium
           - xiaomi-nabu
           - xiaomi-pipa
