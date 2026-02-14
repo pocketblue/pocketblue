@@ -56,7 +56,8 @@ dnf -y install \
 systemctl enable \
     q6voiced@$(systemd-escape oneplus,fajita).service \
     q6voiced@$(systemd-escape oneplus,enchilada).service \
-    q6voiced@$(systemd-escape xiaomi,beryllium).service
+    q6voiced@$(systemd-escape xiaomi,beryllium-ebbg).service \
+    q6voiced@$(systemd-escape xiaomi,beryllium-tianma).service
 
 systemctl mask \
     alsa-state.service \
