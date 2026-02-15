@@ -7,17 +7,15 @@ ARG target_tag
 
 FROM scratch AS ctx
 
-ARG device
-ARG desktop
-
 COPY common /common
-COPY devices/$device /device
-COPY desktops/$desktop /desktop
+COPY devices /devices
+COPY desktops /desktops
 
 # Building the image
 
 FROM $base
 
+ARG device
 ARG desktop
 ARG target_tag
 
@@ -31,12 +29,12 @@ RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=cache,target=/var/cache \
-    env --chdir=/ctx/device ./build && \
+    env --chdir=/ctx/devices/$device ./build && \
     /ctx/common/cleanup
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=cache,target=/var/cache \
-    env --chdir=/ctx/desktop ./build && \
+    env --chdir=/ctx/desktops/$desktop ./build && \
     /ctx/common/cleanup
 
 # os-release file
