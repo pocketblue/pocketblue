@@ -47,13 +47,7 @@ jobs:
       fail-fast: false
       matrix:
         device:
-          - name: oneplus-sdm845
-            tag: ${{ inputs.fedora_branch }}
-            build_aux: 'build-aux'
           - name: qualcomm-sdm845
-            tag: ${{ inputs.fedora_branch }}
-            build_aux: 'build-aux'
-          - name: xiaomi-beryllium
             tag: ${{ inputs.fedora_branch }}
             build_aux: 'build-aux'
           - name: xiaomi-nabu

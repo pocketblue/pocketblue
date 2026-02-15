@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-set -uexo pipefail
-
-env --chdir=../qualcomm-sdm845 ./build
