@@ -7,7 +7,7 @@ base_atomic := env("PB_BASE_ATOMIC", "quay.io/fedora-ostree-desktops/base-atomic
 branch := env("PB_BRANCH", "43")
 tag := env("PB_TAG", branch)
 
-device := env("PB_DEVICE", "oneplus-sdm845")
+device := env("PB_DEVICE", "qualcomm-sdm845")
 desktop := env("PB_DESKTOP", "phosh")
 
 base := env("PB_BASE",
