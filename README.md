@@ -31,8 +31,6 @@ This is a work-in-progress. During the installation process all data on your dev
 
 ### Related projects
 
-- [fedora-remix-mobility/fedora-kiwi-descriptions](https://github.com/fedora-remix-mobility/fedora-kiwi-descriptions) - KIWI image descriptions for Fedora Mobility
-- [samcday/sdm845-live-fedora](https://github.com/samcday/sdm845-live-fedora) - a compact Fedora UKI that can be directly booted from the OnePlus 6(T) bootloader
 - [timoxa0/pipa-fedora-builder](https://github.com/timoxa0/pipa-fedora-builder) - non-atomic Fedora for Xiaomi Pad 6
 - [nik012003/nabu-fedora-builder](https://github.com/nik012003/nabu-fedora-builder) - non-atomic Fedora for Xiaomi Pad 5
 - [jhuang6451/nabu_fedora](https://github.com/jhuang6451/nabu_fedora) - yet another non-atomic Fedora for Xiaomi Pad 5
