@@ -1,2 +1,0 @@
-disable alsa-restore.service
-disable alsa-state.service

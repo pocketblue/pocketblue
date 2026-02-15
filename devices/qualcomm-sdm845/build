@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+
+set -uexo pipefail
+
+# Files
+
+cp -arfT files/etc /etc
+
+cp -arfT files/audio/etc /etc
+cp -arfT files/audio/usr /usr
+
+cp -arfT files/fwload/etc /etc
+cp -arfT files/fwload/usr /usr
+
+# Qualcomm tools and libs
+
+dnf -y install \
+    hexagonrpc \
+    bootmac \
+    tqftpserv \
+    qbootctl \
+    rmtfs \
+    qcom-firmware \
+    pd-mapper \
+    libssc \
+    qrtr
+
+systemctl enable \
+    hexagonrpcd-sdsp.service \
+    bootmac-bluetooth.service \
+    tqftpserv.service \
+    qbootctl.service \
+    rmtfs.service
+
+# droid-juicer
+
+dnf -y install droid-juicer
+systemctl enable droid-juicer.service
+
+rm -rf /etc/droid-juicer
+
+rmdir /usr/lib/firmware/updates
+ln -sf /var/lib/firmware-extract /usr/lib/firmware/updates
+
+# Audio
+
+dnf -y install \
+    alsa-utils \
+    pipewire \
+    pipewire-alsa \
+    pipewire-pulseaudio \
+    alsa-ucm-mobility-sdm845 \
+    q6voiced
+
+systemctl enable \
+    q6voiced@$(systemd-escape oneplus,fajita).service \
+    q6voiced@$(systemd-escape oneplus,enchilada).service \
+    q6voiced@$(systemd-escape xiaomi,beryllium-ebbg).service \
+    q6voiced@$(systemd-escape xiaomi,beryllium-tianma).service
+
+systemctl mask \
+    alsa-state.service \
+    alsa-restore.service
+
+# Other
+
+dnf -y install \
+    ath10k-shutdown \
+    mobility-tweaks \
+    msm-modem-uim-selection
+
+systemctl enable \
+    msm-modem-uim-selection.service
+
+# Kernel
+
+mkdir /boot/dtb
+dnf -y remove \
+    kernel \
+    kernel-core \
+    kernel-modules \
+    kernel-modules-core \
+    kernel-modules-extra \
+    kernel-headers
+rm -rf /usr/lib/modules/*
+dnf -y install kernel kernel-modules-extra
+rm -rf /boot/dtb

@@ -9,8 +9,7 @@ on:
         required: true
         options:
           - nothing-spacewar
-          - oneplus-sdm845
-          - xiaomi-beryllium
+          - qualcomm-sdm845
           - xiaomi-nabu
           - xiaomi-pipa
           - xunlong-orangepi3-lts

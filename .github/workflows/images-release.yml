@@ -33,9 +33,12 @@ jobs:
           tag_name: ${{ steps.version.outputs.version }}
           draft: true
           body: |
-            recommended image for xiaomi pad 5: [gnome-desktop](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-xiaomi-nabu-gnome-desktop-${{ inputs.fedora_branch }}.7z)
-            recommended image for xiaomi pad 6: [gnome-desktop](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-xiaomi-pipa-gnome-desktop-${{ inputs.fedora_branch }}.7z)
-            recommended image for oneplus 6 and oneplus 6t: [gnome-mobile](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-oneplus-sdm845-gnome-mobile-${{ inputs.fedora_branch }}.7z)
+            Recommended images:
+            - Xiaomi Pad 5 (xiaomi-nabu): [xiaomi-nabu-gnome-desktop](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-xiaomi-nabu-gnome-desktop-${{ inputs.fedora_branch }}.7z)
+            - Xiaomi Pad 6 (xiaomi-pipa): [xiaomi-pipa-gnome-desktop](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-xiaomi-pipa-gnome-desktop-${{ inputs.fedora_branch }}.7z)
+            - OnePlus 6/6T (oneplus-enchilada/fajita): [qualcomm-sdm845-phosh](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-qualcomm-sdm845-phosh-${{ inputs.fedora_branch }}.7z)
+            - Xiaomi Poco F1 (xiaomi-beryllium): [qualcomm-sdm845-phosh](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-qualcomm-sdm845-phosh-${{ inputs.fedora_branch }}.7z)
+            - Orange Pi 3 LTS (xunlong-orangepi3-lts): [xunlong-orangepi3-lts-tty](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-xunlong-orangepi3-lts-tty-${{ inputs.fedora_branch }}.7z)
 
   images_build:
     needs: create_release
@@ -44,10 +47,7 @@ jobs:
       fail-fast: false
       matrix:
         device:
-          - name: oneplus-sdm845
-            tag: ${{ inputs.fedora_branch }}
-            build_aux: 'build-aux'
-          - name: xiaomi-beryllium
+          - name: qualcomm-sdm845
             tag: ${{ inputs.fedora_branch }}
             build_aux: 'build-aux'
           - name: xiaomi-nabu
