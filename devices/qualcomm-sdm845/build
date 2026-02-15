@@ -68,9 +68,7 @@ systemctl mask \
 
 dnf -y install \
     ath10k-shutdown \
-    mobility-tweaks \
-    buffyboard \
-    dnsmasq
+    mobility-tweaks
 
 systemctl enable \
     msm-modem-uim-selection.service
