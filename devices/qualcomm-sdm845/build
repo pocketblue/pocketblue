@@ -12,8 +12,6 @@ cp -arfT files/audio/usr /usr
 cp -arfT files/fwload/etc /etc
 cp -arfT files/fwload/usr /usr
 
-cp -arfT files/sim/usr /usr
-
 # Qualcomm tools and libs
 
 dnf -y install \
@@ -68,7 +66,8 @@ systemctl mask \
 
 dnf -y install \
     ath10k-shutdown \
-    mobility-tweaks
+    mobility-tweaks \
+    msm-modem-uim-selection
 
 systemctl enable \
     msm-modem-uim-selection.service
