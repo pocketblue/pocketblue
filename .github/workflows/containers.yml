@@ -32,8 +32,7 @@ on:
         options:
           - 'all'
           - 'nothing-spacewar'
-          - 'oneplus-sdm845'
-          - 'xiaomi-beryllium'
+          - 'qualcomm-sdm845'
           - 'xiaomi-nabu'
           - 'xiaomi-pipa'
           - 'xunlong-orangepi3-lts'
@@ -80,8 +79,7 @@ jobs:
           vars_registry: ${{ vars.REGISTRY }}
           device: ${{ inputs.device || '' }}
           device_list: |
-            oneplus-sdm845
-            xiaomi-beryllium
+            qualcomm-sdm845
             xiaomi-nabu
             xiaomi-pipa
             xunlong-orangepi3-lts

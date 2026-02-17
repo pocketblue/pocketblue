@@ -20,3 +20,5 @@ systemctl enable usb-network.service
 dnf -y swap glibc-all-langpacks glibc-langpack-en
 
 dnf -y remove dracut-config-rescue
+
+dnf -y remove nvidia-gpu-firmware
