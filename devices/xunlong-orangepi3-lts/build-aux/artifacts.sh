@@ -14,4 +14,4 @@ sgdisk --resize-table 56 "$disk_raw"
 start_lba=16
 ss=512
 start_bytes=$(( start_lba * ss ))
-dd if="$uboot_bin" of="$disk_raw" oflag=seek_bytes seek="$start_bytes" conv=notrunc
+dd if="$uboot_bin" of="$disk_raw" bs=4K oflag=seek_bytes seek="$start_bytes" conv=notrunc
