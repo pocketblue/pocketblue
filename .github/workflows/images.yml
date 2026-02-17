@@ -45,3 +45,9 @@ jobs:
           name: pocketblue-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.tag }}
           path: pocketblue-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.tag }}.7z
           compression-level: 0
+      - uses: actions/upload-artifact@v4
+        with:
+          if-no-files-found: ignore
+          name: rootfs-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.tag }}
+          path: rootfs-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.tag }}.ero
+          compression-level: 0
