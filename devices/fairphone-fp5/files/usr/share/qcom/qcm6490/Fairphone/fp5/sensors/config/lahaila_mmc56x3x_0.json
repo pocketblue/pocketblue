@@ -1,0 +1,166 @@
+{
+  "config":{
+    "hw_platform": ["IDP"],
+    "soc_id": ["497"]
+  },   
+  "mmc56x3x_0":{
+    "owner": "sns_mmc56x3x",
+    ".mag":{
+      "owner": "sns_mmc56x3x",
+      ".config":{
+        "owner": "sns_mmc56x3x",
+        "is_dri":{ "type": "int", "ver": "0",
+          "data": "0"
+        },
+        "hw_id":{ "type": "int", "ver": "0",
+          "data": "0"
+        },
+        "res_idx":{ "type": "int", "ver": "0",
+          "data": "0"
+        },
+        "sync_stream":{ "type": "int", "ver": "0",
+          "data": "0"
+        }
+      }
+	}
+  },
+  "mmc56x3x_0_platform":{
+    "owner": "sns_mmc56x3x",
+    ".config":{
+      "owner": "sns_mmc56x3x",
+      "bus_type":{ "type": "int", "ver": "0",
+        "data": "0"
+      },
+      "bus_instance":{ "type": "int", "ver": "0",
+        "data": "1"
+      },
+      "slave_config":{ "type": "int", "ver": "0",
+        "data": "48"
+      },
+      "i3c_address":{ "type": "int", "ver": "0",
+        "data": "20"
+      },
+      "min_bus_speed_khz":{ "type": "int", "ver": "0",
+        "data": "100"
+      },
+      "max_bus_speed_khz":{ "type": "int", "ver": "0",
+        "data": "400"
+      },
+      "reg_addr_type":{ "type": "int", "ver": "0",
+        "data": "0"
+      },
+      "num_rail":{ "type": "int", "ver": "0",
+        "data": "1"
+      },
+      "rail_on_state":{ "type": "int", "ver": "0",
+        "data": "2"
+      },
+
+	  "vddio_rail":{ "type": "str", "ver": "0",
+        "data": "/pmic/client/sensor_vddio"
+      },
+      "rigid_body_type":{ "type": "int", "ver": "0",
+      "data": "0"
+      }
+    },
+    ".orient":{
+      "owner": "sns_mmc56x3x",
+      "x":{ "type": "str", "ver": "4",
+        "data": "-x"
+      },
+      "y":{ "type": "str", "ver": "3",
+        "data": "+y"
+      },
+      "z":{ "type": "str", "ver": "1",
+        "data": "-z"
+      }
+    },
+    ".mag":{
+      "owner": "sns_mmc56x3x",
+      ".fac_cal":{
+        "owner": "sns_mmc56x3x",
+        ".corr_mat":{
+          "owner": "sns_mmc56x3x",
+          "0_0":{ "type": "flt", "ver": "0",
+            "data": "0.99956"
+          },
+          "0_1":{ "type": "flt", "ver": "0",
+            "data": "0.018483"
+          },
+          "0_2":{ "type": "flt", "ver": "0",
+            "data": "0.019663"
+          },
+          "1_0":{ "type": "flt", "ver": "0",
+            "data": "-0.002132"
+          },
+          "1_1":{ "type": "flt", "ver": "0",
+            "data": "1.01536"
+          },
+          "1_2":{ "type": "flt", "ver": "0",
+            "data": "-0.00620"
+          },
+          "2_0":{ "type": "flt", "ver": "0",
+            "data": "-0.03178"
+          },
+          "2_1":{ "type": "flt", "ver": "0",
+            "data": "-0.02655"
+          },
+          "2_2":{ "type": "flt", "ver": "0",
+            "data": "1.069254"
+          }
+        },
+        ".bias":{
+          "owner": "sns_mmc56x3x",
+          "x":{ "type": "flt", "ver": "0",
+            "data": "0.0"
+          },
+          "y":{ "type": "flt", "ver": "0",
+            "data": "0.0"
+          },
+          "z":{ "type": "flt", "ver": "0",
+            "data": "0.0"
+          }
+        }
+      }
+    },
+    ".placement":{
+      "owner": "sns_mmc56x3x",
+      "0":{ "type": "flt", "ver": "0",
+        "data": "0.0"
+      },
+      "1":{ "type": "flt", "ver": "0",
+        "data": "0.0"
+      },
+      "2":{ "type": "flt", "ver": "0",
+        "data": "0.0"
+      },
+      "3":{ "type": "flt", "ver": "0",
+        "data": "0.0"
+      },
+      "4":{ "type": "flt", "ver": "0",
+        "data": "0.0"
+      },
+      "5":{ "type": "flt", "ver": "0",
+        "data": "0.0"
+      },
+      "6":{ "type": "flt", "ver": "0",
+        "data": "0.0"
+      },
+      "7":{ "type": "flt", "ver": "0",
+        "data": "0.0"
+      },
+      "8":{ "type": "flt", "ver": "0",
+        "data": "0.0"
+      },
+      "9":{ "type": "flt", "ver": "0",
+        "data": "0.0"
+      },
+      "10":{ "type": "flt", "ver": "0",
+        "data": "0.0"
+      },
+      "11":{ "type": "flt", "ver": "0",
+        "data": "0.0"
+      }
+    }
+  }
+}

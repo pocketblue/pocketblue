@@ -1,0 +1,1 @@
+{"sns_facing":{"owner":"sns_facing","angle_threshold":{"type":"flt","ver":"0","data":"0.34909999"},"report_neutral":{"type":"int","ver":"0","data":"1"},"sample_rate":{"type":"flt","ver":"0","data":"30.00000000"},"min_sample_rate":{"type":"flt","ver":"0","data":"30.00000000"},"max_sample_rate":{"type":"flt","ver":"0","data":"100.00000000"}}}
