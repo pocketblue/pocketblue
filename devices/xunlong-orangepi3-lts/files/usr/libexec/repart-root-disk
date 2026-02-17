@@ -18,11 +18,11 @@ first_lba="$(sgdisk -p "$disk" | awk '$1 ~ /^[0-9]+$/ {print $2}' | sort -n | he
 start_bytes=$(( start_lba * ss ))
 count_bytes=$(( (first_lba - start_lba) * ss ))
 
-dd if="$disk" of=/run/uboot-from-disk.bin iflag=skip_bytes,count_bytes skip="$start_bytes" count="$count_bytes" status=progress
+dd if="$disk" of=/run/uboot-from-disk.bin bs=4K iflag=skip_bytes,count_bytes skip="$start_bytes" count="$count_bytes" status=progress
 
 "$repart_bin" --definitions=/usr/lib/repart.d --dry-run=no "$disk"
 /usr/libexec/grow-rootfs
 
 sgdisk --resize-table 56 "$disk"
 
-dd if=/run/uboot-from-disk.bin of="$disk" oflag=seek_bytes seek="$start_bytes" conv=notrunc,fsync status=progress
+dd if=/run/uboot-from-disk.bin of="$disk" bs=4K oflag=seek_bytes seek="$start_bytes" conv=notrunc,fsync status=progress
