@@ -25,9 +25,9 @@ This is a work-in-progress. During the installation process all data on your dev
 - [Installing packages](https://pocketblue.github.io/tips-and-tricks/installing-packages)
 - [Using toolbox](https://pocketblue.github.io/tips-and-tricks/toolbox)
 - [Firefox mobile config packaged as flatpak](https://pocketblue.github.io/tips-and-tricks/flatpaks)
-- [Using fex-emu to run x86 apps on arm devices](https://pocketblue.github.io/tips-and-tricks/fex-emu.md)
-- [Encryption](https://pocketblue.github.io/tips-and-tricks/encryption.md)
-- [Backtick symbol on Xiaomi keyboards](https://pocketblue.github.io/tips-and-tricks/backtick-symbol.md)
+- [Using fex-emu to run x86 apps on arm devices](https://pocketblue.github.io/tips-and-tricks/fex-emu)
+- [Encryption](https://pocketblue.github.io/tips-and-tricks/encryption)
+- [Backtick symbol on Xiaomi keyboards](https://pocketblue.github.io/tips-and-tricks/backtick-symbol)
 
 ### Related projects
 
