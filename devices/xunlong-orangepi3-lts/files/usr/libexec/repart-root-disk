@@ -25,4 +25,4 @@ dd if="$disk" of=/run/uboot-from-disk.bin iflag=skip_bytes,count_bytes skip="$st
 
 sgdisk --resize-table 56 "$disk"
 
-dd if=/run/uboot-from-disk.bin of="$disk" oflag=seek_bytes seek="$start_bytes" conv=notrunc,fsync status=progress
+dd if=/run/uboot-from-disk.bin of="$disk" bs=4K oflag=seek_bytes seek="$start_bytes" conv=notrunc,fsync status=progress
