@@ -13,7 +13,6 @@ fi
 # Packages
 
 dnf -y install \
-    xiaomi-nabu-configs \
     xiaomi-nabu-firmware \
     alsa-ucm-conf-sm8150 \
     ath10k-shutdown \
