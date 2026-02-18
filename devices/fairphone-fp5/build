@@ -57,8 +57,10 @@ cp -arfT files/usr /usr
 chmod +x /usr/libexec/fairphone-fp5-debug
 chmod +x /usr/libexec/fairphone-fp5-bt-setup
 
-# Create UCM symlink - ALSA card ID is "F5" but UCM config is in Fairphone/fp5
-ln -sf Fairphone/fp5 /usr/share/alsa/ucm2/F5
+# Create UCM conf.d symlink for ALSA card "F5" (driver: snd-sm8250)
+# UCM2 resolves card configs via conf.d/<driver>/<card_id>.conf
+mkdir -p /usr/share/alsa/ucm2/conf.d/snd-sm8250
+ln -sf ../../Fairphone/fp5/fp5.conf /usr/share/alsa/ucm2/conf.d/snd-sm8250/F5.conf
 
 # Install SELinux policy module for QRTR socket access (CIL format)
 # Fedora's iiosensorproxy_t domain lacks permission for qipcrtr_socket

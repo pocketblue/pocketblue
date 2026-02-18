@@ -161,10 +161,10 @@ heading "iio-sensor-proxy resolved sandbox settings"
 log_run systemctl show iio-sensor-proxy.service -p RestrictAddressFamilies -p PrivateNetwork 2>/dev/null
 echo ""
 
-heading "iio-sensor-proxy SELinux"
+heading "SELinux"
 echo "SELinux mode: $(getenforce 2>/dev/null || echo 'N/A')"
 log_run semodule -lfull 2>/dev/null | grep -i qrtr || echo "  qrtr SELinux module not installed"
-log_run ausearch -m avc --subject iiosensorproxy_t -ts boot 2>/dev/null | grep -c denied | xargs -I{} echo "  AVC denials this boot: {}"
+log_run ausearch -m avc -ts boot 2>/dev/null | grep -c denied | xargs -I{} echo "  AVC denials this boot: {}"
 echo ""
 
 heading "iio-sensor-proxy service logs"
