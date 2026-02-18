@@ -81,14 +81,6 @@ systemctl mask \
 
 KERNEL_SUFFIX=""
 QUALIFIED_KERNEL="$(rpm -qa | grep -P 'kernel-(|'"$KERNEL_SUFFIX"'-)(\d+\.\d+\.\d+)' | sed -E 's/kernel-(|'"$KERNEL_SUFFIX"'-)//')"
-# Place the device tree where OSTree expects it. OSTree looks for
-# a file matching devicetree(-.*)?-$checksum in /usr/lib/modules/<version>/.
-# When found, OSTree deploys it alongside vmlinuz and initramfs and
-# adds a devicetree line to the BLS entry so GRUB loads the kernel's
-# DTB instead of U-Boot's embedded (possibly outdated) one.
-cp "/usr/lib/modules/$QUALIFIED_KERNEL/dtbs/qcom/qcm6490-fairphone-fp5.dtb" \
-   "/usr/lib/modules/$QUALIFIED_KERNEL/devicetree"
-
 export DRACUT_NO_XATTR=1
 /usr/bin/dracut --no-hostonly --kver "$QUALIFIED_KERNEL" --reproducible -v --add ostree -f "/lib/modules/$QUALIFIED_KERNEL/initramfs.img"
 chmod 0600 "/lib/modules/$QUALIFIED_KERNEL/initramfs.img"
