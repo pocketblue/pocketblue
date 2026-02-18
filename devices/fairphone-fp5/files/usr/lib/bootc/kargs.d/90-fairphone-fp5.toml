@@ -1,7 +1,3 @@
 kargs = [
-    "clk_ignore_unused",
-    "pd_ignore_unused",
-    "fw_devlink=permissive",
-    "deferred_probe_timeout=30",
     "selinux=0",
 ]
