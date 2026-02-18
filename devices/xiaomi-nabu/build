@@ -14,7 +14,6 @@ fi
 
 dnf -y install \
     xiaomi-nabu-configs \
-    xiaomi-nabu-firmware \
     alsa-ucm-conf-sm8150 \
     ath10k-shutdown \
     tqftpserv \
@@ -28,6 +27,22 @@ systemctl enable \
     tqftpserv.service \
     rmtfs.service \
     qbootctl.service
+
+# droid-juicer
+
+cp -arfT files/droid-juicer/etc /etc
+cp -arfT files/droid-juicer/usr /usr
+
+dnf -y install \
+    qcom-firmware \
+    droid-juicer \
+    make-dynpart-mappings
+
+rm -rf /etc/droid-juicer || true
+
+systemctl enable \
+    droid-juicer.service \
+    ostree-state-overlay@usr-lib-firmware-updates.service
 
 # Kernel
 
