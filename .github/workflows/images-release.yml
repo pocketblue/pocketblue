@@ -44,7 +44,6 @@ jobs:
     needs: create_release
     runs-on: ubuntu-24.04-arm
     strategy:
-      fail-fast: false
       matrix:
         device:
           - name: qualcomm-sdm845
