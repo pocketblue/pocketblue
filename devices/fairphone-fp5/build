@@ -2,6 +2,7 @@
 
 set -uexo pipefail
 
+cp -arfT files/usr /usr
 cp -arfT files/etc /etc
 
 # packages
@@ -31,9 +32,6 @@ dnf -y install \
 dnf -y install --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
     hexagonrpc
 
-dnf -y swap --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
-    alsa-ucm alsa-ucm-conf-qcom-sc7280
-
 # Re-Install iio-sensor-proxy with Qualcomm SSC support (from COPR)
 # https://gitlab.freedesktop.org/hadess/iio-sensor-proxy/-/merge_requests/381
 dnf -y swap --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
@@ -48,19 +46,8 @@ dnf -y remove \
 dnf -y install --refresh --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
     kernel
 
-# install device-specific files (after packages to override defaults)
-# This includes udev rules, systemd drop-ins, dracut config, modprobe/modules-load
-# config, SELinux policy source and the debug script.
-cp -arfT files/usr /usr
-
 # Set executable permissions on helper scripts
 chmod +x /usr/libexec/fairphone-fp5-debug
-chmod +x /usr/libexec/fairphone-fp5-bt-setup
-
-# Create UCM conf.d symlink for ALSA card ID "F5" (driver: qcm6490)
-# UCM2 resolves card configs via conf.d/<driver>/<card_id>.conf
-mkdir -p /usr/share/alsa/ucm2/conf.d/qcm6490
-ln -sf ../../Fairphone/fp5/fp5.conf /usr/share/alsa/ucm2/conf.d/qcm6490/F5.conf
 
 # Install SELinux policy module for QRTR socket access (CIL format)
 # Fedora's iiosensorproxy_t domain lacks permission for qipcrtr_socket
