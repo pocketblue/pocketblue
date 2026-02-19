@@ -24,8 +24,7 @@ jobs:
       - name: version
         id: version
         run: |
-          podman pull 'quay.io/pocketblue/base:${{ inputs.fedora_branch }}'
-          export full_version=$(podman inspect 'quay.io/pocketblue/base:${{ inputs.fedora_branch }}' --format '{{ index .Config.Labels "org.opencontainers.image.version" }}')
+          export full_version=$(skopeo inspect docker://quay.io/pocketblue/qualcomm-sdm845-phosh:43 --format '{{ index .Labels "org.opencontainers.image.version" }}')
           echo version=$(echo $full_version | cut -d. -f1-2) >> $GITHUB_OUTPUT
       - uses: softprops/action-gh-release@v2
         id: create_release
@@ -84,5 +83,5 @@ jobs:
           compression-level: 0
       - uses: svenstaro/upload-release-action@v2
         with:
-          release_id: ${{ needs.create_release.outputs.release_id}}
+          release_id: ${{ needs.create_release.outputs.release_id }}
           file: pocketblue-${{ matrix.device.name }}-${{ matrix.desktop }}-${{ matrix.device.tag }}.7z
