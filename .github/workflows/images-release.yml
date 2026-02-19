@@ -62,7 +62,7 @@ jobs:
           - name: xunlong-orangepi3-lts
             tag: ${{ inputs.fedora_branch }}
             build_aux: 'build-aux'
-        desktop: [tty, gnome-desktop, gnome-mobile, plasma-desktop, plasma-mobile, phosh]
+        desktop: [tty, gnome-desktop, plasma-desktop, plasma-mobile, phosh]
     name: ${{ matrix.device.name }}-${{ matrix.desktop }}:${{ matrix.device.tag }}
     steps:
       - uses: actions/checkout@v6
