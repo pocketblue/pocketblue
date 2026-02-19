@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# run-qemu.sh <disk.raw> [MEMORY_MB]
-# launch a `disk.raw` produced by the build pipeline
+# run-qemu.sh <disk.{raw,qcow2}> [MEMORY_MB]
+# launch a disk produced by the build pipeline
 # under QEMU (aarch64/`virt` machine + UEFI).
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -28,16 +28,11 @@ case "${DISK##*.}" in
         fi ;;
 esac
 
-# allow a repo-local qemu binary
-if [ -x "$SCRIPT_DIR/bin/qemu-system-aarch64" ]; then
-    QEMU="$SCRIPT_DIR/bin/qemu-system-aarch64"
-else
-    QEMU=$(command -v qemu-system-aarch64 || true)
-fi
+QEMU=${QEMU_BIN:-$(command -v qemu-system-aarch64 || true)}
 
 if [ -z "$QEMU" ]; then
-    echo "qemu-system-aarch64 not found in PATH and no local copy at $SCRIPT_DIR/bin/qemu-system-aarch64" >&2
-    echo "Please install 'qemu-system-aarch64'" >&2
+    echo "qemu-system-aarch64 not found in PATH" >&2
+    echo "Please install 'qemu-system-aarch64' or set QEMU_BIN environment variable" >&2
     exit 1
 fi
 
@@ -66,8 +61,10 @@ else
     SMP=$(grep -c "^processor" /proc/cpuinfo 2>/dev/null || echo 2)
 fi
 
+QEMU_CPU=${QEMU_CPU:-cortex-a76}
+
 exec "$QEMU" \
-    -machine virt,highmem=on -cpu cortex-a76 -smp "$SMP" -m "$MEM" \
+    -machine virt,highmem=on -cpu "$QEMU_CPU" -smp "$SMP" -m "$MEM" \
     -bios "$FW" \
     -drive if=none,file="$DISK",id=hd0,format=${FORMAT},cache=writeback \
     -device virtio-blk-device,drive=hd0 \
