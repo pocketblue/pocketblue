@@ -22,3 +22,8 @@ dnf -y swap glibc-all-langpacks glibc-langpack-en
 dnf -y remove dracut-config-rescue
 
 dnf -y remove nvidia-gpu-firmware
+
+# bluetooth is broken after 5.85
+# since 5.85 is not available on f44 branch, `|| true` is required
+dnf -y downgrade bluez-5.85 || true
+dnf -y versionlock add bluez
