@@ -31,7 +31,7 @@ base_bootc := env("PB_BASE_BOOTC", "quay.io/fedora/fedora-bootc:" + branch)
 registry := env("PB_REGISTRY", "localhost")
 
 expires_after := env("PB_EXPIRES_AFTER", "")
-rechunk_suffix := env("PB_RECHUNK_SUFFIX", "")
+rechunk_suffix := env("PB_RECHUNK_SUFFIX", "-build")
 arch := env("PB_ARCH", "arm64")
 
 default: build
