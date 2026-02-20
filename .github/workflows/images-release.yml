@@ -24,7 +24,7 @@ jobs:
       - name: version
         id: version
         run: |
-          export full_version=$(skopeo inspect docker://quay.io/pocketblue/qualcomm-sdm845-phosh:43 --format '{{ index .Labels "org.opencontainers.image.version" }}')
+          export full_version=$(skopeo inspect docker://quay.io/pocketblue/qualcomm-sdm845-phosh:${{ inputs.fedora_branch }} --format '{{ index .Labels "org.opencontainers.image.version" }}')
           echo version=$(echo $full_version | cut -d. -f1-2) >> $GITHUB_OUTPUT
       - uses: softprops/action-gh-release@v2
         id: create_release

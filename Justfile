@@ -53,6 +53,7 @@ pull:
     sudo podman pull {{base_bootc}}
     sudo podman pull {{registry}}/{{device}}-{{desktop}}:{{tag}} || true
 
+[default]
 build *ARGS:
     sudo buildah bud \
         --net=host \
