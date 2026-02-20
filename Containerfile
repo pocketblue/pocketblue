@@ -29,16 +29,16 @@ RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=cache,target=/var/cache \
-    env --chdir=/ctx/devices/$device ./build && \
+    env --chdir=/ctx/devices/${device} ./build && \
     /ctx/common/cleanup
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=cache,target=/var/cache \
-    env --chdir=/ctx/desktops/$desktop ./build && \
+    env --chdir=/ctx/desktops/${desktop} ./build && \
     /ctx/common/cleanup
 
 # os-release file
-RUN sed -i "s/^PRETTY_NAME=.*/PRETTY_NAME=\"Fedora Linux $target_tag ($desktop)\"/" /usr/lib/os-release
+RUN sed -i "s/^PRETTY_NAME=.*/PRETTY_NAME=\"Fedora Linux ${target_tag} (${desktop})\"/" /usr/lib/os-release
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     /ctx/common/cleanup && \

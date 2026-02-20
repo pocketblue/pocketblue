@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# Stock Fedora kernel already includes virtio drivers for QEMU
