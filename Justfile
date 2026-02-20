@@ -135,7 +135,7 @@ build-qemu qemu_device="qemu" qemu_desktop="tty" image="" type="qcow2":
 qemu path="output/qcow2/disk.qcow2" memory="4096":
     # run QEMU on a disk image (produced by build-qemu or the images workflow).
     test -f {{path}} || { echo "disk image not found: {{path}} \nRun 'just build-qemu' first"; exit 1; }
-    QEMU_CPU={{qemu_cpu}} ./devices/qemu/run-qemu.sh {{path}} {{memory}}
+    QEMU_CPU={{qemu_cpu}} ./tools/run-qemu.sh {{path}} {{memory}}
 
 clean:
     rm -rf output/
