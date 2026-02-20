@@ -1,0 +1,6 @@
+# CI-only Justfile (fast, non-interactive smoke / orchestration targets)
+
+ci-qemu-smoke:
+    # quick smoke: build qemu image then run qemu (placeholder - extend with serial assertions)
+    just build-qemu
+    just qemu

@@ -36,6 +36,17 @@ arch := env("PB_ARCH", "arm64")
 rootfs := env("PB_ROOTFS", "btrfs")
 qemu_cpu := env("PB_QEMU_CPU", "cortex-a76")
 
+print-globals:
+    @echo "branch={{branch}}"
+    @echo "tag={{tag}}"
+    @echo "device={{device}}"
+    @echo "desktop={{desktop}}"
+    @echo "arch={{arch}}"
+    @echo "rootfs={{rootfs}}"
+    @echo "registry={{registry}}"
+    @echo "base={{base}}"
+    @echo "base_bootc={{base_bootc}}"
+
 # Detect container runtime
 _runtime := if `command -v podman >/dev/null 2>&1; echo $?` == "0" { "podman" } else if `command -v docker >/dev/null 2>&1; echo $?` == "0" { "docker" } else { "" }
 
@@ -91,34 +102,7 @@ bootc *ARGS: _check_runtime
         "{{registry}}/{{device}}-{{desktop}}:{{tag}}" bootc {{ARGS}}
 
 disk image="" type="qcow2" rootfs_override="": _check_runtime
-    #!/usr/bin/env bash
-    set -euo pipefail
-    IMAGE="{{image}}"
-    TYPE="{{type}}"
-    ROOTFS="{{rootfs_override}}"
-    if [ -z "$IMAGE" ]; then
-        echo "error: image parameter required" >&2; exit 1
-    fi
-    # Use global rootfs if override not provided
-    if [ -z "$ROOTFS" ]; then
-        ROOTFS="{{rootfs}}"
-    fi
-    echo "==> producing $TYPE disk image from $IMAGE via bootc-image-builder (rootfs: $ROOTFS)"
-    mkdir -p output
-    sudo {{_runtime}} run \
-        --rm --privileged \
-        --pull=newer \
-        -v /var/lib/containers/storage:/var/lib/containers/storage \
-        -v "$(pwd)/bootc-image-builder.toml":/config.toml:ro \
-        -v "$(pwd)/output":/output \
-        --security-opt label=type:unconfined_t \
-        quay.io/centos-bootc/bootc-image-builder:latest \
-        --type="$TYPE" \
-        --target-arch="{{arch}}" \
-        --rootfs="$ROOTFS" \
-        "$IMAGE"
-    sudo chown -R "$(id -u):$(id -g)" output
-    echo "==> disk image ready: output/$TYPE/"
+    bash ./tools/recipes/bin/disk.sh "{{image}}" "{{type}}" "{{rootfs_override}}"
 
 build-qemu qemu_device="qemu" qemu_desktop="tty" image="" type="qcow2":
     #!/usr/bin/env bash
