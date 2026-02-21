@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -euxo pipefail
 
 # Usage: disk.sh <image> [type=qcow2] [rootfs_override]
 IMAGE="${1:-}"

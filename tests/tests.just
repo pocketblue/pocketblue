@@ -13,7 +13,7 @@ build-qemu qemu_device="qemu" qemu_desktop="tty" output="./output/qcow2/disk.qco
 
 @qemu path="output/qcow2/disk.qcow2" memory="4096" format="qcow2":
     #!/usr/bin/env bash
-    set -euo pipefail
+    set -euxo pipefail
 
     test -f {{path}} || { echo "disk image not found: {{path}} \nRun 'just build-qemu' first"; exit 1; }
 
