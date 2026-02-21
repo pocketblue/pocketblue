@@ -1,6 +1,5 @@
 # Local builds and tests
 
-import "ci/ci.just"
 
 qemu_rootfs := "ext4"
 imgtype := "qcow2"
@@ -65,4 +64,3 @@ build-qemu qemu_device="qemu" qemu_desktop="tty" output="./output/qcow2/disk.qco
         -serial mon:stdio \
         -display none
 
-qemu-smoke: ci-qemu-smoke
