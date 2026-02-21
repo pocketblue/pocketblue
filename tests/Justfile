@@ -1,0 +1,11 @@
+# local/dev Justfile: commands you run interactively while hacking
+
+qemu-smoke:
+    # runs the qemu smoke test locally (identical to CI target)
+    just -f tests/ci/Justfile ci-qemu-smoke
+
+clean:
+    rm -rf output/
+
+clean-all:
+    just -f tests/ci/Justfile ci-clean-all
