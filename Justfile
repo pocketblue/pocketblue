@@ -1,7 +1,7 @@
 set dotenv-load
 
 import "tools/recipes/core.just"
-import "tests/tests.just"
+import "tools/recipes/tests.just"
 
 
 silverblue := env("PB_SILVERBLUE", "quay.io/fedora/fedora-silverblue")
