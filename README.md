@@ -17,7 +17,10 @@ This is a work-in-progress. During the installation process all data on your dev
 
 - [Xiaomi Pad 5](https://pocketblue.github.io/devices/xiaomi-nabu)
 - [Xiaomi Pad 6](https://pocketblue.github.io/devices/xiaomi-pipa)
-- [OnePlus 6/6T](https://pocketblue.github.io/devices/oneplus-sdm845)
+- [Qualcomm SDM845](https://pocketblue.github.io/devices/qualcomm-sdm845)
+    - [OnePlus 6/6T](https://pocketblue.github.io/devices/oneplus-sdm845)
+    - [Xiaomi Poco F1](https://pocketblue.github.io/devices/xiaomi-beryllium)
+- [Orange Pi 3 LTS](https://pocketblue.github.io/devices/xunlong-orangepi3-lts)
 
 ### Useful information
 
