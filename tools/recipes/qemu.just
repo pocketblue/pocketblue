@@ -8,8 +8,8 @@ build-qemu qemu_device="qemu" qemu_desktop="tty" output="./output/qcow2/disk.qco
     #!/usr/bin/env bash
     set -euxo pipefail
     image="localhost/{{qemu_device}}-{{qemu_desktop}}:{{tag}}-build"
-    just build {{base}} {{branch}} {{qemu_device}} {{qemu_desktop}} {{tag}}
-    just disk $image {{imgtype}} {{qemu_rootfs}}
+    just device={{qemu_device}} desktop={{qemu_desktop}} build
+    just image=$image type={{imgtype}} rootfs={{qemu_rootfs}} disk
 
 @qemu path="output/qcow2/disk.qcow2" memory="4096" format="qcow2":
     #!/usr/bin/env bash

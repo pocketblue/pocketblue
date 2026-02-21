@@ -11,7 +11,7 @@ pull:
     sudo podman pull {{base_bootc}}
     sudo podman pull {{registry}}/{{device}}-{{desktop}}:{{tag}} || true
 
-build base=base branch=branch device=device desktop=desktop target_tag=tag *ARGS:
+build *ARGS:
     sudo buildah bud \
         --net=host \
         --arch="{{arch}}" \
