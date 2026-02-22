@@ -40,6 +40,9 @@ arch := env("PB_ARCH", "arm64")
 rootfs := env("PB_ROOTFS", "btrfs")
 qemu_cpu := env("PB_QEMU_CPU", "cortex-a76")
 
+image := registry + "/" + device + "-" + desktop + ":" + tag
+d_type := env("PB_D_TYPE", "qcow2")
+
 # Detect container runtime
 _runtime := if `command -v podman >/dev/null 2>&1; echo $?` == "0" { "podman" } else if `command -v docker >/dev/null 2>&1; echo $?` == "0" { "docker" } else { "" }
 

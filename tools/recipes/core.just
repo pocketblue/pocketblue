@@ -3,8 +3,8 @@
 default: build
 
 
-disk image="" type="qcow2" rootfs="":
-    bash ./tools/recipes/bin/disk.sh "{{image}}" "{{type}}" "{{rootfs}}"
+disk d_type="qcow2" rootfs="":
+    bash ./tools/recipes/bin/disk.sh "{{image}}" "{{d_type}}" "{{rootfs}}"
 
 pull:
     sudo podman pull {{base}}:{{branch}}
