@@ -44,12 +44,12 @@ image := registry + "/" + device + "-" + desktop + ":" + tag
 d_type := env("PB_D_TYPE", "qcow2")
 
 # Detect container runtime
-_runtime := if `command -v podman >/dev/null 2>&1; echo $?` == "0" { "podman" } else if `command -v docker >/dev/null 2>&1; echo $?` == "0" { "docker" } else { "" }
+_runtime := if `command -v podman >/dev/null 2>&1; echo $?` == "0" { "podman" } else { "" }
 
 _check_runtime:
     #!/usr/bin/env bash
     if [ -z "{{_runtime}}" ]; then
-        echo "error: need podman or docker to run this target" >&2
+        echo "error: need podman to run this target" >&2
         exit 1
     fi
 

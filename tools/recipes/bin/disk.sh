@@ -18,10 +18,8 @@ ARCH="${PB_ARCH:-arm64}"
 # detect container runtime (fallback to podman/docker)
 if command -v podman >/dev/null 2>&1; then
   RUNTIME=podman
-elif command -v docker >/dev/null 2>&1; then
-  RUNTIME=docker
 else
-  echo "error: need podman or docker to run this script" >&2
+  echo "error: need podman to run this script" >&2
   exit 1
 fi
 
