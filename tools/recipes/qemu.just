@@ -16,12 +16,7 @@ build-qemu qemu_device="qemu" qemu_desktop="tty" output="./output/qcow2/disk.qco
     test -f {{path}} || { echo "disk image not found: {{path}} \nRun 'just build-qemu' first"; exit 1; }
 
 
-    QEMU=${QEMU_BIN:-$(command -v qemu-system-aarch64 || true)}
-    if [ -z "$QEMU" ]; then
-    echo "qemu-system-aarch64 not found in PATH" >&2
-    echo "Please install 'qemu-system-aarch64' or set QEMU_BIN environment variable" >&2
-    exit 1
-    fi
+    QEMU=${command -v qemu-system-aarch64}
 
     # common locations for AArch64 UEFI firmware (local override then distro paths)
     FW_CANDIDATES=("./tools/firmware/QEMU_EFI.fd" \
