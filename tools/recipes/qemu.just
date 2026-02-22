@@ -46,11 +46,7 @@ build-qemu qemu_device="qemu" qemu_desktop="tty" output="./output/qcow2/disk.qco
     fi
     echo "Using firmware: $FW"
 
-    if command -v nproc >/dev/null 2>&1; then
-        SMP=$(nproc --physical 2>/dev/null || nproc)
-    else
-        SMP=$(grep -c "^processor" /proc/cpuinfo 2>/dev/null || echo 2)
-    fi
+    SMP=$(nproc --physical 2>/dev/null || nproc)
 
     QEMU_CPU={{qemu_cpu}}
     "$QEMU" \
