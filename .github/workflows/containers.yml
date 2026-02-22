@@ -46,14 +46,6 @@ on:
         description: 'ARG: xiaomi_nabu_samsung_ufs'
         required: true
         default: false
-  push:
-    paths:
-      - 'Containerfile'
-      - 'common/**'
-      - 'devices/**'
-      - '!devices/*/build-aux/**'
-      - '!devices/*/flash-scripts/**'
-      - 'desktops/**'
 
 run-name: >
   containers:
