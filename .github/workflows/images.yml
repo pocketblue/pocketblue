@@ -1,8 +1,8 @@
 name: images
 run-name: >
   images: ${{ inputs.device }}
-  ${{ inputs.desktop && inputs.desktop != 'all' && format(' / {0}', inputs.desktop) || '' }}
   / fedora ${{ inputs.tag }}
+  ${{ inputs.desktop && inputs.desktop != 'all' && format(' / {0}', inputs.desktop) || '' }}
 on:
   workflow_dispatch:
     inputs:
@@ -40,12 +40,30 @@ on:
         required: true
         default: false
 jobs:
+  desktops:
+    runs-on: ubuntu-24.04-arm
+    outputs:
+      desktops: ${{ steps.desktops.outputs.desktops }}
+    steps:
+      - id: desktops
+        uses: pocketblue/actions/select-desktops@main
+        with:
+          desktop: ${{ inputs.desktop || '' }}
+          desktop_list: |
+            tty
+            gnome-desktop
+            gnome-mobile
+            plasma-desktop
+            plasma-mobile
+            phosh
+
   images:
+    needs: desktops
     runs-on: ubuntu-24.04-arm
     strategy:
       fail-fast: false
       matrix:
-        desktop: ${{ fromJson(inputs.desktop != 'all' && format('["{0}"]', inputs.desktop) || '["tty","gnome-desktop","gnome-mobile","plasma-desktop","plasma-mobile","phosh"]') }}
+        desktop: ${{ fromJson(needs.desktops.outputs.desktops) }}
     name: ${{ inputs.device }}-${{ matrix.desktop }}:${{ inputs.tag }}
     steps:
       - uses: actions/checkout@v6

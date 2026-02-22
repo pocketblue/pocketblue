@@ -101,8 +101,27 @@ jobs:
             xiaomi-pipa
             xunlong-orangepi3-lts
 
+  desktops:
+    runs-on: ubuntu-24.04-arm
+    outputs:
+      desktops: ${{ steps.desktops.outputs.desktops }}
+    steps:
+      - id: desktops
+        uses: pocketblue/actions/select-desktops@main
+        with:
+          desktop: ${{ inputs.desktop || '' }}
+          desktop_list: |
+            tty
+            gnome-desktop
+            gnome-mobile
+            plasma-desktop
+            plasma-mobile
+            phosh
+
   build:
-    needs: config
+    needs:
+      - config
+      - desktops
     secrets: inherit
     permissions:
       packages: write
@@ -110,7 +129,7 @@ jobs:
       fail-fast: false
       matrix:
         device: ${{ fromJson(needs.config.outputs.devices) }}
-        desktop: ${{ fromJson(inputs.desktop && inputs.desktop != 'all' && format('["{0}"]', inputs.desktop) || '["tty","gnome-desktop","gnome-mobile","plasma-desktop","plasma-mobile","phosh"]') }}
+        desktop: ${{ fromJson(needs.desktops.outputs.desktops) }}
     uses: ./.github/workflows/helper-build-container.yml
     with:
       fedora_branch: ${{ inputs.fedora_branch || 43 }}
