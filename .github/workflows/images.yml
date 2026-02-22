@@ -1,5 +1,8 @@
 name: images
-run-name: 'images: ${{ inputs.device }} / fedora ${{ inputs.tag }}'
+run-name: >
+  images: ${{ inputs.device }}
+  ${{ inputs.desktop && inputs.desktop != 'all' && format(' / {0}', inputs.desktop) || '' }}
+  / fedora ${{ inputs.tag }}
 on:
   workflow_dispatch:
     inputs:
@@ -18,6 +21,19 @@ on:
         description: image tag
         required: true
         default: '43'
+      desktop:
+        type: choice
+        description: desktop
+        required: true
+        options:
+          - all
+          - tty
+          - gnome-desktop
+          - gnome-mobile
+          - plasma-desktop
+          - plasma-mobile
+          - phosh
+        default: all
       nabu_samsung_ufs:
         type: boolean
         description: build with Samsung UFS support (xiaomi-nabu only)
@@ -29,7 +45,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        desktop: [tty, gnome-desktop, gnome-mobile, plasma-desktop, plasma-mobile, phosh]
+        desktop: ${{ fromJson(inputs.desktop != 'all' && format('["{0}"]', inputs.desktop) || '["tty","gnome-desktop","gnome-mobile","plasma-desktop","plasma-mobile","phosh"]') }}
     name: ${{ inputs.device }}-${{ matrix.desktop }}:${{ inputs.tag }}
     steps:
       - uses: actions/checkout@v6

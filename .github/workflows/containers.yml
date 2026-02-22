@@ -8,6 +8,9 @@ on:
       device:
         type: string
         required: false
+      desktop:
+        type: string
+        required: false
       target_tag_override:
         type: string
         required: false
@@ -37,6 +40,19 @@ on:
           - 'xiaomi-pipa'
           - 'xunlong-orangepi3-lts'
         default: 'all'
+      desktop:
+        type: choice
+        description: 'desktop'
+        required: true
+        options:
+          - 'all'
+          - 'tty'
+          - 'gnome-desktop'
+          - 'gnome-mobile'
+          - 'plasma-desktop'
+          - 'plasma-mobile'
+          - 'phosh'
+        default: 'all'
       target_tag_override:
         type: string
         description: 'override target tag'
@@ -59,6 +75,7 @@ run-name: >
   containers:
   fedora ${{ inputs.fedora_branch || 43 }}
   ${{ inputs.device && inputs.device != 'all' && format(' | {0}', inputs.device) || '' }}
+  ${{ inputs.desktop && inputs.desktop != 'all' && format(' | {0}', inputs.desktop) || '' }}
   ${{ github.event_name == 'push' && format(' | {0}', github.event.head_commit.message) || '' }}
 
 jobs:
@@ -93,7 +110,7 @@ jobs:
       fail-fast: false
       matrix:
         device: ${{ fromJson(needs.config.outputs.devices) }}
-        desktop: [tty, gnome-desktop, gnome-mobile, plasma-desktop, plasma-mobile, phosh]
+        desktop: ${{ fromJson(inputs.desktop && inputs.desktop != 'all' && format('["{0}"]', inputs.desktop) || '["tty","gnome-desktop","gnome-mobile","plasma-desktop","plasma-mobile","phosh"]') }}
     uses: ./.github/workflows/helper-build-container.yml
     with:
       fedora_branch: ${{ inputs.fedora_branch || 43 }}
