@@ -15,17 +15,10 @@ fi
 ROOTFS="${ROOTFS_OVERRIDE:-${PB_ROOTFS:-btrfs}}"
 ARCH="${PB_ARCH:-arm64}"
 
-# detect container runtime (fallback to podman/docker)
-if command -v podman >/dev/null 2>&1; then
-  RUNTIME=podman
-else
-  echo "error: need podman to run this script" >&2
-  exit 1
-fi
 
 echo "==> producing $TYPE disk image from $IMAGE via bootc-image-builder (rootfs: $ROOTFS)"
 mkdir -p output
-sudo "$RUNTIME" run \
+sudo podman run \
   --rm --privileged \
   --pull=newer \
   -v /var/lib/containers/storage:/var/lib/containers/storage \

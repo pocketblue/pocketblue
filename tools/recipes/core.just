@@ -24,8 +24,8 @@ build *ARGS:
         {{ if expires_after != "" { "--label quay.expires-after=" + expires_after } else { "" } }} \
         "."
 
-rechunk *ARGS: _check_runtime
-    sudo {{_runtime}} run --rm --privileged -v /var/lib/containers:/var/lib/containers {{ARGS}} \
+rechunk *ARGS:
+    sudo podman run --rm --privileged -v /var/lib/containers:/var/lib/containers {{ARGS}} \
         {{base_bootc}} \
         /usr/libexec/bootc-base-imagectl rechunk \
         {{registry}}/{{device}}-{{desktop}}:{{tag}}{{rechunk_suffix}} \
@@ -34,8 +34,8 @@ rechunk *ARGS: _check_runtime
 rebase local_image=(registry / device + "-" + desktop + ":" + tag):
     sudo rpm-ostree rebase ostree-unverified-image:containers-storage:{{local_image}}
 
-bootc *ARGS: _check_runtime
-    sudo {{_runtime}} run \
+bootc *ARGS:
+    sudo podman run \
         --rm --privileged --pid=host \
         -it \
         -v /sys/fs/selinux:/sys/fs/selinux \
