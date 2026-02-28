@@ -2,6 +2,7 @@
 set -e
 
 BT_INTERFACE="hci0"
+BT_INDEX="0"
 MAC_PREFIX="0200"
 BT_TIMEOUT=5
 
@@ -36,11 +37,11 @@ set +e
 BT_RFKILL_UNBLOCKED=$(rfkill -n -r -o DEVICE,TYPE,SOFT | grep "bluetooth" | grep "unblocked")
 set -e
 
-yes | btmgmt -i "$BT_INTERFACE" power off
+bluetoothctl mgmt.power-off "$BT_INDEX"
 
 timeout=0
 while [ $timeout -lt "$BT_TIMEOUT" ]; do
-    if yes | btmgmt -i "$BT_INTERFACE" public-addr "$BT_MAC"; then
+    if bluetoothctl mgmt.public-addr "$BT_INDEX" "$BT_MAC"; then
         break
     fi
     log "Unable to set Bluetooth MAC, retrying after 1 second..."
@@ -56,7 +57,7 @@ fi
 if [ -n "$BT_RFKILL_UNBLOCKED" ]; then
     log "Restoring Bluetooth rfkill state to unblocked"
     rfkill unblock bluetooth
-    yes | btmgmt -i "$BT_INTERFACE" power on
+    bluetoothctl mgmt.power-on "$BT_INDEX"
 fi
 
 log "Bluetooth MAC address configured successfully"
