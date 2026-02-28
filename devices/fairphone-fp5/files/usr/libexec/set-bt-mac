@@ -1,0 +1,62 @@
+#!/bin/sh
+set -e
+
+BT_INTERFACE="hci0"
+MAC_PREFIX="0200"
+BT_TIMEOUT=5
+
+log() {
+    echo "$@"
+}
+
+log "Generating Bluetooth MAC address"
+
+SERIAL_NUMBER=$(grep -o "serialno.*" /proc/cmdline | cut -d" " -f1)
+
+if [ -z "$SERIAL_NUMBER" ]; then
+    log "Serial number not available, falling back to machine-id"
+    SERIAL_NUMBER=$(cat /etc/machine-id)
+fi
+
+if [ -z "$SERIAL_NUMBER" ]; then
+    log "No unique ID available, cannot generate MAC address"
+    exit 1
+fi
+
+BT_MAC=$(echo "$SERIAL_NUMBER-BT" | sha256sum | awk -v prefix="$MAC_PREFIX" '{printf("%s%010s\n", prefix, $1)}')
+BT_MAC=$(echo "$BT_MAC" | cut -c1-12 | sed 's/\(..\)/\1:/g' | sed '$s/:$//')
+
+log "Setting Bluetooth MAC to $BT_MAC"
+
+if hciconfig "$BT_INTERFACE" | grep -q "UP"; then
+    hciconfig "$BT_INTERFACE" down
+fi
+
+set +e
+BT_RFKILL_UNBLOCKED=$(rfkill -n -r -o DEVICE,TYPE,SOFT | grep "bluetooth" | grep "unblocked")
+set -e
+
+yes | btmgmt -i "$BT_INTERFACE" power off
+
+timeout=0
+while [ $timeout -lt "$BT_TIMEOUT" ]; do
+    if yes | btmgmt -i "$BT_INTERFACE" public-addr "$BT_MAC"; then
+        break
+    fi
+    log "Unable to set Bluetooth MAC, retrying after 1 second..."
+    sleep 1
+    timeout=$((timeout + 1))
+done
+
+if [ $timeout -ge "$BT_TIMEOUT" ]; then
+    log "Failed to set Bluetooth MAC address after $BT_TIMEOUT seconds"
+    exit 1
+fi
+
+if [ -n "$BT_RFKILL_UNBLOCKED" ]; then
+    log "Restoring Bluetooth rfkill state to unblocked"
+    rfkill unblock bluetooth
+    yes | btmgmt -i "$BT_INTERFACE" power on
+fi
+
+log "Bluetooth MAC address configured successfully"

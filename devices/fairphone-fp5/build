@@ -48,6 +48,7 @@ dnf -y install --refresh --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
 
 # Set executable permissions on helper scripts
 chmod +x /usr/libexec/fairphone-fp5-debug
+chmod +x /usr/libexec/set-bt-mac
 
 # Install SELinux policy module for QRTR socket access (CIL format)
 # Fedora's iiosensorproxy_t domain lacks permission for qipcrtr_socket

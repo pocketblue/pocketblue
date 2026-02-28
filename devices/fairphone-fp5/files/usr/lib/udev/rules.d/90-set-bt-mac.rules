@@ -1,0 +1,1 @@
+ACTION=="add", SUBSYSTEM=="bluetooth", KERNEL=="hci0", TAG+="systemd", ENV{SYSTEMD_WANTS}="set-bt-mac.service"
