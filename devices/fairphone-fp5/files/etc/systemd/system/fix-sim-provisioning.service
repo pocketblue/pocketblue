@@ -1,0 +1,28 @@
+# The Qualcomm modem firmware initializes both logical SIM slots but does not
+# automatically bind a provisioning session to the USIM application on slot 1.
+# Without this, ModemManager sees no provisioned SIM and reports sim-missing.
+# This service discovers the USIM application ID on slot 1 and binds the
+# primary GW provisioning session to it before ModemManager starts.
+
+[Unit]
+Description=Fix SIM provisioning session
+Before=ModemManager.service
+After=qrtr-ns.service systemd-modules-load.service
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+ExecStartPre=/usr/bin/sleep 3
+ExecStart=/bin/bash -c '\
+  AID=$(/usr/bin/qmicli -d qrtr://0 --uim-get-card-status \
+    | grep -A3 "usim" \
+    | tail -1 \
+    | tr -d " \\t\\n:") && \
+  [ -n "$AID" ] && \
+  /usr/bin/qmicli -d qrtr://0 --uim-change-provisioning-session="session-type=primary-gw-provisioning,activate=yes,slot=1,aid=$AID"'
+RemainAfterExit=yes
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

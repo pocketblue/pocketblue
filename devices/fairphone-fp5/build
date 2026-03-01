@@ -61,7 +61,8 @@ systemctl enable \
     bluetooth.service \
     tqftpserv.service \
     qbootctl.service \
-    rmtfs.service
+    rmtfs.service \
+    fix-sim-provisioning.service
 
 # Mask services that don't apply to mobile ARM devices:
 # - bootloader-update: uses bootupd for EFI systems; FP5 uses Android A/B boot
