@@ -1,7 +1,6 @@
 #!/bin/sh
 set -e
 
-BT_INTERFACE="hci0"
 BT_INDEX="0"
 MAC_PREFIX="0200"
 BT_TIMEOUT=5
@@ -29,19 +28,15 @@ BT_MAC=$(echo "$BT_MAC" | cut -c1-12 | sed 's/\(..\)/\1:/g' | sed '$s/:$//')
 
 log "Setting Bluetooth MAC to $BT_MAC"
 
-if hciconfig "$BT_INTERFACE" | grep -q "UP"; then
-    hciconfig "$BT_INTERFACE" down
-fi
-
 set +e
 BT_RFKILL_UNBLOCKED=$(rfkill -n -r -o DEVICE,TYPE,SOFT | grep "bluetooth" | grep "unblocked")
 set -e
 
-bluetoothctl mgmt.power-off "$BT_INDEX"
+bluetoothctl power off
 
 timeout=0
 while [ $timeout -lt "$BT_TIMEOUT" ]; do
-    if bluetoothctl mgmt.public-addr "$BT_INDEX" "$BT_MAC"; then
+    if printf 'menu mgmt\npublic-addr %s %s\nquit\n' "$BT_INDEX" "$BT_MAC" | bluetoothctl 2>&1 | grep -q "Set public address successfully"; then
         break
     fi
     log "Unable to set Bluetooth MAC, retrying after 1 second..."
@@ -57,7 +52,7 @@ fi
 if [ -n "$BT_RFKILL_UNBLOCKED" ]; then
     log "Restoring Bluetooth rfkill state to unblocked"
     rfkill unblock bluetooth
-    bluetoothctl mgmt.power-on "$BT_INDEX"
+    bluetoothctl power on
 fi
 
 log "Bluetooth MAC address configured successfully"
