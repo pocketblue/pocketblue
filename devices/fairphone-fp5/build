@@ -45,7 +45,7 @@ dnf -y remove \
     kernel-modules-core \
     kernel-modules-extra
 dnf -y install --refresh --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
-    kernel
+    kernel-6.19.0-918.sc7280.fc44
 
 # Set executable permissions on helper scripts
 chmod +x /usr/libexec/fairphone-fp5-debug
