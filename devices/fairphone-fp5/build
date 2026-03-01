@@ -38,14 +38,14 @@ dnf -y swap --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
     iio-sensor-proxy iio-sensor-proxy
 
 # kernel (from lorbus/misc copr)
-dnf -y remove \
-    kernel \
-    kernel-core \
-    kernel-modules \
-    kernel-modules-core \
-    kernel-modules-extra
-dnf -y install --refresh --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
-    kernel-6.19.0-918.sc7280.fc43
+#dnf -y remove \
+#    kernel \
+#    kernel-core \
+#    kernel-modules \
+#    kernel-modules-core \
+#    kernel-modules-extra
+#dnf -y install --refresh --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
+#    kernel
 
 # Set executable permissions on helper scripts
 chmod +x /usr/libexec/fairphone-fp5-debug
