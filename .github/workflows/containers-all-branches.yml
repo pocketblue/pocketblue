@@ -3,6 +3,14 @@ on:
   workflow_dispatch: {}
   schedule:
     - cron: '0 6 * * *'
+  push:
+    paths:
+      - 'Containerfile'
+      - 'common/**'
+      - 'devices/**'
+      - '!devices/*/build-aux/**'
+      - '!devices/*/flash-scripts/**'
+      - 'desktops/**'
 
 jobs:
   main:
@@ -12,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        fedora_branch: ['43']
+        fedora_branch: ['43', '44']
     uses: ./.github/workflows/containers.yml
     with:
       fedora_branch: ${{ matrix.fedora_branch }}
