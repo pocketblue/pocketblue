@@ -1,3 +1,7 @@
 kargs = [
     "selinux=0",
+    "console=tty0",
+    "earlycon",
+    "earlyprintk",
+    "loglevel=8",
 ]
