@@ -34,6 +34,7 @@ jobs:
           body: |
             Recommended images:
             - Xiaomi Pad 5 (xiaomi-nabu): [xiaomi-nabu-gnome-desktop](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-xiaomi-nabu-gnome-desktop-${{ inputs.fedora_branch }}.7z)
+            - Xiaomi Pad 5, **Outdated kernel with Samsung UFS patches** (xiaomi-nabu): [xiaomi-nabu-gnome-desktop](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-xiaomi-nabu-gnome-desktop-${{ inputs.fedora_branch }}-samsung.7z)
             - Xiaomi Pad 6 (xiaomi-pipa): [xiaomi-pipa-gnome-desktop](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-xiaomi-pipa-gnome-desktop-${{ inputs.fedora_branch }}.7z)
             - OnePlus 6/6T (oneplus-enchilada/fajita): [qualcomm-sdm845-phosh](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-qualcomm-sdm845-phosh-${{ inputs.fedora_branch }}.7z)
             - Xiaomi Poco F1 (xiaomi-beryllium): [qualcomm-sdm845-phosh](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-qualcomm-sdm845-phosh-${{ inputs.fedora_branch }}.7z)
