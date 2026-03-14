@@ -74,14 +74,14 @@ jobs:
           image_name: ${{ inputs.device }}-${{ matrix.desktop }}
           image_tag: ${{ inputs.tag }}
           build_aux: ${{ inputs.device == 'xiaomi-nabu' && inputs.nabu_samsung_ufs && 'build-aux.samsung' || 'build-aux' }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: pocketblue-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.tag }}
           path: pocketblue-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.tag }}.7z
-          compression-level: 0
-      - uses: actions/upload-artifact@v4
+          archive: false
+      - uses: actions/upload-artifact@v7
         with:
           if-no-files-found: ignore
           name: rootfs-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.tag }}
           path: rootfs-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.tag }}.ero
-          compression-level: 0
+          archive: false
