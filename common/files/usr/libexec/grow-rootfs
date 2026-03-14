@@ -2,3 +2,5 @@
 set -eu
 mount -o remount,rw /sysroot
 /usr/lib/systemd/systemd-growfs /sysroot
+btrfs filesystem sync /sysroot || true
+sync
