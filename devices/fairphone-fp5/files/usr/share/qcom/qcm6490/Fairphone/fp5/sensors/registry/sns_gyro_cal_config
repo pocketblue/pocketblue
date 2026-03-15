@@ -1,0 +1,1 @@
+{"sns_gyro_cal_config":{"owner":"sns_gyro_cal","calibration_period":{"type":"int","ver":"0","data":"60"},"num_samples":{"type":"int","ver":"0","data":"64"},"variance_threshold":{"type":"flt","ver":"0","data":"0.00000085"},"sample_rate":{"type":"flt","ver":"0","data":"10.00000000"},"bias_threshold":{"type":"flt","ver":"0","data":"0.20000000"}}}

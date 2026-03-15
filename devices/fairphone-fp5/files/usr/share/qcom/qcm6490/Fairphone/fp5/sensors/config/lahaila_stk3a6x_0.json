@@ -1,0 +1,125 @@
+{
+  "config": {
+     "hw_platform": ["IDP"],
+     "soc_id": [ "497" ]
+  },
+  "stk3a6x_0":{
+    "owner": "sns_stk3a6x",
+    ".ambient_light":{
+      "owner": "sns_stk3a6x",
+      ".config":{
+        "owner": "sns_stk3a6x",
+        "is_dri":{ "type": "int", "ver": "0",
+          "data": "0"
+        },
+        "hw_id":{ "type": "int", "ver": "0",
+          "data": "0"
+        },
+        "res_idx":{ "type": "int", "ver": "0",
+          "data": "0"
+        },
+        "sync_stream":{ "type": "int", "ver": "0",
+          "data": "0"
+        }
+      }
+    },
+  ".proximity":{
+      "owner": "sns_stk3a6x",
+      ".config":{
+        "owner": "sns_stk3a6x",
+        "is_dri":{ "type": "int", "ver": "0",
+          "data": "0"
+        },
+        "hw_id":{ "type": "int", "ver": "0",
+          "data": "0"
+        },
+        "res_idx":{ "type": "int", "ver": "0",
+          "data": "0"
+        },
+        "sync_stream":{ "type": "int", "ver": "0",
+          "data": "0"
+        }
+      }
+    }
+  },
+  "stk3a6x_0_platform":{
+    "owner": "sns_stk3a6x",
+    ".config":{
+      "owner": "sns_stk3a6x",
+      "bus_type":{ "type": "int", "ver": "0",
+        "data": "0"
+      },
+      "bus_instance":{ "type": "int", "ver": "0",
+        "data": "2"
+      },
+      "slave_config":{ "type": "int", "ver": "0",
+        "data": "72"
+      },
+      "min_bus_speed_khz":{ "type": "int", "ver": "0",
+        "data": "400"
+      },
+      "max_bus_speed_khz":{ "type": "int", "ver": "0",
+        "data": "400"
+      },
+      "reg_addr_type":{ "type": "int", "ver": "0",
+        "data": "0"
+      },
+      "dri_irq_num":{ "type": "int", "ver": "0",
+        "data": "12"
+      },
+      "irq_pull_type":{ "type": "int", "ver": "0",
+        "data": "2"
+      },
+      "irq_is_chip_pin":{ "type": "int", "ver": "0",
+        "data": "1"
+      },
+      "irq_drive_strength":{ "type": "int", "ver": "0",
+        "data": "0"
+      },
+      "irq_trigger_type":{ "type": "int", "ver": "0",
+        "data": "1"
+      },
+      "num_rail":{ "type": "int", "ver": "0",
+        "data": "1"
+      },
+      "rail_on_state":{ "type": "int", "ver": "0",
+        "data": "2"
+      },
+      "vddio_rail":{ "type": "str", "ver": "0",
+        "data": "/pmic/client/sensor_vddio"
+      },
+      "rigid_body_type":{ "type": "int", "ver": "0",
+      "data": "0"
+      }
+    },
+	".als":{
+      "owner": "sns_stk3a6x",
+      ".fac_cal":{
+        "owner": "sns_stk3a6x",
+	"r_channel_scale":{"type": "flt", "ver": "2",
+		"data": "1.0"},
+	"g_channel_scale":{"type": "flt", "ver": "2",
+		"data": "1.0"},
+	"b_channel_scale":{"type": "flt", "ver": "2",
+		"data": "1.0"},
+	"c_channel_scale":{"type": "flt", "ver": "2",
+		"data": "1.0"}
+      }
+    },
+    ".ps":{
+      "owner": "sns_stk3a6x",
+      ".fac_cal":{
+        "owner": "sns_stk3a6x",
+        "near_threshold":{ "type": "flt", "ver": "0",
+          "data": "1000.0"
+        },
+        "far_threshold":{ "type": "flt", "ver": "0",
+          "data": "900.0"
+        },
+        "ctir_config":{ "type": "flt", "ver": "0",
+          "data": "0.0"
+        }
+      }
+    }
+  }
+}
