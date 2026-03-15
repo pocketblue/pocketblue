@@ -35,25 +35,35 @@ on:
         required: true
         type: boolean
 
-env:
-  JUST_ARGS: >
-    branch=${{ inputs.fedora_branch }}
-    tag=${{ inputs.tag }}
-    device=${{ inputs.device }}
-    desktop=${{ inputs.desktop }}
-    registry=${{ inputs.registry }}
-    ${{ inputs.expires && 'expires_after=1w' || '' }}
-    rechunk_suffix=-build
-
 jobs:
   build:
     name: ${{ inputs.device }}-${{ inputs.desktop }}
     runs-on: ubuntu-24.04-arm
     permissions:
       packages: write
+    env:
+      INPUT_REGISTRY: ${{ inputs.registry }}
+      REGISTRY_USERNAME: ${{ vars.REGISTRY_USERNAME || github.repository_owner }}
     steps:
+      - name: Prepare environment
+        run: |
+          echo "INPUT_REGISTRY=${INPUT_REGISTRY,,}" >> ${GITHUB_ENV}
+          echo "REGISTRY_USERNAME=${REGISTRY_USERNAME,,}" >> ${GITHUB_ENV}
+          cat >> ${GITHUB_ENV} << EOF
+          JUST_ARGS=\
+          branch=${{ inputs.fedora_branch }} \
+          tag=${{ inputs.tag }} \
+          device=${{ inputs.device }} \
+          desktop=${{ inputs.desktop }} \
+          registry=${INPUT_REGISTRY,,} \
+          ${{ inputs.expires && 'expires_after=1w' || '' }} \
+          rechunk_suffix=-build
+          EOF
+
       - uses: actions/checkout@v6
       - uses: extractions/setup-just@v3
+        with:
+          just-version: '1.46.0'
 
       - name: Pull
         id: pull
@@ -74,8 +84,8 @@ jobs:
         uses: pocketblue/actions/container-push@main
         env:
           latest: ${{ inputs.latest }}
-          username: ${{ vars.REGISTRY_USERNAME != '' && vars.REGISTRY_USERNAME || github.repository_owner }}
-          password: ${{ secrets.REGISTRY_TOKEN != '' && secrets.REGISTRY_TOKEN || secrets.GITHUB_TOKEN }}
-          registry: ${{ inputs.registry }}
+          username: ${{ env.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_TOKEN || secrets.GITHUB_TOKEN }}
+          registry: ${{ env.INPUT_REGISTRY }}
           name: ${{ inputs.device }}-${{ inputs.desktop }}
           tag: ${{ inputs.tag }}
