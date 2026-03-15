@@ -44,6 +44,7 @@ pull:
 [default]
 build *ARGS:
     sudo buildah bud \
+        --layers=true \
         --arch="{{arch}}" \
         --build-arg "base={{base}}:{{branch}}" \
         --build-arg "device={{device}}" \
