@@ -1,5 +1,11 @@
 set dotenv-load
 
+import 'tools/build.just'
+import 'tools/pull.just'
+import 'tools/rechunk.just'
+import 'tools/rebase.just'
+import 'tools/bootc.just'
+
 silverblue := env("PB_SILVERBLUE", "quay.io/fedora/fedora-silverblue")
 kinoite := env("PB_KINOITE", "quay.io/fedora/fedora-kinoite")
 base_atomic := env("PB_BASE_ATOMIC", "quay.io/fedora-ostree-desktops/base-atomic")
@@ -35,45 +41,3 @@ rechunk_suffix := env("PB_RECHUNK_SUFFIX", "-build")
 arch := env("PB_ARCH", "arm64")
 
 default: build
-
-pull:
-    sudo podman pull {{base}}:{{branch}}
-    sudo podman pull {{base_bootc}}
-    sudo podman pull {{registry}}/{{device}}-{{desktop}}:{{tag}} || true
-
-[default]
-build *ARGS:
-    sudo buildah bud \
-        --net=host \
-        --arch="{{arch}}" \
-        --build-arg "base={{base}}:{{branch}}" \
-        --build-arg "device={{device}}" \
-        --build-arg "desktop={{desktop}}" \
-        --build-arg "target_tag={{tag}}" \
-        {{ARGS}} \
-        -t "{{registry}}/{{device}}-{{desktop}}:{{tag}}{{rechunk_suffix}}" \
-        {{ if expires_after != "" { "--label quay.expires-after=" + expires_after } else { "" } }} \
-        "."
-
-rechunk *ARGS:
-    sudo podman run --rm --privileged -v /var/lib/containers:/var/lib/containers {{ARGS}} \
-        {{base_bootc}} \
-        /usr/libexec/bootc-base-imagectl rechunk \
-        {{registry}}/{{device}}-{{desktop}}:{{tag}}{{rechunk_suffix}} \
-        {{registry}}/{{device}}-{{desktop}}:{{tag}}
-
-rebase local_image=(registry / device + "-" + desktop + ":" + tag):
-    sudo rpm-ostree rebase ostree-unverified-image:containers-storage:{{local_image}}
-
-bootc *ARGS:
-    sudo podman run \
-        --rm --privileged --pid=host \
-        -it \
-        -v /sys/fs/selinux:/sys/fs/selinux \
-        -v /etc/containers:/etc/containers:Z \
-        -v /var/lib/containers:/var/lib/containers:Z \
-        -v /dev:/dev \
-        -e RUST_LOG=debug \
-        -v .:/data \
-        --security-opt label=type:unconfined_t \
-        "{{registry}}/{{device}}-{{desktop}}:{{tag}}" bootc {{ARGS}}
