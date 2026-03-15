@@ -2,16 +2,51 @@
 
 set -uexo pipefail
 
-dnf -y install default-flatpaks
+# Install additional fedora packages
+ADDITIONAL_FEDORA_PACKAGES=(
+    gnome-text-editor
+    snapshot
+    firefox
+    gnome-shell-extension-appindicator
+    gnome-shell-extension-blur-my-shell
+    gnome-shell-extension-caffeine
+    gnome-shell-extension-dash-to-dock
+    gnome-shell-extension-gsconnect
+    #gnome-shell-extension-just-perfection
+    #gnome-shell-extension-nekotorch
+    #gnome-shell-extension-network-displays
+    gnome-shell-extension-screen-autorotate
+    #gnome-shell-extension-weather-or-not
 
-dnf -y remove \
-    firefox \
-    firefox-langpacks
+    # Default GNOME Shell Extensions
+    # https://src.fedoraproject.org/rpms/gnome-shell-extensions
+    gnome-shell-extension-apps-menu
+    gnome-shell-extension-auto-move-windows
+    gnome-shell-extension-drive-menu
+    gnome-shell-extension-launch-new-instance
+    gnome-shell-extension-light-style
+    gnome-shell-extension-native-window-placement
+    gnome-shell-extension-places-menu
+    gnome-shell-extension-screenshot-window-sizer
+    gnome-shell-extension-status-icons
+    gnome-shell-extension-system-monitor
+    gnome-shell-extension-user-theme
+    gnome-shell-extension-window-list
+    gnome-shell-extension-windowsNavigator
+    gnome-shell-extension-workspace-indicator
+)
 
-dnf -y remove \
-    gnome-classic-session \
-    gnome-system-monitor \
-    gnome-user-docs \
-    gnome-tour \
-    malcontent-control \
-    yelp
+# Replace stock mutter with patched build (Night Light EDID fallback, auto-rotate fix)
+dnf -y swap --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
+    mutter mutter
+
+dnf -y install --skip-unavailable \
+    "${ADDITIONAL_FEDORA_PACKAGES[@]}"
+
+dnf -y copr enable lorbus/calls
+dnf -y install calls
+dnf -y copr disable lorbus/calls
+
+dnf -y copr enable lorbus/network-displays
+dnf -y install gnome-network-displays gnome-network-displays-extension
+dnf -y copr disable lorbus/network-displays
