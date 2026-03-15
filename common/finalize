@@ -6,6 +6,7 @@ dnf5 clean all
 
 find /var/* -maxdepth 0 -type d \! -name cache -exec rm -fr {} \;
 
+mkdir -p /var/lib/selinux
 mkdir -p /var/tmp
 chmod -R 1777 /var/tmp
 

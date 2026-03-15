@@ -1,0 +1,1 @@
+{"sns_tilt":{"owner":"sns_tilt","enabled":{"type":"int","ver":"0","data":"1"},"sample_rate":{"type":"flt","ver":"0","data":"10.00000000"},"angle_threshold":{"type":"flt","ver":"0","data":"0.61086524"},"init_accel_window_time":{"type":"flt","ver":"0","data":"1.00000000"},"accel_window_time":{"type":"flt","ver":"0","data":"2.00000000"}}}

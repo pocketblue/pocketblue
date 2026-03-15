@@ -9,6 +9,7 @@ After=sysinit.target
 Before=basic.target
 
 [Service]
+Type=oneshot
 ExecStart=/usr/libexec/grow-rootfs
 # So we can temporarily remount the sysroot writable
 MountFlags=slave
