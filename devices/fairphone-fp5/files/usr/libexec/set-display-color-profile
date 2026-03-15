@@ -1,0 +1,30 @@
+#!/bin/sh
+# Manually assign sRGB color profile to DSI-1 display via colord.
+# Workaround for mutter not assigning a profile when EDID is missing (DSI panels).
+# With the patched mutter this should no longer be needed, but kept as a fallback.
+
+set -e
+
+for i in $(seq 1 30); do
+    if colormgr device-get-default-profile xrandr-DSI-1 >/dev/null 2>&1; then
+        echo "DSI-1 already has a color profile assigned."
+        exit 0
+    fi
+
+    profile=$(colormgr find-profile-by-filename /usr/share/color/icc/colord/sRGB.icc 2>/dev/null | grep "Object Path:" | head -1 | sed "s/.*: *//")
+    if [ -n "$profile" ]; then
+        device=$(colormgr find-device xrandr-DSI-1 2>/dev/null | grep "Object Path:" | head -1 | sed "s/.*: *//")
+        if [ -n "$device" ]; then
+            colormgr device-add-profile "$device" "$profile" 2>/dev/null
+            colormgr device-make-profile-default "$device" "$profile" 2>/dev/null
+            echo "Assigned sRGB profile to DSI-1."
+            exit 0
+        fi
+    fi
+
+    echo "Waiting for colord device/profile ($i/30)..."
+    sleep 1
+done
+
+echo "Failed to assign color profile after 30 attempts." >&2
+exit 1

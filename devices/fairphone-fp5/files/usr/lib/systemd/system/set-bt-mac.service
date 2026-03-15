@@ -1,0 +1,8 @@
+[Unit]
+Description=Set Bluetooth MAC address
+Before=bluetooth.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/libexec/set-bt-mac
