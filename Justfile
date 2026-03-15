@@ -44,7 +44,6 @@ pull:
 [default]
 build *ARGS:
     sudo buildah bud \
-        --net=host \
         --arch="{{arch}}" \
         --build-arg "base={{base}}:{{branch}}" \
         --build-arg "device={{device}}" \
