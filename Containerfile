@@ -19,9 +19,6 @@ ARG device
 ARG desktop
 ARG target_tag
 
-# device-specific args
-ARG xiaomi_nabu_samsung_ufs=false
-
 COPY cosign.pub /etc/pki/containers/pocketblue.pub
 
 RUN --mount=type=bind,from=ctx,source=/common,target=/ctx/common \
