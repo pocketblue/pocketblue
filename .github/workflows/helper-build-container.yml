@@ -30,11 +30,6 @@ on:
         type: string
         default: ''
 
-      # build args
-      xiaomi_nabu_samsung_ufs:
-        required: true
-        type: boolean
-
 jobs:
   build:
     name: ${{ inputs.device }}-${{ inputs.desktop }}
