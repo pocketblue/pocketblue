@@ -1,0 +1,121 @@
+#!/usr/bin/env bash
+
+set -uexo pipefail
+
+cp -arfT files/usr /usr
+
+# Set executable permissions on helper scripts
+chmod +x /usr/libexec/set-bt-mac
+chmod +x /usr/libexec/set-modem-sim-slot
+chmod +x /usr/libexec/ucsi-rebind
+
+# Install SELinux policy modules (CIL format)
+# - iio-sensor-proxy-qrtr: QRTR socket access for Qualcomm SSC sensors
+# - systemd-system-control: file context for /etc/systemd/system.control/
+#   (systemd-oomd drop-ins that otherwise get mislabeled as etc_t)
+semodule -X 400 -i \
+    /usr/share/selinux/packages/iio-sensor-proxy-qrtr.cil \
+    /usr/share/selinux/packages/systemd-system-control.cil
+
+# packages
+dnf -y install \
+    atheros-firmware \
+    qcom-firmware \
+    qrtr \
+    rmtfs \
+    tqftpserv \
+    alsa-ucm-utils \
+    bluez \
+    libcamera \
+    libcamera-ipa
+
+dnf -y install --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
+    hexagonrpc \
+    libssc
+
+# FP5-specific firmware from FairBlobs
+# DT firmware-name paths reference qcm6490/fairphone5/ — the RPM generic
+# qcm6490 firmware fails PIL authentication, so we need FP5-signed blobs.
+# qcom-firmware RPM is still needed for GPU core firmware (a660_gmu, a660_sqe).
+FW_DIR="/usr/lib/firmware/qcom/qcm6490/fairphone5"
+mkdir -p "$FW_DIR"
+
+FP5_FW="$(mktemp -d)"
+git clone --depth 1 https://github.com/FairBlobs/FP5-firmware.git "$FP5_FW"
+
+# DSP + modem firmware (split format: .mdt + .b*)
+cp -a "$FP5_FW"/adsp.mdt "$FP5_FW"/adsp.b* "$FW_DIR/"
+cp -a "$FP5_FW"/cdsp.mdt "$FP5_FW"/cdsp.b* "$FW_DIR/"
+cp -a "$FP5_FW"/wpss.mdt "$FP5_FW"/wpss.b* "$FW_DIR/"
+cp -a "$FP5_FW"/modem.mdt "$FP5_FW"/modem.b* "$FW_DIR/"
+
+# GPU zap shader (split format)
+cp -a "$FP5_FW"/a660_zap.mdt "$FP5_FW"/a660_zap.b* "$FW_DIR/"
+
+# IPA firmware (rename yupik_ipa_fws → ipa_fws for DT firmware-name match)
+for f in "$FP5_FW"/yupik_ipa_fws.*; do
+    cp -a "$f" "$FW_DIR/$(basename "$f" | sed 's/^yupik_//')"
+done
+
+# VPU firmware
+cp -a "$FP5_FW"/vpu20_1v.mbn "$FW_DIR/"
+
+# Sidecar configs
+cp -a "$FP5_FW"/adspr.jsn "$FP5_FW"/adsps.jsn "$FP5_FW"/adspua.jsn \
+      "$FP5_FW"/battmgr.jsn "$FP5_FW"/cdspr.jsn "$FP5_FW"/modemr.jsn "$FW_DIR/"
+
+# Audio amplifier config (DT references aw88261_acf.bin)
+cp -a "$FP5_FW"/aw882xx_acf.bin "$FW_DIR/aw88261_acf.bin"
+
+# Hexagon filesystem (ADSP services: acdb, dsp, sensors, socinfo)
+cp -ar "$FP5_FW"/hexagonfs "$FW_DIR/"
+
+# Modem carrier configs
+cp -ar "$FP5_FW"/modem_pr "$FW_DIR/"
+
+# Sensor configs + socinfo (served by hexagonrpcd via /usr/share/qcom)
+QCOM_SHARE="/usr/share/qcom/qcm6490/Fairphone/fp5"
+mkdir -p "$QCOM_SHARE"
+cp -ar "$FP5_FW"/hexagonfs/sensors "$QCOM_SHARE/"
+cp -ar "$FP5_FW"/hexagonfs/socinfo "$QCOM_SHARE/"
+
+rm -rf "$FP5_FW"
+
+# Create .mbn symlinks for kernel firmware loader
+# request_firmware() asks for .mbn names, but FairBlobs ships split format (.mdt + .b*)
+# The MDT loader handles the rest once it can find the .mdt via the .mbn name.
+for fw in adsp cdsp wpss modem a660_zap ipa_fws; do
+    ln -sf "${fw}.mdt" "$FW_DIR/${fw}.mbn"
+done
+
+# Verify critical firmware files are in place
+for fw in adsp cdsp wpss modem a660_zap ipa_fws; do
+    [ -f "$FW_DIR/${fw}.mdt" ] || { echo "FATAL: missing $FW_DIR/${fw}.mdt"; exit 1; }
+    [ -L "$FW_DIR/${fw}.mbn" ] || { echo "FATAL: missing symlink $FW_DIR/${fw}.mbn"; exit 1; }
+done
+
+systemctl enable \
+    hexagonrpcd-adsp-sensorspd.service \
+    hexagonrpcd-adsp-rootpd.service \
+    rmtfs.service \
+    tqftpserv.service
+
+# Mask services that don't apply to mobile ARM devices:
+# - bootloader-update: uses bootupd for EFI systems; FP5 uses Android A/B boot
+systemctl mask \
+    bootloader-update.service
+
+# kernel (from lorbus/misc copr)
+dnf -y remove \
+    kernel \
+    kernel-core \
+    kernel-modules \
+    kernel-modules-core \
+    kernel-modules-extra
+
+dnf -y install --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
+    kernel \
+    kernel-core \
+    kernel-modules \
+    kernel-modules-core \
+    kernel-modules-extra
