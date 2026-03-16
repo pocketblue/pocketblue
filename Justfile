@@ -40,6 +40,7 @@ bib_output := env("PB_BIB_CONFIG", "./output")
 bib := env("PB_BIB", "quay.io/centos-bootc/bootc-image-builder:latest")
 disk_type := env("PB_DISK_TYPE", "raw")
 rootfs := env("PB_ROOTFS", "btrfs")
+compression_7z := env("PB_COMPRESSION_7Z", "") # 7z compression args, empty means default compression
 
 import "tools/containers.just"
 import "tools/disk_images.just"
