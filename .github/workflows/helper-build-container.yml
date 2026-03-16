@@ -41,26 +41,39 @@ jobs:
     runs-on: ubuntu-24.04-arm
     permissions:
       packages: write
-    env:
-      INPUT_REGISTRY: ${{ inputs.registry }}
-      REGISTRY_USERNAME: ${{ vars.REGISTRY_USERNAME || github.repository_owner }}
     steps:
-      - name: Prepare environment
+      - uses: actions/checkout@v6
+
+      - name: Get device config
+        id: conf
+        shell: bash
         run: |
-          echo "INPUT_REGISTRY=${INPUT_REGISTRY,,}" >> ${GITHUB_ENV}
+          cat 'devices/${{ inputs.device }}/build-aux/device.conf' >> $GITHUB_OUTPUT
+
+      - name: Prepare environment
+        env:
+          INPUT_REGISTRY: ${{ inputs.registry }}
+          REGISTRY_USERNAME: ${{ vars.REGISTRY_USERNAME || github.repository_owner }}
+        run: |
           echo "REGISTRY_USERNAME=${REGISTRY_USERNAME,,}" >> ${GITHUB_ENV}
+
+          if [ -z "${{ steps.conf.outputs.device_variant }}" ]; then
+            echo "PB_TAG=${{ inputs.tag }}" >> $GITHUB_ENV
+            echo "TARGET_IMAGE_NAME=${{ inputs.device }}-${{ inputs.desktop }}" >> $GITHUB_ENV
+          else
+            echo "PB_TAG=${{ inputs.tag }}-${{ steps.conf.outputs.device_variant }}" >> $GITHUB_ENV
+            echo "TARGET_IMAGE_NAME=${{ steps.conf.outputs.device_base }}-${{ inputs.desktop }}" >> $GITHUB_ENV
+          fi
+
           cat >> ${GITHUB_ENV} << EOF
-          JUST_ARGS=\
-          branch=${{ inputs.fedora_branch }} \
-          tag=${{ inputs.tag }} \
-          device=${{ inputs.device }} \
-          desktop=${{ inputs.desktop }} \
-          registry=${INPUT_REGISTRY,,} \
-          ${{ inputs.expires && 'expires_after=1w' || '' }} \
-          rechunk_suffix=-build
+          PB_BRANCH=${{ inputs.fedora_branch }}
+          PB_DEVICE=${{ inputs.device }}
+          PB_DESKTOP=${{ inputs.desktop }}
+          PB_REGISTRY=${INPUT_REGISTRY,,}
+          PB_EXPIRES_AFTER=${{ inputs.expires && '1w' || '' }}
+          PB_RECHUNK_SUFFIX=-build
           EOF
 
-      - uses: actions/checkout@v6
       - uses: extractions/setup-just@v3
         with:
           just-version: '1.46.0'
@@ -68,16 +81,25 @@ jobs:
       - name: Pull
         id: pull
         run: |
-          just $JUST_ARGS pull
+          just pull
 
       - name: Build
         id: build
-        run: just $JUST_ARGS build --build-arg xiaomi_nabu_samsung_ufs=${{ inputs.xiaomi_nabu_samsung_ufs }}
+        run: just build
 
       - name: Rechunk
         id: rechunk
         run: |
-          just $JUST_ARGS rechunk
+          just rechunk
+
+      - name: Retag
+        id: retag
+        if: steps.conf.outputs.device_base
+        shell: bash
+        run: |
+          sudo podman tag \
+            ${{ env.PB_REGISTRY }}/${{ env.PB_DEVICE }}-${{ env.PB_DESKTOP }}:${{ env.PB_TAG }} \
+            ${{ env.PB_REGISTRY }}/${{ env.TARGET_IMAGE_NAME }}:${{ env.PB_TAG }}
 
       - name: Push
         id: push
@@ -86,6 +108,6 @@ jobs:
           latest: ${{ inputs.latest }}
           username: ${{ env.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_TOKEN || secrets.GITHUB_TOKEN }}
-          registry: ${{ env.INPUT_REGISTRY }}
-          name: ${{ inputs.device }}-${{ inputs.desktop }}
-          tag: ${{ inputs.tag }}
+          registry: ${{ env.PB_REGISTRY }}
+          name: ${{ env.TARGET_IMAGE_NAME }}
+          tag: ${{ env.PB_TAG }}
