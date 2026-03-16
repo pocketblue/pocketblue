@@ -10,5 +10,42 @@ disk image=(registry / device + "-" + desktop + ":" + tag):
             --use-librepo=True \
             --type={{disk_type}} \
             --rootfs={{rootfs}} \
-            --output={{bib_output}} \
             {{image}}
+
+postprocess image=(registry / device + "-" + desktop + ":" + tag):
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    if [ "$(id -u) -ne 0" ]; then 
+        echo This target should be ran as root!
+        exit -1
+    fi
+
+    source devices/{{device}}/build-aux/device.conf
+    export CONF_ESP_SIZE=${esp_size:-}
+    export CONF_ESP_SECTOR_SIZE=${esp_sector_size:-4096}
+    export CONF_BOOT_SIZE=${boot_size:-}
+    export CONF_INSTALL_DTB=${install_dtb:-}
+    export CONF_SPLIT_PARTITIONS=${split_partitions:-}
+    export CONF_BUILD_EROFS=${build_erofs:-false}
+
+    export ROOTFS_TYPE={{rootfs}}
+    export FULL_IMAGE={{bib_output}}
+    export ACTION_PATH=tools/postprocess
+    export BUILD_AUX=build-aux
+    export OCI_IMAGE={{image}}
+
+    tools/postprocess/postprocess.sh
+
+artifacts:
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    export DEVICE_PATH=devices/{{device}}
+    export IMAGE_NAME={{device}}-{{desktop}}
+    export IMAGE_TAG={{tag}}
+    # TODO: export ARGS_7Z
+    export ACTION_PATH=tools/postprocess
+    export BUILD_AUX=build-aux
+
+    tools/collect-artifacts.sh
