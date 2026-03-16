@@ -34,6 +34,13 @@ expires_after := env("PB_EXPIRES_AFTER", "")
 rechunk_suffix := env("PB_RECHUNK_SUFFIX", "-build")
 arch := env("PB_ARCH", "arm64")
 
+# disk image vars
+bib_config := env("PB_BIB_CONFIG", "./bootc-image-builder.toml")
+bib_output := env("PB_BIB_CONFIG", "./output")
+bib := env("PB_BIB", "quay.io/centos-bootc/bootc-image-builder:latest")
+disk_type := env("PB_DISK_TYPE", "raw")
+rootfs := env("PB_ROOTFS", "btrfs")
+
 default: build
 
 pull:
@@ -76,3 +83,18 @@ bootc *ARGS:
         -v .:/data \
         --security-opt label=type:unconfined_t \
         "{{registry}}/{{device}}-{{desktop}}:{{tag}}" bootc {{ARGS}}
+
+disk image=(registry / device + "-" + desktop + ":" + tag):
+    sudo mkdir -p {{bib_output}}
+    sudo podman run \
+        --rm -it --privileged \
+        --security-opt label=type:unconfined_t \
+        -v {{bib_config}}:/config.toml:ro \
+        -v {{bib_output}}:/output \
+        -v /var/lib/containers/storage:/var/lib/containers/storage \
+        {{bib}} \
+            --use-librepo=True \
+            --type={{disk_type}} \
+            --rootfs={{rootfs}} \
+            --output={{bib_output}} \
+            {{image}}
