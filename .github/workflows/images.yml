@@ -105,15 +105,15 @@ jobs:
 
       - name: Build disk image
         run: |
-          sudo just disk
+          just disk
 
       - name: Post-process images
         run: |
-          sudo just postprocess
+          just postprocess
 
       - name: Collect artifacts
         run: |
-          sudo just artifacts
+          just artifacts
 
       - name: Upload images archive
         uses: actions/upload-artifact@v7

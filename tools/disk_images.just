@@ -16,11 +16,6 @@ postprocess image=(registry / device + "-" + desktop + ":" + tag):
     #!/usr/bin/env bash
     set -euo pipefail
 
-    if [ "$(id -u) -ne 0" ]; then 
-        echo This target should be ran as root!
-        exit -1
-    fi
-
     source devices/{{device}}/build-aux/device.conf
     export CONF_ESP_SIZE=${esp_size:-}
     export CONF_ESP_SECTOR_SIZE=${esp_sector_size:-4096}
@@ -35,7 +30,7 @@ postprocess image=(registry / device + "-" + desktop + ":" + tag):
     export BUILD_AUX=build-aux
     export OCI_IMAGE={{image}}
 
-    tools/postprocess/postprocess.sh
+    sudo -E tools/postprocess/postprocess.sh
 
 artifacts:
     #!/usr/bin/env bash
