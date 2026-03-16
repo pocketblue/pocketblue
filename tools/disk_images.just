@@ -39,7 +39,7 @@ artifacts:
     export DEVICE_PATH=devices/{{device}}
     export IMAGE_NAME={{device}}-{{desktop}}
     export IMAGE_TAG={{tag}}
-    # TODO: export ARGS_7Z
+    export ARGS_7Z="{{compression_7z}}"
     export ACTION_PATH=tools/postprocess
     export BUILD_AUX=build-aux
 
