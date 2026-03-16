@@ -41,64 +41,7 @@ bib := env("PB_BIB", "quay.io/centos-bootc/bootc-image-builder:latest")
 disk_type := env("PB_DISK_TYPE", "raw")
 rootfs := env("PB_ROOTFS", "btrfs")
 
+import "tools/containers.just"
+import "tools/disk_images.just"
+
 default: build
-
-pull:
-    sudo podman pull {{base}}
-    sudo podman pull {{full_image}} || true
-
-build *ARGS:
-    sudo buildah bud \
-        --layers=true \
-        --arch="{{arch}}" \
-        --build-arg="base={{base}}" \
-        --build-arg="device={{device}}" \
-        --build-arg="desktop={{desktop}}" \
-        --build-arg="target_tag={{tag}}" \
-        {{ARGS}} \
-        -t "{{full_image}}{{rechunk_suffix}}" \
-        {{ if expires_after != "" { "--label quay.expires-after=" + expires_after } else { "" } }} \
-        "."
-
-rechunk *ARGS:
-    sudo podman run --rm --privileged -v /var/lib/containers:/var/lib/containers {{ARGS}} \
-        {{base}} \
-        rpm-ostree experimental compose build-chunked-oci \
-            --bootc \
-            --format-version=1 \
-            --from={{full_image}}{{rechunk_suffix}} \
-            --output=containers-storage:{{full_image}}
-
-sign digest:
-    cosign sign -y --new-bundle-format=false --key env://SIGNING_KEY "{{registry}}/{{device}}-{{desktop}}@{{digest}}"
-
-rebase:
-    sudo rpm-ostree rebase ostree-unverified-image:containers-storage:{{full_image}}
-
-bootc *ARGS:
-    sudo podman run \
-        --rm --privileged --pid=host \
-        -it \
-        -v /sys/fs/selinux:/sys/fs/selinux \
-        -v /etc/containers:/etc/containers:Z \
-        -v /var/lib/containers:/var/lib/containers:Z \
-        -v /dev:/dev \
-        -e RUST_LOG=debug \
-        -v .:/data \
-        --security-opt label=type:unconfined_t \
-        "{{full_image}}" bootc {{ARGS}}
-
-disk:
-    sudo mkdir -p {{bib_output}}
-    sudo podman run \
-        --rm -it --privileged \
-        --security-opt label=type:unconfined_t \
-        -v {{bib_config}}:/config.toml:ro \
-        -v {{bib_output}}:/output \
-        -v /var/lib/containers/storage:/var/lib/containers/storage \
-        {{bib}} \
-            --use-librepo=True \
-            --type={{disk_type}} \
-            --rootfs={{rootfs}} \
-            --output={{bib_output}} \
-            {{full_image}}
