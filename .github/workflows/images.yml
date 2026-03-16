@@ -14,6 +14,7 @@ on:
           - nothing-spacewar
           - qualcomm-sdm845
           - xiaomi-nabu
+          - xiaomi-nabu-rodriguezst
           - xiaomi-pipa
           - xunlong-orangepi3-lts
       tag:
@@ -34,11 +35,6 @@ on:
           - plasma-mobile
           - phosh
         default: all
-      nabu_samsung_ufs:
-        type: boolean
-        description: build with Samsung UFS support (xiaomi-nabu only)
-        required: true
-        default: false
 jobs:
   desktops:
     runs-on: ubuntu-24.04-arm
@@ -65,26 +61,69 @@ jobs:
       matrix:
         desktop: ${{ fromJson(needs.desktops.outputs.desktops) }}
     name: ${{ inputs.device }}-${{ matrix.desktop }}:${{ inputs.tag }}
-    env:
-      IMAGE_REGISTRY: ${{ vars.REGISTRY || format('ghcr.io/{0}', github.repository_owner) }}
     steps:
-      - name: Prepare environment
-        run: |
-          echo "IMAGE_REGISTRY=${IMAGE_REGISTRY,,}" >> ${GITHUB_ENV}
       - uses: actions/checkout@v6
-      - uses: pocketblue/actions/images@main
+
+      - name: Get device config
+        id: conf
+        shell: bash
+        run: |
+          cat 'devices/${{ inputs.device }}/build-aux/device.conf' >> $GITHUB_OUTPUT
+
+      - name: Prepare environment
+        env:
+          IMAGE_REGISTRY: ${{ vars.REGISTRY || format('ghcr.io/{0}', github.repository_owner) }}
+        run: |
+          if [ -z "${{ steps.conf.outputs.device_variant }}" ]; then
+            echo "PB_TAG=${{ inputs.tag }}" >> $GITHUB_ENV
+          else
+            echo "PB_TAG=${{ inputs.tag }}-${{ steps.conf.outputs.device_variant }}" >> $GITHUB_ENV
+          fi
+
+          cat >> ${GITHUB_ENV} << EOF
+          PB_DEVICE=${{ inputs.device }}
+          PB_DESKTOP=${{ inputs.desktop }}
+          PB_REGISTRY=${IMAGE_REGISTRY,,}
+          EOF
+
+      - uses: extractions/setup-just@v3
         with:
-          device: ${{ inputs.device }}
-          registry: ${{ env.IMAGE_REGISTRY }}
-          image_name: ${{ inputs.device }}-${{ matrix.desktop }}
-          image_tag: ${{ inputs.tag }}
-          build_aux: ${{ inputs.device == 'xiaomi-nabu' && inputs.nabu_samsung_ufs && 'build-aux.samsung' || 'build-aux' }}
-      - uses: actions/upload-artifact@v7
+          just-version: '1.46.0'
+
+      - name: Pull the container image
+        run: |
+          if [ -z "${{ steps.conf.outputs.device_base }}" ]; then
+            # not a variant, nothing to retag
+            sudo podman pull "${{ env.PB_REGISTRY }}/${{ env.PB_DEVICE }}-${{ env.PB_DESKTOP }}:${{ env.PB_TAG }}"
+          else
+            # a variant, pull from the base device repo and retag
+            sudo podman pull "${{ env.PB_REGISTRY }}/${{ steps.conf.outputs.device_base }}-${{ env.PB_DESKTOP }}:${{ env.PB_TAG }}"
+            sudo podman tag \
+              "${{ env.PB_REGISTRY }}/${{ steps.conf.outputs.device_base }}-${{ env.PB_DESKTOP }}:${{ env.PB_TAG }}" \
+              "${{ env.PB_REGISTRY }}/${{ env.PB_DEVICE }}-${{ env.PB_DESKTOP }}:${{ env.PB_TAG }}"
+          fi
+
+      - name: Build disk image
+        run: |
+          sudo just disk
+
+      - name: Post-process images
+        run: |
+          sudo just postprocess
+
+      - name: Collect artifacts
+        run: |
+          sudo just artifacts
+
+      - name: Upload images archive
+        uses: actions/upload-artifact@v7
         with:
           name: pocketblue-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.tag }}
           path: pocketblue-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.tag }}.7z
           archive: false
-      - uses: actions/upload-artifact@v7
+
+      - name: Upload erofs image
+        uses: actions/upload-artifact@v7
         with:
           if-no-files-found: ignore
           name: rootfs-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.tag }}
