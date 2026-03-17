@@ -1,4 +1,4 @@
-disk image=(registry / device + "-" + desktop + ":" + tag):
+disk:
     sudo mkdir -p {{bib_output}}
     sudo podman run \
         --rm -it --privileged \
@@ -10,9 +10,9 @@ disk image=(registry / device + "-" + desktop + ":" + tag):
             --use-librepo=True \
             --type={{disk_type}} \
             --rootfs={{rootfs}} \
-            {{image}}
+            "{{registry}}/{{device}}-{{desktop}}:{{tag}}"
 
-postprocess image=(registry / device + "-" + desktop + ":" + tag):
+postprocess:
     #!/usr/bin/env bash
     set -euo pipefail
 
@@ -28,7 +28,7 @@ postprocess image=(registry / device + "-" + desktop + ":" + tag):
     export FULL_IMAGE={{bib_output}}
     export ACTION_PATH=tools/postprocess
     export BUILD_AUX=build-aux
-    export OCI_IMAGE={{image}}
+    export OCI_IMAGE="{{registry}}/{{device}}-{{desktop}}:{{tag}}"
 
     sudo -E tools/postprocess/postprocess.sh
 
