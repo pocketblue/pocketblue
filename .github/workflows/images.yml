@@ -35,6 +35,25 @@ on:
           - plasma-mobile
           - phosh
         default: all
+  workflow_call:
+    inputs:
+      device:
+        type: string
+        description: 'device name'
+        required: true
+      tag:
+        type: string
+        description: image tag
+        required: true
+      desktop:
+        type: string
+        description: desktop
+        required: true
+      release_id:
+        type: string
+        description: 'release id to upload the images to'
+        required: false
+
 jobs:
   desktops:
     runs-on: ubuntu-24.04-arm
@@ -74,6 +93,10 @@ jobs:
         env:
           IMAGE_REGISTRY: ${{ vars.REGISTRY || format('ghcr.io/{0}', github.repository_owner) }}
         run: |
+          if [ -n "${{ inputs.release_id }}" ]; then
+            echo "PB_COMPRESSION_7Z='-mmt=1 -md=1500m'" >> $GITHUB_ENV
+          fi
+
           if [ -z "${{ steps.conf.outputs.device_variant }}" ]; then
             echo "PB_TAG=${{ inputs.tag }}" >> $GITHUB_ENV
           else
@@ -94,13 +117,13 @@ jobs:
         run: |
           if [ -z "${{ steps.conf.outputs.device_base }}" ]; then
             # not a variant, nothing to retag
-            sudo podman pull "${{ env.PB_REGISTRY }}/${{ env.PB_DEVICE }}-${{ env.PB_DESKTOP }}:${{ env.PB_TAG }}"
+            sudo podman pull "$PB_REGISTRY/$PB_DEVICE-$PB_DESKTOP:$PB_TAG"
           else
             # a variant, pull from the base device repo and retag
-            sudo podman pull "${{ env.PB_REGISTRY }}/${{ steps.conf.outputs.device_base }}-${{ env.PB_DESKTOP }}:${{ env.PB_TAG }}"
+            sudo podman pull "$PB_REGISTRY/${{ steps.conf.outputs.device_base }}-$PB_DESKTOP:$PB_TAG"
             sudo podman tag \
-              "${{ env.PB_REGISTRY }}/${{ steps.conf.outputs.device_base }}-${{ env.PB_DESKTOP }}:${{ env.PB_TAG }}" \
-              "${{ env.PB_REGISTRY }}/${{ env.PB_DEVICE }}-${{ env.PB_DESKTOP }}:${{ env.PB_TAG }}"
+              "$PB_REGISTRY/${{ steps.conf.outputs.device_base }}-$PB_DESKTOP:$PB_TAG" \
+              "$PB_REGISTRY/$PB_DEVICE-$PB_DESKTOP:$PB_TAG"
           fi
 
       - name: Build disk image
@@ -122,10 +145,10 @@ jobs:
           just artifacts
 
           if [ -f "rootfs.ero" ]; then
-            mv "rootfs.ero" "rootfs-${{ steps.conf.outputs.device_base || env.PB_DEVICE }}-$PB_DESKTOP:$PB_TAG.ero"
+            mv "rootfs.ero" "rootfs-${{ steps.conf.outputs.device_base || env.PB_DEVICE }}-$PB_DESKTOP-$PB_TAG.ero"
           fi
 
-          mv "pocketblue.7z" "pocketblue-${{ steps.conf.outputs.device_base || env.PB_DEVICE }}-$PB_DESKTOP:$PB_TAG.7z"
+          mv "pocketblue.7z" "pocketblue-${{ steps.conf.outputs.device_base || env.PB_DEVICE }}-$PB_DESKTOP-$PB_TAG.7z"
 
       - name: Upload images archive
         uses: actions/upload-artifact@v7
@@ -141,3 +164,10 @@ jobs:
           name: rootfs-${{ steps.conf.outputs.device_base || env.PB_DEVICE }}-${{ env.PB_DESKTOP }}-${{ env.PB_TAG }}
           path: rootfs-${{ steps.conf.outputs.device_base || env.PB_DEVICE }}-${{ env.PB_DESKTOP }}-${{ env.PB_TAG }}.ero
           archive: false
+
+      - name: Upload release artifacts
+        if: ${{ inputs.release_id }}
+        uses: svenstaro/upload-release-action@v2
+        with:
+          release_id: ${{ inputs.release_id }}
+          file: pocketblue-${{ steps.conf.outputs.device_base || env.PB_DEVICE }}-${{ env.PB_DESKTOP }}-${{ env.PB_TAG }}.7z
