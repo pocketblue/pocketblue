@@ -14,6 +14,7 @@ on:
           - nothing-spacewar
           - qualcomm-sdm845
           - xiaomi-nabu
+          - xiaomi-nabu-rodriguezst
           - xiaomi-pipa
           - xunlong-orangepi3-lts
       tag:
@@ -34,11 +35,25 @@ on:
           - plasma-mobile
           - phosh
         default: all
-      nabu_samsung_ufs:
-        type: boolean
-        description: build with Samsung UFS support (xiaomi-nabu only)
+  workflow_call:
+    inputs:
+      device:
+        type: string
+        description: 'device name'
         required: true
-        default: false
+      tag:
+        type: string
+        description: image tag
+        required: true
+      desktop:
+        type: string
+        description: desktop
+        required: true
+      release_id:
+        type: string
+        description: 'release id to upload the images to'
+        required: false
+
 jobs:
   desktops:
     runs-on: ubuntu-24.04-arm
@@ -65,28 +80,94 @@ jobs:
       matrix:
         desktop: ${{ fromJson(needs.desktops.outputs.desktops) }}
     name: ${{ inputs.device }}-${{ matrix.desktop }}:${{ inputs.tag }}
-    env:
-      IMAGE_REGISTRY: ${{ vars.REGISTRY || format('ghcr.io/{0}', github.repository_owner) }}
     steps:
-      - name: Prepare environment
-        run: |
-          echo "IMAGE_REGISTRY=${IMAGE_REGISTRY,,}" >> ${GITHUB_ENV}
       - uses: actions/checkout@v6
-      - uses: pocketblue/actions/images@main
+
+      - name: Get device config
+        id: conf
+        shell: bash
+        run: |
+          cat 'devices/${{ inputs.device }}/build-aux/device.conf' >> $GITHUB_OUTPUT
+
+      - name: Prepare environment
+        env:
+          IMAGE_REGISTRY: ${{ vars.REGISTRY || format('ghcr.io/{0}', github.repository_owner) }}
+        run: |
+          if [ -n "${{ inputs.release_id }}" ]; then
+            echo "PB_COMPRESSION_7Z='-mmt=1 -md=1500m'" >> $GITHUB_ENV
+          fi
+
+          if [ -z "${{ steps.conf.outputs.device_variant }}" ]; then
+            echo "PB_TAG=${{ inputs.tag }}" >> $GITHUB_ENV
+          else
+            echo "PB_TAG=${{ inputs.tag }}-${{ steps.conf.outputs.device_variant }}" >> $GITHUB_ENV
+          fi
+
+          cat >> ${GITHUB_ENV} << EOF
+          PB_DEVICE=${{ inputs.device }}
+          PB_DESKTOP=${{ inputs.desktop }}
+          PB_REGISTRY=${IMAGE_REGISTRY,,}
+          EOF
+
+      - uses: extractions/setup-just@v3
         with:
-          device: ${{ inputs.device }}
-          registry: ${{ env.IMAGE_REGISTRY }}
-          image_name: ${{ inputs.device }}-${{ matrix.desktop }}
-          image_tag: ${{ inputs.tag }}
-          build_aux: ${{ inputs.device == 'xiaomi-nabu' && inputs.nabu_samsung_ufs && 'build-aux.samsung' || 'build-aux' }}
-      - uses: actions/upload-artifact@v7
+          just-version: '1.46.0'
+
+      - name: Pull the container image
+        run: |
+          if [ -z "${{ steps.conf.outputs.device_base }}" ]; then
+            # not a variant, nothing to retag
+            sudo podman pull "$PB_REGISTRY/$PB_DEVICE-$PB_DESKTOP:$PB_TAG"
+          else
+            # a variant, pull from the base device repo and retag
+            sudo podman pull "$PB_REGISTRY/${{ steps.conf.outputs.device_base }}-$PB_DESKTOP:$PB_TAG"
+            sudo podman tag \
+              "$PB_REGISTRY/${{ steps.conf.outputs.device_base }}-$PB_DESKTOP:$PB_TAG" \
+              "$PB_REGISTRY/$PB_DEVICE-$PB_DESKTOP:$PB_TAG"
+          fi
+
+      - name: Build disk image
+        run: |
+          just disk
+
+      - name: Post-process images
+        run: |
+          just postprocess
+          if [ -d images ]; then
+            sudo chown "$(id -u):$(id -g)" -R images
+          fi
+          if [ -f disk.raw ]; then
+            sudo chown "$(id -u):$(id -g)" disk.raw
+          fi
+
+      - name: Collect artifacts
+        run: |
+          just artifacts
+
+          if [ -f "rootfs.ero" ]; then
+            mv "rootfs.ero" "rootfs-${{ steps.conf.outputs.device_base || env.PB_DEVICE }}-$PB_DESKTOP-$PB_TAG.ero"
+          fi
+
+          mv "pocketblue.7z" "pocketblue-${{ steps.conf.outputs.device_base || env.PB_DEVICE }}-$PB_DESKTOP-$PB_TAG.7z"
+
+      - name: Upload images archive
+        uses: actions/upload-artifact@v7
         with:
-          name: pocketblue-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.tag }}
-          path: pocketblue-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.tag }}.7z
+          name: pocketblue-${{ steps.conf.outputs.device_base || env.PB_DEVICE }}-${{ env.PB_DESKTOP }}-${{ env.PB_TAG }}
+          path: pocketblue-${{ steps.conf.outputs.device_base || env.PB_DEVICE }}-${{ env.PB_DESKTOP }}-${{ env.PB_TAG }}.7z
           archive: false
-      - uses: actions/upload-artifact@v7
+
+      - name: Upload erofs image
+        uses: actions/upload-artifact@v7
         with:
           if-no-files-found: ignore
-          name: rootfs-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.tag }}
-          path: rootfs-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.tag }}.ero
+          name: rootfs-${{ steps.conf.outputs.device_base || env.PB_DEVICE }}-${{ env.PB_DESKTOP }}-${{ env.PB_TAG }}
+          path: rootfs-${{ steps.conf.outputs.device_base || env.PB_DEVICE }}-${{ env.PB_DESKTOP }}-${{ env.PB_TAG }}.ero
           archive: false
+
+      - name: Upload release artifacts
+        if: ${{ inputs.release_id }}
+        uses: svenstaro/upload-release-action@v2
+        with:
+          release_id: ${{ inputs.release_id }}
+          file: pocketblue-${{ steps.conf.outputs.device_base || env.PB_DEVICE }}-${{ env.PB_DESKTOP }}-${{ env.PB_TAG }}.7z

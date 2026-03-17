@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+set -uexo pipefail
+
+cp -arfT files/etc /etc
+env --chdir=../xiaomi-nabu ./build

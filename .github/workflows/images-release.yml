@@ -34,7 +34,7 @@ jobs:
           body: |
             Recommended images:
             - Xiaomi Pad 5 (xiaomi-nabu): [xiaomi-nabu-gnome-desktop](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-xiaomi-nabu-gnome-desktop-${{ inputs.fedora_branch }}.7z)
-            - Xiaomi Pad 5, **Outdated kernel with Samsung UFS patches** (xiaomi-nabu): [xiaomi-nabu-gnome-desktop](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-xiaomi-nabu-gnome-desktop-${{ inputs.fedora_branch }}-samsung.7z)
+            - Xiaomi Pad 5, **Outdated kernel with Samsung UFS patches** (xiaomi-nabu-rodriguezst): [xiaomi-nabu-gnome-desktop](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-xiaomi-nabu-gnome-desktop-${{ inputs.fedora_branch }}-rodriguezst.7z)
             - Xiaomi Pad 6 (xiaomi-pipa): [xiaomi-pipa-gnome-desktop](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-xiaomi-pipa-gnome-desktop-${{ inputs.fedora_branch }}.7z)
             - OnePlus 6/6T (oneplus-enchilada/fajita): [qualcomm-sdm845-phosh](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-qualcomm-sdm845-phosh-${{ inputs.fedora_branch }}.7z)
             - Xiaomi Poco F1 (xiaomi-beryllium): [qualcomm-sdm845-phosh](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-qualcomm-sdm845-phosh-${{ inputs.fedora_branch }}.7z)
@@ -42,47 +42,19 @@ jobs:
 
   images_build:
     needs: create_release
-    runs-on: ubuntu-24.04-arm
     strategy:
       matrix:
         device:
-          - name: qualcomm-sdm845
-            tag: ${{ inputs.fedora_branch }}
-            build_aux: 'build-aux'
-          - name: xiaomi-nabu
-            tag: ${{ inputs.fedora_branch }}
-            build_aux: 'build-aux'
-          - name: xiaomi-nabu
-            tag: ${{ inputs.fedora_branch }}-samsung
-            build_aux: 'build-aux.samsung'
-          - name: xiaomi-pipa
-            tag: ${{ inputs.fedora_branch }}
-            build_aux: 'build-aux'
-          - name: xunlong-orangepi3-lts
-            tag: ${{ inputs.fedora_branch }}
-            build_aux: 'build-aux'
+          - qualcomm-sdm845
+          - xiaomi-nabu
+          - xiaomi-nabu-rodriguezst
+          - xiaomi-pipa
+          - xunlong-orangepi3-lts
         desktop: [tty, gnome-desktop, plasma-desktop, plasma-mobile, phosh]
-    name: ${{ matrix.device.name }}-${{ matrix.desktop }}:${{ matrix.device.tag }}
-    steps:
-      - uses: actions/checkout@v6
-      - uses: pocketblue/actions/images@main
-        with:
-          device: ${{ matrix.device.name }}
-          registry: ${{ vars.REGISTRY }}
-          image_name: ${{ matrix.device.name }}-${{ matrix.desktop }}
-          image_tag: ${{ matrix.device.tag }}
-          args_7z: -mmt=1 -md=1500m
-          build_aux: ${{ matrix.device.build_aux }}
-      - name: check size
-        run: |
-          du 'pocketblue-${{ matrix.device.name }}-${{ matrix.desktop }}-${{ matrix.device.tag }}.7z' -h
-          du 'pocketblue-${{ matrix.device.name }}-${{ matrix.desktop }}-${{ matrix.device.tag }}.7z'
-      - uses: actions/upload-artifact@v7
-        with:
-          name: pocketblue-${{ matrix.device.name }}-${{ matrix.desktop }}-${{ matrix.device.tag }}
-          path: pocketblue-${{ matrix.device.name }}-${{ matrix.desktop }}-${{ matrix.device.tag }}.7z
-          archive: false
-      - uses: svenstaro/upload-release-action@v2
-        with:
-          release_id: ${{ needs.create_release.outputs.release_id }}
-          file: pocketblue-${{ matrix.device.name }}-${{ matrix.desktop }}-${{ matrix.device.tag }}.7z
+    name: ${{ matrix.device }}-${{ matrix.desktop }}:${{ inputs.fedora_branch }}
+    uses: ./.github/workflows/images.yml
+    with:
+      device: ${{ matrix.device }}
+      desktop: ${{ matrix.desktop }}
+      tag: ${{ inputs.fedora_branch }}
+      release_id: ${{ needs.create_release.outputs.release_id }}

@@ -19,9 +19,6 @@ ARG device
 ARG desktop
 ARG target_tag
 
-# device-specific args
-ARG xiaomi_nabu_samsung_ufs=false
-
 RUN --mount=type=bind,from=ctx,source=/common,target=/ctx/common \
     --mount=type=cache,target=/var/cache \
     env --chdir=/ctx/common ./build && \
