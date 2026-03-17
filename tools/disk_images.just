@@ -37,8 +37,6 @@ artifacts:
     set -euo pipefail
 
     export DEVICE_PATH=devices/{{device}}
-    export IMAGE_NAME={{device}}-{{desktop}}
-    export IMAGE_TAG={{tag}}
     export ARGS_7Z="{{compression_7z}}"
     export ACTION_PATH=tools/postprocess
     export BUILD_AUX=build-aux

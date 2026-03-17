@@ -121,17 +121,23 @@ jobs:
         run: |
           just artifacts
 
+          if [ -f "rootfs.ero" ]; then
+            mv "rootfs.ero" "rootfs-${{ steps.conf.outputs.device_base || env.PB_DEVICE }}-$PB_DESKTOP:$PB_TAG.ero"
+          fi
+
+          mv "pocketblue.7z" "pocketblue-${{ steps.conf.outputs.device_base || env.PB_DEVICE }}-$PB_DESKTOP:$PB_TAG.7z"
+
       - name: Upload images archive
         uses: actions/upload-artifact@v7
         with:
-          name: pocketblue-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.tag }}
-          path: pocketblue-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.tag }}.7z
+          name: pocketblue-${{ steps.conf.outputs.device_base || env.PB_DEVICE }}-${{ env.PB_DESKTOP }}-${{ env.PB_TAG }}
+          path: pocketblue-${{ steps.conf.outputs.device_base || env.PB_DEVICE }}-${{ env.PB_DESKTOP }}-${{ env.PB_TAG }}.7z
           archive: false
 
       - name: Upload erofs image
         uses: actions/upload-artifact@v7
         with:
           if-no-files-found: ignore
-          name: rootfs-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.tag }}
-          path: rootfs-${{ inputs.device }}-${{ matrix.desktop }}-${{ inputs.tag }}.ero
+          name: rootfs-${{ steps.conf.outputs.device_base || env.PB_DEVICE }}-${{ env.PB_DESKTOP }}-${{ env.PB_TAG }}
+          path: rootfs-${{ steps.conf.outputs.device_base || env.PB_DEVICE }}-${{ env.PB_DESKTOP }}-${{ env.PB_TAG }}.ero
           archive: false

@@ -22,11 +22,5 @@ export OUT_PATH=$(realpath ./out)
 export DEVICE_PATH=$(realpath $DEVICE_PATH)
 $DEVICE_PATH/$BUILD_AUX/artifacts.sh
 
-# pack the artifacts:
-
-if [ -f "rootfs.ero" ]; then
-    mv "rootfs.ero" "rootfs-$IMAGE_NAME-$IMAGE_TAG.ero"
-fi
-
 cd out
-7z a -mx=9 $ARGS_7Z "../pocketblue-$IMAGE_NAME-$IMAGE_TAG.7z" .
+7z a -mx=9 $ARGS_7Z "../pocketblue.7z" .
