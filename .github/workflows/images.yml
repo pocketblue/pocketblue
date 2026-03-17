@@ -35,6 +35,25 @@ on:
           - plasma-mobile
           - phosh
         default: all
+  workflow_call:
+    inputs:
+      device:
+        type: string
+        description: 'device name'
+        required: true
+      tag:
+        type: string
+        description: image tag
+        required: true
+      desktop:
+        type: string
+        description: desktop
+        required: true
+      release_id:
+        type: string
+        description: 'release id to upload the images to'
+        required: false
+
 jobs:
   desktops:
     runs-on: ubuntu-24.04-arm
@@ -74,6 +93,10 @@ jobs:
         env:
           IMAGE_REGISTRY: ${{ vars.REGISTRY || format('ghcr.io/{0}', github.repository_owner) }}
         run: |
+          if [ -n "${{ inputs.release_id }}" ]; then
+            echo "PB_COMPRESSION_7Z='-mmt=1 -md=1500m'" >> $GITHUB_ENV
+          fi
+
           if [ -z "${{ steps.conf.outputs.device_variant }}" ]; then
             echo "PB_TAG=${{ inputs.tag }}" >> $GITHUB_ENV
             echo "PB_FULL_IMAGE=${IMAGE_REGISTRY,,}/${{ inputs.device }}-${{ inputs.desktop }}:${{ inputs.tag }}" >> $GITHUB_ENV
@@ -95,7 +118,7 @@ jobs:
 
       - name: Pull the container image
         run: |
-          sudo podman pull ${{ env.PB_FULL_IMAGE }}
+          sudo podman pull $PB_FULL_IMAGE
 
       - name: Build disk image
         run: |
@@ -116,10 +139,10 @@ jobs:
           just artifacts
 
           if [ -f "rootfs.ero" ]; then
-            mv "rootfs.ero" "rootfs-${{ steps.conf.outputs.device_base || env.PB_DEVICE }}-$PB_DESKTOP:$PB_TAG.ero"
+            mv "rootfs.ero" "rootfs-${{ steps.conf.outputs.device_base || env.PB_DEVICE }}-$PB_DESKTOP-$PB_TAG.ero"
           fi
 
-          mv "pocketblue.7z" "pocketblue-${{ steps.conf.outputs.device_base || env.PB_DEVICE }}-$PB_DESKTOP:$PB_TAG.7z"
+          mv "pocketblue.7z" "pocketblue-${{ steps.conf.outputs.device_base || env.PB_DEVICE }}-$PB_DESKTOP-$PB_TAG.7z"
 
       - name: Upload images archive
         uses: actions/upload-artifact@v7
@@ -135,3 +158,10 @@ jobs:
           name: rootfs-${{ steps.conf.outputs.device_base || env.PB_DEVICE }}-${{ env.PB_DESKTOP }}-${{ env.PB_TAG }}
           path: rootfs-${{ steps.conf.outputs.device_base || env.PB_DEVICE }}-${{ env.PB_DESKTOP }}-${{ env.PB_TAG }}.ero
           archive: false
+
+      - name: Upload release artifacts
+        if: ${{ inputs.release_id }}
+        uses: svenstaro/upload-release-action@v2
+        with:
+          release_id: ${{ inputs.release_id }}
+          file: pocketblue-${{ steps.conf.outputs.device_base || env.PB_DEVICE }}-${{ env.PB_DESKTOP }}-${{ env.PB_TAG }}.7z
