@@ -4,7 +4,7 @@ set -uexo pipefail
 
 which fastboot
 
-echo 'waiting for device appear in fastboot'
+echo 'waiting for device to appear in fastboot'
 
 fastboot getvar product 2>&1 | grep nabu
 fastboot erase dtbo_ab
@@ -14,5 +14,5 @@ fastboot flash   rawdump images/fedora_esp.raw
 fastboot flash      cust images/fedora_boot.raw
 fastboot flash  userdata images/fedora_rootfs.raw
 
-echo 'done flashing, rebooting now'
+echo 'rebooting (this may take a while, DO NOT DISCONNECT THE DEVICE)'
 fastboot reboot
