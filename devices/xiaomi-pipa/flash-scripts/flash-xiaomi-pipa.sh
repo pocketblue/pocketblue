@@ -5,7 +5,7 @@ set -uexo pipefail
 which fastboot
 
 set +x
-echo 'waiting for device appear in fastboot'
+echo 'waiting for device to appear in fastboot'
 set -x
 
 fastboot getvar product 2>&1 | grep pipa
@@ -17,7 +17,7 @@ fastboot flash      cust images/fedora_boot.raw
 fastboot flash  userdata images/fedora_rootfs.raw
 
 set +x
-echo 'done flashing, rebooting device now'
+echo 'rebooting (this may take a while, DO NOT DISCONNECT THE DEVICE)'
 set -x
 
 fastboot reboot
