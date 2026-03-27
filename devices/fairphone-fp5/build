@@ -3,6 +3,7 @@
 set -uexo pipefail
 
 cp -arfT files/usr /usr
+cp -arfT files/etc /etc
 
 # Set executable permissions on helper scripts
 chmod +x /usr/libexec/set-bt-mac
