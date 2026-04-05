@@ -8,6 +8,7 @@ cp -arfT files/etc /etc
 
 if [ "$xiaomi_nabu_samsung_ufs" = "true" ]; then
     cp -arfT files/samsung/etc /etc
+    cp -arfT files/samsung/usr /usr
 fi
 
 # Packages
