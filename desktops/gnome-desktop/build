@@ -15,3 +15,11 @@ dnf -y remove \
     gnome-tour \
     malcontent-control \
     yelp
+
+# Replace stock mutter with patched build (Night Light EDID fallback, auto-rotate fix, 3x auto-scale fix)
+dnf -y swap --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
+    mutter mutter
+
+# Replace stock iio-sensor-proxy with patched build (Do not exit based on sensor events workaround)
+dnf -y swap --repo='copr:copr.fedorainfracloud.org:lorbus:misc' \
+    iio-sensor-proxy iio-sensor-proxy
