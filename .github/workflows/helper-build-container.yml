@@ -81,7 +81,7 @@ jobs:
 
       - name: Push
         id: push
-        uses: pocketblue/actions/container-push@main
+        uses: pocketblue/actions/container-push@brew-cache
         env:
           latest: ${{ inputs.latest }}
           username: ${{ env.REGISTRY_USERNAME }}
