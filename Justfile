@@ -24,9 +24,7 @@ base := env("PB_BASE",
     } else {
         base_atomic
     }
-)
-
-base_bootc := env("PB_BASE_BOOTC", "quay.io/fedora/fedora-bootc:" + branch)
+) + ":" + branch
 
 registry := env("PB_REGISTRY", "localhost")
 
@@ -37,15 +35,14 @@ arch := env("PB_ARCH", "arm64")
 default: build
 
 pull:
-    sudo podman pull {{base}}:{{branch}}
-    sudo podman pull {{base_bootc}}
+    sudo podman pull {{base}}
     sudo podman pull {{registry}}/{{device}}-{{desktop}}:{{tag}} || true
 
 build *ARGS:
     sudo buildah bud \
         --layers=true \
         --arch="{{arch}}" \
-        --build-arg="base={{base}}:{{branch}}" \
+        --build-arg="base={{base}}" \
         --build-arg="device={{device}}" \
         --build-arg="desktop={{desktop}}" \
         --build-arg="target_tag={{tag}}" \
@@ -56,10 +53,12 @@ build *ARGS:
 
 rechunk *ARGS:
     sudo podman run --rm --privileged -v /var/lib/containers:/var/lib/containers {{ARGS}} \
-        {{base_bootc}} \
-        /usr/libexec/bootc-base-imagectl rechunk \
-        {{registry}}/{{device}}-{{desktop}}:{{tag}}{{rechunk_suffix}} \
-        {{registry}}/{{device}}-{{desktop}}:{{tag}}
+        {{base}} \
+        rpm-ostree experimental compose build-chunked-oci \
+            --bootc \
+            --format-version=1 \
+            --from={{registry}}/{{device}}-{{desktop}}:{{tag}}{{rechunk_suffix}} \
+            --output=containers-storage:{{registry}}/{{device}}-{{desktop}}:{{tag}}
 
 rebase local_image=(registry / device + "-" + desktop + ":" + tag):
     sudo rpm-ostree rebase ostree-unverified-image:containers-storage:{{local_image}}
