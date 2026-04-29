@@ -24,7 +24,7 @@ base := env("PB_BASE",
     } else {
         base_atomic
     }
-)
+) + ":" + branch
 
 registry := env("PB_REGISTRY", "localhost")
 
@@ -35,14 +35,14 @@ arch := env("PB_ARCH", "arm64")
 default: build
 
 pull:
-    sudo podman pull {{base}}:{{branch}}
+    sudo podman pull {{base}}
     sudo podman pull {{registry}}/{{device}}-{{desktop}}:{{tag}} || true
 
 build *ARGS:
     sudo buildah bud \
         --layers=true \
         --arch="{{arch}}" \
-        --build-arg="base={{base}}:{{branch}}" \
+        --build-arg="base={{base}}" \
         --build-arg="device={{device}}" \
         --build-arg="desktop={{desktop}}" \
         --build-arg="target_tag={{tag}}" \
@@ -53,7 +53,7 @@ build *ARGS:
 
 rechunk *ARGS:
     sudo podman run --rm --privileged -v /var/lib/containers:/var/lib/containers {{ARGS}} \
-        {{base}}:{{branch}} \
+        {{base}} \
         rpm-ostree experimental compose build-chunked-oci \
             --bootc \
             --format-version=1 \
