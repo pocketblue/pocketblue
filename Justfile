@@ -26,8 +26,6 @@ base := env("PB_BASE",
     }
 )
 
-base_bootc := env("PB_BASE_BOOTC", "quay.io/fedora/fedora-bootc:" + branch)
-
 registry := env("PB_REGISTRY", "localhost")
 
 expires_after := env("PB_EXPIRES_AFTER", "")
@@ -38,7 +36,6 @@ default: build
 
 pull:
     sudo podman pull {{base}}:{{branch}}
-    sudo podman pull {{base_bootc}}
     sudo podman pull {{registry}}/{{device}}-{{desktop}}:{{tag}} || true
 
 build *ARGS:
@@ -56,10 +53,12 @@ build *ARGS:
 
 rechunk *ARGS:
     sudo podman run --rm --privileged -v /var/lib/containers:/var/lib/containers {{ARGS}} \
-        {{base_bootc}} \
-        /usr/libexec/bootc-base-imagectl rechunk \
-        {{registry}}/{{device}}-{{desktop}}:{{tag}}{{rechunk_suffix}} \
-        {{registry}}/{{device}}-{{desktop}}:{{tag}}
+        {{base}}:{{branch}} \
+        rpm-ostree experimental compose build-chunked-oci \
+            --bootc \
+            --format-version=1 \
+            --from={{registry}}/{{device}}-{{desktop}}:{{tag}}{{rechunk_suffix}} \
+            --output=containers-storage:{{registry}}/{{device}}-{{desktop}}:{{tag}}
 
 rebase local_image=(registry / device + "-" + desktop + ":" + tag):
     sudo rpm-ostree rebase ostree-unverified-image:containers-storage:{{local_image}}
