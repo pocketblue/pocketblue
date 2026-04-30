@@ -2,4 +2,6 @@
 
 set -uexo pipefail
 
-# this empty desktop
+dnf -y remove \
+    firefox \
+    firefox-langpacks
