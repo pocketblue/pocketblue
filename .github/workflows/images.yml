@@ -20,7 +20,7 @@ on:
         type: string
         description: image tag
         required: true
-        default: '43'
+        default: '44'
       desktop:
         type: choice
         description: desktop
