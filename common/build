@@ -8,6 +8,8 @@ cp -arfT files/usr /usr
 # workaround (see https://github.com/ublue-os/bluefin-lts/issues/3)
 mkdir -p /var/roothome
 
+curl --retry 3 -Lo /etc/flatpak/remotes.d/flathub.flatpakrepo https://dl.flathub.org/repo/flathub.flatpakrepo
+
 # setup development tools
 dnf -y install git just buildah
 systemctl enable sshd.service
