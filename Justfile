@@ -60,6 +60,9 @@ rechunk *ARGS:
             --from={{registry}}/{{device}}-{{desktop}}:{{tag}}{{rechunk_suffix}} \
             --output=containers-storage:{{registry}}/{{device}}-{{desktop}}:{{tag}}
 
+sign digest:
+    cosign sign -y --new-bundle-format=false --key env://SIGNING_KEY "{{registry}}/{{device}}-{{desktop}}@{{digest}}"
+
 rebase local_image=(registry / device + "-" + desktop + ":" + tag):
     sudo rpm-ostree rebase ostree-unverified-image:containers-storage:{{local_image}}
 
