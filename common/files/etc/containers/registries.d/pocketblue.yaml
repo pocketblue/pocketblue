@@ -1,0 +1,3 @@
+docker:
+  quay.io/pocketblue:
+    use-sigstore-attachments: true
