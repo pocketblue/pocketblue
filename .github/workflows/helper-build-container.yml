@@ -87,5 +87,6 @@ jobs:
           username: ${{ env.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_TOKEN || secrets.GITHUB_TOKEN }}
           registry: ${{ env.INPUT_REGISTRY }}
+          signing_key: ${{ secrets.SIGNING_KEY }}
           name: ${{ inputs.device }}-${{ inputs.desktop }}
           tag: ${{ inputs.tag }}
