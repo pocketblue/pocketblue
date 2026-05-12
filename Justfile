@@ -28,6 +28,8 @@ base := env("PB_BASE",
 
 registry := env("PB_REGISTRY", "localhost")
 
+full_image := env("PB_FULL_IMAGE", registry / device + "-" + desktop + ":" + tag)
+
 expires_after := env("PB_EXPIRES_AFTER", "")
 rechunk_suffix := env("PB_RECHUNK_SUFFIX", "-build")
 arch := env("PB_ARCH", "arm64")
@@ -36,7 +38,7 @@ default: build
 
 pull:
     sudo podman pull {{base}}
-    sudo podman pull {{registry}}/{{device}}-{{desktop}}:{{tag}} || true
+    sudo podman pull {{full_image}} || true
 
 build *ARGS:
     sudo buildah bud \
@@ -47,7 +49,7 @@ build *ARGS:
         --build-arg="desktop={{desktop}}" \
         --build-arg="target_tag={{tag}}" \
         {{ARGS}} \
-        -t "{{registry}}/{{device}}-{{desktop}}:{{tag}}{{rechunk_suffix}}" \
+        -t "{{full_image}}{{rechunk_suffix}}" \
         {{ if expires_after != "" { "--label quay.expires-after=" + expires_after } else { "" } }} \
         "."
 
@@ -57,14 +59,14 @@ rechunk *ARGS:
         rpm-ostree experimental compose build-chunked-oci \
             --bootc \
             --format-version=1 \
-            --from={{registry}}/{{device}}-{{desktop}}:{{tag}}{{rechunk_suffix}} \
-            --output=containers-storage:{{registry}}/{{device}}-{{desktop}}:{{tag}}
+            --from={{full_image}}{{rechunk_suffix}} \
+            --output=containers-storage:{{full_image}}
 
 sign digest:
     cosign sign -y --new-bundle-format=false --key env://SIGNING_KEY "{{registry}}/{{device}}-{{desktop}}@{{digest}}"
 
-rebase local_image=(registry / device + "-" + desktop + ":" + tag):
-    sudo rpm-ostree rebase ostree-unverified-image:containers-storage:{{local_image}}
+rebase:
+    sudo rpm-ostree rebase ostree-unverified-image:containers-storage:{{full_image}}
 
 bootc *ARGS:
     sudo podman run \
@@ -77,4 +79,4 @@ bootc *ARGS:
         -e RUST_LOG=debug \
         -v .:/data \
         --security-opt label=type:unconfined_t \
-        "{{registry}}/{{device}}-{{desktop}}:{{tag}}" bootc {{ARGS}}
+        "{{full_image}}" bootc {{ARGS}}
