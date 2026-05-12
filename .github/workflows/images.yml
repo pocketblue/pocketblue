@@ -99,16 +99,16 @@ jobs:
 
           if [ -z "${{ steps.conf.outputs.device_variant }}" ]; then
             echo "PB_TAG=${{ inputs.tag }}" >> $GITHUB_ENV
-            echo "PB_FULL_IMAGE=${IMAGE_REGISTRY,,}/${{ inputs.device }}-${{ inputs.desktop }}:${{ inputs.tag }}" >> $GITHUB_ENV
+            echo "PB_FULL_IMAGE=${IMAGE_REGISTRY,,}/${{ inputs.device }}-${{ matrix.desktop }}:${{ inputs.tag }}" >> $GITHUB_ENV
           else
             pb_tag="${{ inputs.tag }}-${{ steps.conf.outputs.device_variant }}"
             echo "PB_TAG=$pb_tag" >> $GITHUB_ENV
-            echo "PB_FULL_IMAGE=${IMAGE_REGISTRY,,}/${{ steps.conf.outputs.device_base }}-${{ inputs.desktop }}:${pb_tag}" >> $GITHUB_ENV
+            echo "PB_FULL_IMAGE=${IMAGE_REGISTRY,,}/${{ steps.conf.outputs.device_base }}-${{ matrix.desktop }}:${pb_tag}" >> $GITHUB_ENV
           fi
 
           cat >> ${GITHUB_ENV} << EOF
           PB_DEVICE=${{ inputs.device }}
-          PB_DESKTOP=${{ inputs.desktop }}
+          PB_DESKTOP=${{ matrix.desktop }}
           PB_REGISTRY=${IMAGE_REGISTRY,,}
           EOF
 
