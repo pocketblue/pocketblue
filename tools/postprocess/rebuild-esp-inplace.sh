@@ -12,7 +12,7 @@ mount "$esp_dev" "$tmp_dir/esp.old"
 cp -a "$tmp_dir/esp.old/." "$tmp_dir/esp.new/"
 umount "$tmp_dir/esp.old"
 
-mkfs.vfat -F 32 -S "$CONF_ESP_SECTOR_SIZE" -n EFI -i "$UUID" "$esp_dev"
+mkfs.vfat -F "$CONF_ESP_FAT_SIZE" -S "$CONF_ESP_SECTOR_SIZE" -n EFI -i "$UUID" "$esp_dev"
 
 mount "$esp_dev" "$tmp_dir/esp.old"
 cp -a "$tmp_dir/esp.new/." "$tmp_dir/esp.old/"
