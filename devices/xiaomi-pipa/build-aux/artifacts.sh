@@ -2,6 +2,9 @@
 
 set -uexo pipefail
 
+which git
+which python
+
 git clone --depth=1 https://android.googlesource.com/platform/external/avb
 python avb/avbtool.py make_vbmeta_image --flags 2 --padding_size 4096 --output $OUT_PATH/images/vbmeta-disabled.img
 
