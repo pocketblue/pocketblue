@@ -5,7 +5,7 @@ set -uexo pipefail
 export UUID=$(blkid -s UUID -o value /dev/mapper/loop0p1 | tr -d '-')
 
 truncate -s $CONF_ESP_SIZE images/fedora_esp.raw
-mkfs.vfat -F 32 -S $CONF_ESP_SECTOR_SIZE -n EFI -i $UUID images/fedora_esp.raw
+mkfs.vfat -F $CONF_ESP_FAT_SIZE -S $CONF_ESP_SECTOR_SIZE -n EFI -i $UUID images/fedora_esp.raw
 
 mkdir -p esp.old esp.new
 mount /dev/mapper/loop0p1 esp.old

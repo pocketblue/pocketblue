@@ -19,6 +19,7 @@ postprocess:
     source devices/{{device}}/build-aux/device.conf
     export CONF_ESP_SIZE=${esp_size:-}
     export CONF_ESP_SECTOR_SIZE=${esp_sector_size:-4096}
+    export CONF_ESP_FAT_SIZE=${esp_fat_size:-32}
     export CONF_BOOT_SIZE=${boot_size:-}
     export CONF_INSTALL_DTB=${install_dtb:-}
     export CONF_SPLIT_PARTITIONS=${split_partitions:-}
