@@ -94,7 +94,7 @@ jobs:
           IMAGE_REGISTRY: ${{ vars.REGISTRY || format('ghcr.io/{0}', github.repository_owner) }}
         run: |
           if [ -n "${{ inputs.release_id }}" ]; then
-            echo "PB_COMPRESSION_7Z='-mmt=1 -md=1500m'" >> $GITHUB_ENV
+            echo "PB_COMPRESSION_7Z=-mmt=1 -md=1500m" >> $GITHUB_ENV
           fi
 
           if [ -z "${{ steps.conf.outputs.device_variant }}" ]; then
