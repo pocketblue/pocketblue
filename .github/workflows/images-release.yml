@@ -45,8 +45,7 @@ jobs:
 
             > [!IMPORTANT]
             > We are switching our Xiaomi Pad 6 (pipa) images from kxboot to Silicium.
-            > If you have already installed Pocketblue with kxboot, follow this guide to switch to Silicium manually to avoid possible problems with future updates:
-            > https://github.com/pocketblue/pocketblue/issues/223
+            > If you have already installed Pocketblue with kxboot, follow this guide to switch to Silicium manually to avoid possible problems with future updates: https://github.com/pocketblue/pocketblue/issues/223
 
             Recommended images:
             - Xiaomi Pad 5 (xiaomi-nabu): [xiaomi-nabu-gnome-desktop](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-xiaomi-nabu-gnome-desktop-${{ inputs.fedora_branch }}.7z)
