@@ -89,6 +89,13 @@ jobs:
         run: |
           cat 'devices/${{ inputs.device }}/build-aux/device.conf' >> $GITHUB_OUTPUT
 
+      - name: Install erofs-utils
+        if: ${{ steps.conf.outputs.build_erofs == 'true' }}
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y erofs-utils
+
       - name: Prepare environment
         env:
           IMAGE_REGISTRY: ${{ vars.REGISTRY || format('ghcr.io/{0}', github.repository_owner) }}
