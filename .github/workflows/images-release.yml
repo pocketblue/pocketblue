@@ -32,6 +32,22 @@ jobs:
           tag_name: ${{ steps.version.outputs.version }}
           draft: true
           body: |
+            > [!IMPORTANT]
+            > Xiaomi Pad 5 images with UFS patches have been renamed from `44-samsung` to `44-rodriguezst`. You should rebase to the new tag:
+            > With bootc:
+            > ```bash
+            > sudo bootc switch --enforce-container-sigpolicy quay.io/pocketblue/xiaomi-nabu-<DESKTOP>:44-rodriguezst
+            > ```
+            > With rpm-ostree:
+            > ```bash
+            > sudo rpm-ostree rebase ostree-image-signed:docker://quay.io/pocketblue/xiaomi-nabu-<DESKTOP>:44-rodriguezst
+            > ```
+
+            > [!IMPORTANT]
+            > We are switching our Xiaomi Pad 6 (pipa) images from kxboot to Silicium.
+            > If you have already installed Pocketblue with kxboot, follow this guide to switch to Silicium manually to avoid possible problems with future updates:
+            > https://github.com/pocketblue/pocketblue/issues/223
+
             Recommended images:
             - Xiaomi Pad 5 (xiaomi-nabu): [xiaomi-nabu-gnome-desktop](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-xiaomi-nabu-gnome-desktop-${{ inputs.fedora_branch }}.7z)
             - Xiaomi Pad 5, **Outdated kernel with Samsung UFS patches** (xiaomi-nabu-rodriguezst): [xiaomi-nabu-gnome-desktop](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-xiaomi-nabu-gnome-desktop-${{ inputs.fedora_branch }}-rodriguezst.7z)
@@ -39,6 +55,17 @@ jobs:
             - OnePlus 6/6T (oneplus-enchilada/fajita): [qualcomm-sdm845-phosh](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-qualcomm-sdm845-phosh-${{ inputs.fedora_branch }}.7z)
             - Xiaomi Poco F1 (xiaomi-beryllium): [qualcomm-sdm845-phosh](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-qualcomm-sdm845-phosh-${{ inputs.fedora_branch }}.7z)
             - Orange Pi 3 LTS (xunlong-orangepi3-lts): [xunlong-orangepi3-lts-tty](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-xunlong-orangepi3-lts-tty-${{ inputs.fedora_branch }}.7z)
+
+            Changelog:
+            - All container images are now signed with cosign
+            - The tag of xiaomi-nabu images with rodriguezst kernel has been renamed to `<version>-rodriguezst`
+            - Disk images can now be built locally
+            - `rodriguezst` variant of Xiaomi Pad 5 images no longer requires custom partitioning
+            - Xiaomi Pad 6 images now use Silicium UEFI and GRUB instead of kxboot
+            - `sm8250` kernel for xiaomi-pipa upgraged to 6.18.2
+            - `bluez` package is no longer downgraded
+            - Default applications are now installed with Flatpak's preinstall.d
+            - Firefox RPM package removed from `-tty` images
 
   images_build:
     needs: create_release
