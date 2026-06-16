@@ -33,7 +33,7 @@ on:
 jobs:
   build:
     name: ${{ inputs.device }}-${{ inputs.desktop }}
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-26.04-arm
     permissions:
       packages: write
     steps:

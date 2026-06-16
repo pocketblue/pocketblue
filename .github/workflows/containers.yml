@@ -65,7 +65,7 @@ run-name: >
 
 jobs:
   config:
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-26.04-arm
     outputs:
       target_tag: ${{ steps.config.outputs.target_tag }}
       expires: ${{ steps.config.outputs.expires }}
@@ -88,7 +88,7 @@ jobs:
             xunlong-orangepi3-lts
 
   desktops:
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-26.04-arm
     outputs:
       desktops: ${{ steps.desktops.outputs.desktops }}
     steps:

@@ -16,7 +16,7 @@ on:
 
 jobs:
   create_release:
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-26.04-arm
     name: create release
     outputs:
       release_id: ${{ steps.create_release.outputs.id }}
