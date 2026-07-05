@@ -25,6 +25,11 @@ dnf -y install \
     libssc \
     qrtr
 
+# (re)install patched iio-sensor-proxy
+dnf -y do \
+    --action=remove iio-sensor-proxy \
+    --action=install iio-sensor-proxy
+
 systemctl enable \
     hexagonrpcd-sdsp.service \
     bootmac-bluetooth.service \
