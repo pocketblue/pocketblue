@@ -9,28 +9,62 @@ rpm-ostree override remove \
     firefox-langpacks
 
 rpm-ostree override remove \
+    akonadi-server \
+    akonadi-server-mysql \
     ark \
+    ark-libs \
+    bluez-cups \
+    braille-printer-app \
+    c2esp \
+    colord-kde \
+    cups \
+    cups-browsed \
+    cups-filters \
+    cups-filters-driverless \
+    default-fonts-core-mono \
+    default-fonts-core-serif \
+    default-fonts-other-mono \
+    default-fonts-other-serif \
+    dymo-cups-drivers \
     filelight \
+    ghostscript \
+    ghostscript-tools-fontutils \
+    ghostscript-tools-printing \
+    google-droid-sans-fonts \
+    google-noto-sans-mono-vf-fonts \
+    google-noto-serif-fonts \
+    google-noto-serif-vf-fonts \
+    gutenprint-cups \
+    hplip \
+    ImageMagick \
+    ImageMagick-libs \
     kcharselect \
     kdebugsettings \
     kde-connect \
+    kdeconnectd \
+    kde-connect-libs \
     khelpcenter \
     kinfocenter \
     kwrite \
-    plasma-systemmonitor \
-    akonadi-server \
-    akonadi-server-mysql \
-    colord-kde \
-    plasma-print-manager \
-    plasma-workspace-wallpapers \
-    plasma-desktop-doc \
-    phonon-qt6-backend-vlc \
-    vlc-libs \
-    vlc-plugins-base \
-    vlc-plugin-pulseaudio \
-    vlc-plugin-gstreamer \
+    langpacks-en \
+    langpacks-fonts-en \
+    libcupsfilters \
+    libgs \
+    libppd \
     phonon-backend-vlc-common \
-    google-droid-sans-fonts \
-    google-noto-serif-fonts \
-    google-noto-sans-mono-vf-fonts \
-    google-noto-serif-vf-fonts
+    phonon-qt6-backend-vlc \
+    plasma-desktop-doc \
+    plasma-print-manager \
+    plasma-print-manager-libs \
+    plasma-systemmonitor \
+    plasma-workspace-wallpapers \
+    printer-driver-brlaser \
+    ptouch-driver \
+    splix \
+    vlc-libs \
+    vlc-plugin-ffmpeg \
+    vlc-plugin-gstreamer \
+    vlc-plugin-pipewire \
+    vlc-plugin-pulseaudio \
+    vlc-plugins-base \
+    vlc-plugins-video-out
