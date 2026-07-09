@@ -21,6 +21,7 @@ rechunk *ARGS:
         rpm-ostree experimental compose build-chunked-oci \
             --bootc \
             --format-version=1 \
+            --max-layers=127 \
             --from={{full_image}}{{rechunk_suffix}} \
             --output=containers-storage:{{full_image}}
 
