@@ -1,6 +1,6 @@
 pull:
     sudo podman pull {{base}}
-    sudo podman pull {{full_image}} || true
+    # sudo podman pull {{full_image}} || true
 
 build *ARGS:
     sudo buildah bud \
