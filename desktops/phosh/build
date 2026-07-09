@@ -12,7 +12,6 @@ rpm-ostree override remove \
     firefox-langpacks
 
 rpm-ostree override remove \
-    gnome-classic-session \
     gnome-system-monitor \
     gnome-user-docs \
     gnome-tour \
