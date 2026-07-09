@@ -11,11 +11,11 @@ dnf -y install \
     default-flatpaks\
     gnome-shell-extension-nekotorch
 
-dnf -y remove \
+rpm-ostree override remove \
     firefox \
     firefox-langpacks
 
-dnf -y remove \
+rpm-ostree override remove \
     gnome-classic-session \
     gnome-system-monitor \
     gnome-user-docs \

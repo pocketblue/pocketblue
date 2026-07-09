@@ -4,11 +4,11 @@ set -uexo pipefail
 
 dnf -y install default-flatpaks
 
-dnf -y remove \
+rpm-ostree override remove \
     firefox \
     firefox-langpacks
 
-dnf -y remove \
+rpm-ostree override remove \
     ark \
     filelight \
     kcharselect \

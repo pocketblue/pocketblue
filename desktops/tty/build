@@ -2,6 +2,6 @@
 
 set -uexo pipefail
 
-dnf -y remove \
+rpm-ostree override remove \
     firefox \
     firefox-langpacks
