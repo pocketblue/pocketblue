@@ -80,7 +80,17 @@ jobs:
       - name: Pull
         id: pull
         run: |
-          just pull
+          # retry 3 times
+          n=0
+          until [ "$n" -ge 3 ]; do
+            just pull && break
+            n=$((n+1))
+            sleep 10
+          done
+
+          if [ "$n" -ge 3 ]; then
+             exit 1
+          fi
 
       - name: Build
         id: build
