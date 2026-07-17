@@ -1,6 +1,13 @@
-pull:
+[private]
+pull-base:
     sudo podman pull {{base}}
-    # sudo podman pull {{full_image}} || true
+
+[private]
+pull-image:
+    sudo podman pull {{full_image}} || true
+
+[parallel]
+pull: pull-base pull-image
 
 build *ARGS:
     sudo buildah bud \
