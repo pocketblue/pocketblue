@@ -1,0 +1,10 @@
+[copr:copr.fedorainfracloud.org:onesaladleaf:81voltd-test]
+name=Copr repo for 81voltd-test owned by onesaladleaf
+baseurl=https://download.copr.fedorainfracloud.org/results/onesaladleaf/81voltd-test/fedora-$releasever-$basearch/
+type=rpm-md
+skip_if_unavailable=True
+gpgcheck=1
+gpgkey=https://download.copr.fedorainfracloud.org/results/onesaladleaf/81voltd-test/pubkey.gpg
+repo_gpgcheck=0
+enabled=1
+enabled_metadata=1
