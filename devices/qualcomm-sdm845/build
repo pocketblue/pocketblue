@@ -67,10 +67,12 @@ systemctl mask \
 dnf -y install \
     ath10k-shutdown \
     mobility-tweaks \
-    msm-modem-uim-selection
+    msm-modem-uim-selection \
+    81voltd
 
 systemctl enable \
-    msm-modem-uim-selection.service
+    msm-modem-uim-selection.service \
+    81voltd.service
 
 # Kernel
 
