@@ -13,7 +13,7 @@ COPY desktops /desktops
 
 # Building the image
 
-FROM $base
+FROM $base as builder
 
 ARG device
 ARG desktop

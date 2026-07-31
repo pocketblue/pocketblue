@@ -32,6 +32,25 @@ rechunk *ARGS:
             --from={{full_image}}{{rechunk_suffix}} \
             --output=containers-storage:{{full_image}}
 
+build-chunkah *ARGS:
+    buildah bud \
+        --layers=true \
+        --skip-unused-stages=false \
+        --arch="{{arch}}" \
+        --build-arg="base={{base}}" \
+        --build-arg="device={{device}}" \
+        --build-arg="desktop={{desktop}}" \
+        --build-arg="target_tag={{tag}}" \
+        --build-arg="CHUNKAH_CONFIG_STR=$(podman inspect {{full_image}})" \
+        -v=$(pwd):/run/src \
+        --security-opt=label=disable \
+        {{ if expires_after != "" { "--label quay.expires-after=" + expires_after } else { "" } }} \
+        {{ARGS}} \
+        -t "{{full_image}}" \
+        -f Containerfile.chunkah.in \
+        "."
+    [ -d out ] && rm -r out/
+
 sign digest:
     cosign sign -y --new-bundle-format=false --key env://SIGNING_KEY "{{registry}}/{{device}}-{{desktop}}@{{digest}}"
 
