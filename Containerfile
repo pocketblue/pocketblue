@@ -41,11 +41,7 @@ RUN --mount=type=bind,from=common,source=/,target=/ctx/common \
     env --chdir=/ctx/devices/${device} ./build && \
     /ctx/common/cleanup
 
-# os-release file
-RUN sed -i "s/^PRETTY_NAME=.*/PRETTY_NAME=\"Fedora Linux ${target_tag} (${desktop})\"/" /usr/lib/os-release
-
 RUN --mount=type=bind,from=common,source=/,target=/ctx/common \
-    /ctx/common/cleanup && \
     /ctx/common/finalize
 
 RUN bootc container lint --no-truncate
