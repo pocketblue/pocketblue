@@ -1,0 +1,41 @@
+#!/bin/sh
+# The Qualcomm modem firmware initializes both logical SIM slots but does not
+# automatically bind a provisioning session to the USIM application on slot 1.
+# Without this, ModemManager sees no provisioned SIM and reports sim-missing.
+# This script discovers the USIM application ID on slot 1 and binds the
+# primary GW provisioning session to it.
+
+set -e
+
+TIMEOUT=10
+SLOT=1
+
+get_usim_aid() {
+    qmicli -d qrtr://0 --uim-get-card-status 2>/dev/null \
+        | grep -A3 "usim" \
+        | tail -1 \
+        | tr -d " \t\n:"
+}
+
+attempt=0
+while [ $attempt -lt "$TIMEOUT" ]; do
+    AID=$(get_usim_aid)
+    if [ -n "$AID" ]; then
+        break
+    fi
+    echo "Waiting for USIM application (attempt $((attempt + 1))/$TIMEOUT)..."
+    sleep 1
+    attempt=$((attempt + 1))
+done
+
+if [ -z "$AID" ]; then
+    echo "Failed to discover USIM application ID after $TIMEOUT seconds"
+    exit 1
+fi
+
+echo "Found USIM AID: $AID"
+
+qmicli -d qrtr://0 \
+    --uim-change-provisioning-session="session-type=primary-gw-provisioning,activate=yes,slot=$SLOT,aid=$AID"
+
+echo "SIM provisioning session bound to slot $SLOT"

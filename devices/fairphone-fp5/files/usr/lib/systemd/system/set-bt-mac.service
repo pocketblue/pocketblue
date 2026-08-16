@@ -1,0 +1,11 @@
+[Unit]
+Description=Set Bluetooth MAC address
+Before=bluetooth.service
+# The controller only shows up after blob-wrangler has provided its firmware
+After=blob-wrangler.service
+Wants=blob-wrangler.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/libexec/set-bt-mac

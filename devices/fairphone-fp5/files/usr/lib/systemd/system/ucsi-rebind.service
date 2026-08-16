@@ -1,0 +1,6 @@
+[Unit]
+Description=Rebind UCSI to fix USB 2.0 HS with DP alt-mode partners
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/ucsi-rebind
