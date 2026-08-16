@@ -1,0 +1,5 @@
+# image-builder asks the container what root filesystem to use. The rawhide
+# base does not answer, so builds fail with "missing required info:
+# DefaultRootFs". Every device's disk.yaml uses btrfs, so declare it here.
+[install.filesystem.root]
+type = "btrfs"
