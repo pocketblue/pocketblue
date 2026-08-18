@@ -11,7 +11,6 @@ fastboot erase dtbo_ab
 fastboot flash vbmeta_ab images/vbmeta-disabled.img
 fastboot flash boot_ab   images/aloha.img
 fastboot flash rawdump   images/fedora_esp.raw
-fastboot flash cust      images/fedora_boot.raw
 fastboot flash userdata  images/fedora_rootfs.raw
 
 echo 'rebooting (this may take a while, DO NOT DISCONNECT THE DEVICE)'

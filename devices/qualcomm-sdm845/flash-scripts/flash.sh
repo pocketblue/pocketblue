@@ -16,7 +16,6 @@ case $choice in
     product_name=sdm845
     has_slots=true
     esp_part=system_b
-    boot_part=system_a
     root_part=userdata
     ;;
 2)
@@ -24,7 +23,6 @@ case $choice in
     product_name=sdm845
     has_slots=true
     esp_part=system_b
-    boot_part=system_a
     root_part=userdata
     ;;
 3)
@@ -32,7 +30,6 @@ case $choice in
     product_name=beryllium
     has_slots=false
     esp_part=cust
-    boot_part=system
     root_part=userdata
     ;;
 4)
@@ -40,7 +37,6 @@ case $choice in
     product_name=beryllium
     has_slots=false
     esp_part=cust
-    boot_part=system
     root_part=userdata
     ;;
 *)
@@ -54,26 +50,23 @@ echo '>>> Waiting for device to appear in fastboot...'
 fastboot getvar product 2>&1 | grep "$product_name"
 
 if [ "$has_slots" = "true" ]; then
-    echo '>>> (1/6) Erasing DTBO'
+    echo '>>> (1/5) Erasing DTBO'
     fastboot erase dtbo_a
     fastboot erase dtbo_b
-    echo '>>> (2/6) Flashing U-Boot'
+    echo '>>> (2/5) Flashing U-Boot'
     fastboot flash boot images/u-boot-$device.img --slot=all
 else
-    echo '>>> (1/6) Erasing DTBO'
+    echo '>>> (1/5) Erasing DTBO'
     fastboot erase dtbo
-    echo '>>> (2/6) Flashing U-Boot'
+    echo '>>> (2/5) Flashing U-Boot'
     fastboot flash boot images/u-boot-$device.img
 fi
 
-echo ">>> (3/6) Flashing fedora_esp.raw into $esp_part"
+echo ">>> (3/5) Flashing fedora_esp.raw into $esp_part"
 fastboot flash $esp_part images/fedora_esp.raw
 
-echo ">>> (4/6) Flashing fedora_boot.raw into $boot_part"
-fastboot flash $boot_part images/fedora_boot.raw
-
-echo ">>> (5/6) Flashing fedora_rootfs.raw into $root_part"
+echo ">>> (4/5) Flashing fedora_rootfs.raw into $root_part"
 fastboot flash $root_part images/fedora_rootfs.raw
 
-echo '>>> (6/6) Rebooting (this may take a while, DO NOT DISCONNECT THE DEVICE)'
+echo '>>> (5/5) Rebooting (this may take a while, DO NOT DISCONNECT THE DEVICE)'
 fastboot reboot
