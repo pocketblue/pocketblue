@@ -1,17 +1,28 @@
-@echo on
+@echo off
 setlocal EnableExtensions EnableDelayedExpansion
 
 where fastboot || (pause & exit)
 
-echo 'waiting for device to appear in fastboot'
+echo ^>^>^> Flashing xiaomi-nabu-rodriguezst
 
+echo ^>^>^> Waiting for device to appear in fastboot...
 fastboot getvar product 2>&1 | findstr /i nabu || (pause & exit)
-fastboot erase dtbo_ab || (pause & exit)
-fastboot flash vbmeta_ab images/vbmeta-disabled.img || (pause & exit)
-fastboot flash   boot_ab images/aloha.img || (pause & exit)
-fastboot flash   rawdump images/fedora_esp.raw || (pause & exit)
-fastboot flash  userdata images/fedora_rootfs.raw || (pause & exit)
 
-echo 'rebooting (this may take a while, DO NOT DISCONNECT THE DEVICE)'
+echo ^>^>^> (1/6) Erasing DTBO
+fastboot erase dtbo_ab || (pause & exit)
+
+echo ^>^>^> (2/6) Disabling verified boot
+fastboot flash vbmeta_ab images/vbmeta-disabled.img || (pause & exit)
+
+echo ^>^>^> (3/6) Flashing Aloha
+fastboot flash boot_ab images/aloha.img || (pause & exit)
+
+echo ^>^>^> (4/6) Flashing fedora_esp.raw into rawdump
+fastboot flash rawdump images/fedora_esp.raw || (pause & exit)
+
+echo ^>^>^> (5/6) Flashing fedora_rootfs.raw into userdata
+fastboot flash userdata images/fedora_rootfs.raw || (pause & exit)
+
+echo ^>^>^> (6/6) Writing to disk and rebooting (this may take a while, DO NOT DISCONNECT THE DEVICE)
 fastboot reboot
 pause

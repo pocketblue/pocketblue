@@ -68,5 +68,5 @@ fastboot flash $esp_part images/fedora_esp.raw
 echo ">>> (4/5) Flashing fedora_rootfs.raw into $root_part"
 fastboot flash $root_part images/fedora_rootfs.raw
 
-echo '>>> (5/5) Rebooting (this may take a while, DO NOT DISCONNECT THE DEVICE)'
+echo '>>> (5/5) Writing to disk and rebooting (this may take a while, DO NOT DISCONNECT THE DEVICE)'
 fastboot reboot
