@@ -34,7 +34,7 @@ artifacts:
     set -euo pipefail
 
     export DEVICE_PATH=devices/{{device}}
-    export ARGS_7Z="{{compression_7z}}"
+    export ARGS_7Z={{compression_7z}}
     export SCRIPTS=tools/postprocess
 
     tools/collect-artifacts.sh
