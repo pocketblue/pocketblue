@@ -1,0 +1,76 @@
+#!/bin/sh
+set -e
+
+BT_INDEX="0"
+MAC_PREFIX="0200"
+BT_TIMEOUT=5
+HCI_TIMEOUT=60
+
+echo "Generating Bluetooth MAC address"
+
+# hci0 only appears once the QCA firmware has been downloaded, which happens
+# well after this used to run - the controller firmware itself now waits on
+# blob-wrangler. Wait for the device instead of failing against an empty index.
+waited=0
+while [ ! -d "/sys/class/bluetooth/hci${BT_INDEX}" ]; do
+    if [ $waited -ge $HCI_TIMEOUT ]; then
+        echo "hci${BT_INDEX} did not appear within ${HCI_TIMEOUT}s"
+        exit 1
+    fi
+    sleep 1
+    waited=$((waited + 1))
+done
+echo "hci${BT_INDEX} present after ${waited}s"
+
+SERIAL_NUMBER=$(grep -o "serialno.*" /proc/cmdline | cut -d" " -f1)
+
+if [ -z "$SERIAL_NUMBER" ]; then
+    echo "Serial number not available, falling back to machine-id"
+    SERIAL_NUMBER=$(cat /etc/machine-id)
+fi
+
+if [ -z "$SERIAL_NUMBER" ]; then
+    echo "No unique ID available, cannot generate MAC address"
+    exit 1
+fi
+
+BT_MAC=$(echo "$SERIAL_NUMBER-BT" | sha256sum | awk -v prefix="$MAC_PREFIX" '{printf("%s%010s\n", prefix, $1)}')
+BT_MAC=$(echo "$BT_MAC" | cut -c1-12 | sed 's/\(..\)/\1:/g' | sed '$s/:$//')
+
+echo "Setting Bluetooth MAC to $BT_MAC"
+
+set +e
+BT_RFKILL_UNBLOCKED=$(rfkill -n -r -o DEVICE,TYPE,SOFT | grep "bluetooth" | grep "unblocked")
+set -e
+
+btmgmt --index "$BT_INDEX" power off
+
+# Go by btmgmt's exit status. It reports success as
+#   hci0 Set Public Address complete, options:
+# which never contained the word this used to grep for, so every run set the
+# address correctly and then failed anyway. Keep btmgmt's own message too -
+# discarding it is why the unit only ever said "Unable to set".
+timeout=0
+while :; do
+    if btmgmt_out=$(btmgmt --index "$BT_INDEX" public-addr "$BT_MAC" 2>&1); then
+        echo "$btmgmt_out"
+        break
+    fi
+
+    timeout=$((timeout + 1))
+    if [ $timeout -ge "$BT_TIMEOUT" ]; then
+        echo "Failed to set Bluetooth MAC address after $BT_TIMEOUT seconds: $btmgmt_out"
+        exit 1
+    fi
+
+    echo "Unable to set Bluetooth MAC ($btmgmt_out), retrying after 1 second..."
+    sleep 1
+done
+
+if [ -n "$BT_RFKILL_UNBLOCKED" ]; then
+    echo "Restoring Bluetooth rfkill state to unblocked"
+    rfkill unblock bluetooth
+    btmgmt --index "$BT_INDEX" power on
+fi
+
+echo "Bluetooth MAC address configured successfully"
