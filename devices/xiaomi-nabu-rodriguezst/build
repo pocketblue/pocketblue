@@ -4,3 +4,10 @@ set -uexo pipefail
 
 cp -arfT files/etc /etc
 env --chdir=../xiaomi-nabu ./build
+
+dnf -y \
+    --disablerepo=copr:copr.fedorainfracloud.org:pocketblue:sm8150 \
+    --disablerepo=copr:copr.fedorainfracloud.org:pocketblue:sm8150-samsung-ufs \
+    install akmod-idtp9418 || true
+KVER="$(rpm -q "kernel" --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}')"
+akmods --force --kernels "${KVER}" --kmod idtp9418
