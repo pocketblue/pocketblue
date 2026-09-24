@@ -5,7 +5,7 @@ disk:
         -v /var/lib/containers/storage:/var/lib/containers/storage \
         -v ./output:/output \
         -v ./common/blueprint.toml:/blueprint.toml \
-        ghcr.io/osbuild/image-builder-cli:latest \
+        ghcr.io/osbuild/image-builder:latest \
             build \
                 --bootc-ref={{full_image}} \
                 --blueprint=/blueprint.toml \
