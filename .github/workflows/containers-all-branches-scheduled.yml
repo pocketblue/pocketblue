@@ -1,0 +1,13 @@
+name: containers (all branches, scheduled)
+
+on:
+  schedule:
+    - cron: '0 12 * * *'
+
+jobs:
+  main:
+    if: ${{ !github.event.repository.fork }}
+    secrets: inherit
+    permissions:
+      packages: write
+    uses: ./.github/workflows/containers-all-branches.yml

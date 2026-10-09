@@ -1,12 +1,10 @@
 name: containers (all branches)
 on:
   workflow_dispatch: {}
-  schedule:
-    - cron: '0 12 * * *'
+  workflow_call: {}
 
 jobs:
   main:
-    if: ${{ github.event_name != 'schedule' || !github.event.repository.fork }}
     secrets: inherit
     permissions:
       packages: write
