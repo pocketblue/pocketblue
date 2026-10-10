@@ -1,0 +1,36 @@
+#!/bin/bash
+# Rebind UCSI to fix USB 2.0 HS with DP alt-mode partners.
+#
+# On Qualcomm SC7280/QCM6490/Kodiak, the ADSP firmware may not have
+# the USB 2.0 high-speed data path ready when a DisplayPort alt-mode
+# partner is connected (SuperSpeed lanes used for DP).
+# Rebinding ucsi_glink triggers two PPM resets which force the firmware
+# to re-initialize the USB-C data path, making USB 2.0 devices
+# (e.g. touchscreens) appear on the host controller.
+#
+# Rate-limited to prevent infinite loops: the rebind itself triggers
+# a partner add event which would re-trigger this script via udev.
+
+DRIVER_PATH=/sys/bus/auxiliary/drivers/ucsi_glink.pmic_glink_ucsi
+DEVICE=pmic_glink.ucsi.0
+STAMP=/run/ucsi-rebind.stamp
+COOLDOWN=30
+
+# Skip if we ran recently
+if [ -f "$STAMP" ]; then
+    age=$(( $(date +%s) - $(stat -c %Y "$STAMP") ))
+    if [ "$age" -lt "$COOLDOWN" ]; then
+        exit 0
+    fi
+fi
+touch "$STAMP"
+
+# Skip if the driver or device doesn't exist
+if [ ! -d "$DRIVER_PATH" ]; then
+    echo "ucsi-rebind: driver not loaded, skipping" >&2
+    exit 0
+fi
+
+echo "$DEVICE" > "$DRIVER_PATH/unbind" 2>/dev/null
+sleep 2
+echo "$DEVICE" > "$DRIVER_PATH/bind" 2>/dev/null

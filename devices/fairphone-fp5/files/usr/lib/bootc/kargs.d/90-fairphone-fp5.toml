@@ -1,0 +1,4 @@
+kargs = [
+    "clk_ignore_unused",
+    "earlycon=efifb",
+]

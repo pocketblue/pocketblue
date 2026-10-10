@@ -1,0 +1,4 @@
+# Extract to /var, since /usr is read-only. /usr/lib/firmware/updates is a
+# symlink to this directory, so the kernel finds it without a search path.
+[general]
+extract_path = "/var/lib/firmware-extract"

@@ -1,0 +1,5 @@
+; Label /etc/systemd/system.control/ as systemd_unit_file_t.
+; systemd-oomd creates drop-ins here at runtime (e.g. 50-MemoryMin.conf)
+; which otherwise get the generic etc_t label, causing AVC denials when
+; systemd (init_t) tries to unlink them.
+(filecon "/etc/systemd/system\.control(/.*)?" any (system_u object_r systemd_unit_file_t ((s0) (s0))))

@@ -1,0 +1,9 @@
+[Unit]
+Description=Bind SIM provisioning session
+Before=ModemManager.service
+After=qrtr-ns.service systemd-modules-load.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/libexec/set-modem-sim-slot

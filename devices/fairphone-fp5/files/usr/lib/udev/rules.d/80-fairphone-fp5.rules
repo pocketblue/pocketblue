@@ -1,0 +1,22 @@
+# Fairphone 5 udev rules
+
+# Accelerometer mount matrix for iio-sensor-proxy with libssc
+SUBSYSTEM=="misc", KERNEL=="fastrpc-adsp", ENV{ACCEL_MOUNT_MATRIX}="-1, 0, 0; 0, -1, 0; 0, 0, -1"
+
+# Enable additional SSC sensor types for iio-sensor-proxy.
+# ssc-light and ssc-compass are already enabled by upstream iio-sensor-proxy udev rules.
+# ssc-accel and ssc-proximity are disabled by default in iio-sensor-proxy.
+SUBSYSTEM=="misc", KERNEL=="fastrpc-adsp", ENV{IIO_SENSOR_PROXY_TYPE}+="ssc-accel ssc-proximity"
+
+# Set Bluetooth MAC address
+ACTION=="add", SUBSYSTEM=="bluetooth", KERNEL=="hci0", TAG+="systemd", ENV{SYSTEMD_WANTS}="set-bt-mac.service"
+
+# Rebind UCSI when a USB-C partner is connected to fix USB 2.0 HS
+# detection with DP alt-mode partners (e.g. touchscreen monitors).
+# The ADSP firmware needs a PPM reset cycle to properly initialize
+# the USB 2.0 data path when SuperSpeed lanes are used for DisplayPort.
+# The ucsi-rebind script is rate-limited to prevent infinite loops.
+ACTION=="add", SUBSYSTEM=="typec", KERNEL=="port*-partner", TAG+="systemd", ENV{SYSTEMD_WANTS}="ucsi-rebind.service"
+
+# Allow unprivileged users to control flash LEDs via sysfs
+SUBSYSTEM=="leds", DEVPATH=="*/*:flash", RUN+="/bin/chmod -R a+rw /sys%p"

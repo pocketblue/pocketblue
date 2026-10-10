@@ -1,0 +1,39 @@
+#!/bin/bash
+# Only bring the DSPs up once their configuration is actually in place.
+#
+# The ADSP sensors service crashes if its registry and acdb data are missing,
+# and the kernel oopses while recovering from that crash, which turns into a
+# boot loop. Booting without the DSPs is degraded but usable, and leaves the
+# logs readable.
+set -u
+
+SENSORS=/var/lib/blob-wrangler/sensors
+
+# Check the files hexagonrpcd actually serves, not just directory names. A tree
+# that looks populated but lacks sns_reg_config still crashes the ADSP, which
+# is what "Could not open /vendor/etc/sensors/sns_reg_config" in the log means.
+# An empty registry is what actually crashes the ADSP: SNS_REG_TASK aborts,
+# and the kernel has been seen to oops while recovering from that. The registry
+# comes from the persist partition and is the folder blob-wrangler used to
+# delete on re-runs.
+if [ -z "$(ls -A "$SENSORS/sensors/registry" 2>/dev/null)" ]; then
+    echo "fp5: $SENSORS/sensors/registry is empty - not starting the DSPs." >&2
+    echo "fp5: the ADSP sensor registry task crashes without it." >&2
+    exit 0
+fi
+
+for f in sensors/sns_reg_config acdb/adsp_avs_config.acdb; do
+    if [ ! -e "$SENSORS/$f" ]; then
+        echo "fp5: $SENSORS/$f is missing - not starting the DSPs." >&2
+        echo "fp5: the ADSP sensors service crashes without it, and the kernel" >&2
+        echo "fp5: has been seen to oops while recovering from that crash." >&2
+        exit 0
+    fi
+done
+
+if [ -z "$(ls -A "$SENSORS/dsp" 2>/dev/null)" ]; then
+    echo "fp5: $SENSORS/dsp is empty - not starting the DSPs." >&2
+    exit 0
+fi
+
+modprobe qcom_q6v5_pas
