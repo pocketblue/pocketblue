@@ -26,5 +26,10 @@ else
     export root_part="${loop}p2"
 fi
 
-[ "$CONF_INSTALL_DTB" = "true" ] && $SCRIPTS/install-dtb.sh
-[ "$CONF_BUILD_EROFS" = "true" ] && $SCRIPTS/build-erofs.sh
+if [ "$CONF_INSTALL_DTB" = "true" ]; then
+    "$SCRIPTS/install-dtb.sh"
+fi
+
+if [ "$CONF_BUILD_EROFS" = "true" ]; then
+    "$SCRIPTS/build-erofs.sh"
+fi
