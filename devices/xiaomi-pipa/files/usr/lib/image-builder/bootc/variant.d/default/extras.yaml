@@ -1,0 +1,5 @@
+partitions:
+  esp:
+    mountpoint: "/boot/efi"
+  rootfs:
+    mountpoint: "/"
