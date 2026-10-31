@@ -10,6 +10,9 @@ mkdir -p /var/roothome
 
 curl --retry 3 -Lo /etc/flatpak/remotes.d/flathub.flatpakrepo https://dl.flathub.org/repo/flathub.flatpakrepo
 
+# uki
+dnf -y install systemd-boot-unsigned systemd-ukify
+
 # setup development tools
 dnf -y install git just buildah
 
