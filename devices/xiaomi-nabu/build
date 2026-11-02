@@ -32,7 +32,8 @@ dnf -y remove \
     kernel-core \
     kernel-modules \
     kernel-modules-core \
+    kernel-modules-extra \
     kernel-headers
 rm -rf /usr/lib/modules/*
-dnf -y install kernel
-rm -r /boot/dtb
+dnf -y install kernel kernel-modules-extra
+rm -rf /boot/dtb
