@@ -18,11 +18,11 @@ fastboot flash vbmeta_ab images/vbmeta-disabled.img
 echo '>>> (3/6) Flashing U-Boot'
 fastboot flash boot_ab images/uboot.img
 
-echo ">>> (4/6) Flashing fedora_esp.raw into rawdump"
-fastboot flash rawdump images/fedora_esp.raw
+echo ">>> (4/6) Flashing fedora_esp.img into rawdump"
+fastboot flash rawdump images/fedora_esp.img
 
-echo ">>> (5/6) Flashing fedora_rootfs.raw into userdata"
-fastboot flash userdata images/fedora_rootfs.raw
+echo ">>> (5/6) Flashing fedora_rootfs.img into userdata"
+fastboot flash userdata images/fedora_rootfs.img
 
 echo '>>> (6/6) Writing to disk and rebooting (this may take a while, DO NOT DISCONNECT THE DEVICE)'
 fastboot reboot
