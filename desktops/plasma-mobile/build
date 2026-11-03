@@ -2,6 +2,8 @@
 
 set -uexo pipefail
 
+cp -arfT etc /etc
+
 dnf -y install \
     plasma-mobile \
     plasma-mobile-sounds \
