@@ -90,6 +90,7 @@ jobs:
         uses: pocketblue/actions/container-config@main
         with:
           from_tag: ${{ inputs.fedora_branch || 45 }}
+          latest_tag: 45
           vars_registry: ${{ vars.REGISTRY }}
           device: ${{ inputs.device || '' }}
           device_list: |
