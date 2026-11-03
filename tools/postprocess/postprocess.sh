@@ -33,3 +33,9 @@ fi
 if [ "$CONF_BUILD_EROFS" = "true" ]; then
     "$SCRIPTS/build-erofs.sh"
 fi
+
+if [ -d $OUTPUT/images ]; then
+  img2simg $OUTPUT/images/fedora_rootfs.raw $OUTPUT/images/fedora_rootfs.img
+  img2simg $OUTPUT/images/fedora_esp.raw $OUTPUT/images/fedora_esp.img
+  rm $OUTPUT/images/fedora_rootfs.raw $OUTPUT/images/fedora_esp.raw
+fi
