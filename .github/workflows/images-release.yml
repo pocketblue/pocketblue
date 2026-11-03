@@ -12,7 +12,7 @@ on:
           - '44'
           - '45'
           - 'rawhide'
-        default: '44'
+        default: '45'
 
 jobs:
   create_release:
@@ -40,18 +40,6 @@ jobs:
             - Xiaomi Poco F1 (xiaomi-beryllium): [qualcomm-sdm845-phosh](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-qualcomm-sdm845-phosh-${{ inputs.fedora_branch }}.7z)
             - Orange Pi 3 LTS (xunlong-orangepi3-lts): [xunlong-orangepi3-lts-tty](https://github.com/pocketblue/pocketblue/releases/download/${{ steps.version.outputs.version }}/pocketblue-xunlong-orangepi3-lts-tty-${{ inputs.fedora_branch }}.7z)
 
-            Changelog:
-            - OCI images are now separated into 128 layers to optimize updates size
-            - Moved from bootc-image-builder to OSBuild image-builder
-            - Disk images now use default Fedora btrfs subvolumes
-            - Dropped the separate partition for `/boot`. Only 2 partitions are now required (ESP, root), `/boot` is now a subvolume
-            - Updated xiaomi-pipa kernel to 7.1.7
-            - Added DP audio support for xiaomi-pipa
-            - Fixed GNOME Mobile on rawhide
-            - User-friendlier flash scripts
-            - Various build optimizations
-            - Experimental support for Chunkah
-
   images_build:
     needs: create_release
     strategy:
@@ -62,7 +50,7 @@ jobs:
           - xiaomi-nabu-rodriguezst
           - xiaomi-pipa
           - xunlong-orangepi3-lts
-        desktop: [tty, gnome-desktop, plasma-desktop, plasma-mobile, phosh]
+        desktop: [tty, gnome-desktop, gnome-mobile, plasma-desktop, plasma-mobile, phosh]
     name: ${{ matrix.device }}-${{ matrix.desktop }}:${{ inputs.fedora_branch }}
     uses: ./.github/workflows/images.yml
     with:
