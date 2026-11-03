@@ -12,7 +12,7 @@ on:
           - '44'
           - '45'
           - 'rawhide'
-        default: '44'
+        default: '45'
 
 jobs:
   create_release:
