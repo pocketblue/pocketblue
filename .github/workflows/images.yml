@@ -89,12 +89,11 @@ jobs:
         run: |
           cat 'devices/${{ inputs.device }}/build-aux/device.conf' >> $GITHUB_OUTPUT
 
-      - name: Install erofs-utils
-        if: ${{ steps.conf.outputs.build_erofs == 'true' }}
+      - name: Install dependencies
         shell: bash
         run: |
           sudo apt-get update
-          sudo apt-get install -y erofs-utils
+          sudo apt-get install -y erofs-utils android-sdk-libsparse-utils
 
       - name: Prepare environment
         env:
