@@ -50,7 +50,7 @@ jobs:
           - xiaomi-nabu-rodriguezst
           - xiaomi-pipa
           - xunlong-orangepi3-lts
-        desktop: [tty, gnome-desktop, plasma-desktop, plasma-mobile, phosh]
+        desktop: [tty, gnome-desktop, gnome-mobile, plasma-desktop, plasma-mobile, phosh]
     name: ${{ matrix.device }}-${{ matrix.desktop }}:${{ inputs.fedora_branch }}
     uses: ./.github/workflows/images.yml
     with:
