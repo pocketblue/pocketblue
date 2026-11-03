@@ -15,7 +15,7 @@ mkdir $ROOTFS_EXTRACT
 tar --xattrs-include='*' -p -xf $ROOTFS_TAR -C $ROOTFS_EXTRACT
 rm $ROOTFS_TAR
 
-mkfs.erofs -zlz4 -C1048576 $ROOTFS_ERO $ROOTFS_EXTRACT
+mkfs.erofs -d0 -zlz4 -C1048576 $ROOTFS_ERO $ROOTFS_EXTRACT
 rm -rf $ROOTFS_EXTRACT
 
 chown "$(id -u):$(id -g)" $ROOTFS_ERO
