@@ -170,3 +170,4 @@ jobs:
         with:
           release_id: ${{ inputs.release_id }}
           file: pocketblue-${{ steps.conf.outputs.device_base || env.PB_DEVICE }}-${{ env.PB_DESKTOP }}-${{ env.PB_TAG }}.7z
+          draft: true
