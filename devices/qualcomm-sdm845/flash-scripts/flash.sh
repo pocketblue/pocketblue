@@ -62,11 +62,11 @@ else
     fastboot flash boot images/u-boot-$device.img
 fi
 
-echo ">>> (3/5) Flashing fedora_esp.raw into $esp_part"
-fastboot flash $esp_part images/fedora_esp.raw
+echo ">>> (3/5) Flashing fedora_esp.img into $esp_part"
+fastboot flash $esp_part images/fedora_esp.img
 
-echo ">>> (4/5) Flashing fedora_rootfs.raw into $root_part"
-fastboot flash $root_part images/fedora_rootfs.raw
+echo ">>> (4/5) Flashing fedora_rootfs.img into $root_part"
+fastboot flash $root_part images/fedora_rootfs.img
 
 echo '>>> (5/5) Writing to disk and rebooting (this may take a while, DO NOT DISCONNECT THE DEVICE)'
 fastboot reboot
