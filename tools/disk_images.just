@@ -12,7 +12,7 @@ disk:
                 --output-dir=/output \
                 --output-name='{{'{{ if .Extra.Name }}fedora_{{ .Extra.Name }}{{ else }}disk{{ end }}'}}' \
                 --progress=verbose \
-                --with-extra '*' \
+                {{ if extras == "true" { "--with-extra '*'" } else { "" } }} \
                 raw
 
 postprocess:

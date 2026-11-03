@@ -116,6 +116,7 @@ jobs:
           PB_DEVICE=${{ inputs.device }}
           PB_DESKTOP=${{ matrix.desktop }}
           PB_REGISTRY=${IMAGE_REGISTRY,,}
+          PB_EXTRAS=${{ steps.conf.outputs.extras || 'true' }}
           EOF
 
           cat .env >> $GITHUB_ENV
