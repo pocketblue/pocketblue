@@ -9,7 +9,6 @@ cp -arfT files/usr /usr
 cp -arfT files/audio/etc /etc
 cp -arfT files/audio/usr /usr
 
-cp -arfT files/fwload/etc /etc
 cp -arfT files/fwload/usr /usr
 
 # Qualcomm tools and libs
