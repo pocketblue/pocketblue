@@ -2,7 +2,7 @@
 
 set -uexo pipefail
 
-cp -arfT etc /etc
+cp -arfT usr /usr
 
 dnf -y remove gnome-shell gnome-shell-common mutter-common gnome-settings-daemon
 dnf -y install gnome-shell mutter gnome-settings-daemon
