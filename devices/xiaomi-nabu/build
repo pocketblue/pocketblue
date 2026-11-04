@@ -4,7 +4,6 @@ set -uexo pipefail
 
 # Files
 
-cp -arfT files/etc /etc
 cp -arfT files/usr /usr
 
 # Packages
