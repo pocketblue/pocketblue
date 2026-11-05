@@ -12,7 +12,6 @@ curl --retry 3 -Lo /etc/flatpak/remotes.d/flathub.flatpakrepo https://dl.flathub
 
 # setup development tools
 dnf -y install git just buildah
-systemctl enable sshd.service
 
 # usb network
 dnf -y install usb-network
