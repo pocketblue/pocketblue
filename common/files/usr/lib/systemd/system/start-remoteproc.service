@@ -1,0 +1,12 @@
+[Unit]
+Description=Start failed remoteproc after vendor firmware becomes available
+RequiresMountsFor=/var/lib/firmware-extract
+Before=bluetooth.service bootmac-bluetooth.service
+ConditionPathExists=/var/lib/firmware-extract/qcom
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/bash -c "echo start | tee /sys/class/remoteproc/remoteproc*/state"
+
+[Install]
+WantedBy=multi-user.target
