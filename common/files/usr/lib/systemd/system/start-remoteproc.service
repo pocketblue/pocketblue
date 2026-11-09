@@ -6,6 +6,7 @@ ConditionPathExists=/var/lib/firmware-extract/qcom
 
 [Service]
 Type=oneshot
+ExecStartPre=/usr/sbin/modprobe hci_uart
 ExecStart=/usr/bin/bash -c "echo start | tee /sys/class/remoteproc/remoteproc*/state"
 
 [Install]
