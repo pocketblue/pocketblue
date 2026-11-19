@@ -8,6 +8,7 @@ disk:
         ghcr.io/osbuild/image-builder:latest \
             build \
                 --bootc-ref={{full_image}} \
+                --bootc-variant={{variant}} \
                 --blueprint=/blueprint.toml \
                 --output-dir=/output \
                 --output-name='{{'{{ if .Extra.Name }}fedora_{{ .Extra.Name }}{{ else }}disk{{ end }}'}}' \
