@@ -1,0 +1,29 @@
+mount_configuration: "units"
+partition_table:
+  type: "gpt"
+  sector_size: 4096
+  partitions:
+    # flashed to logdump, which is exactly 512M on the device
+    - size: "512 MiB"
+      type: "C12A7328-F81F-11D2-BA4B-00A0C93EC93B" # EFI system partition
+      payload_type: "filesystem"
+      payload:
+        type: "vfat"
+        mountpoint: "/boot/efi"
+        label: "EFI"
+        fstab_options: "umask=0077,shortname=winnt"
+        fstab_freq: 0
+        fstab_passno: 2
+    - size: "6 GiB"
+      type: "0FC63DAF-8483-4772-8E79-3D69D8477DE4" # Linux Filesystem
+      payload_type: "btrfs"
+      payload:
+        subvolumes:
+          - name: "root"
+            mountpoint: "/"
+          - name: "boot"
+            mountpoint: "/boot"
+          - name: "var"
+            mountpoint: "/var"
+          - name: "home"
+            mountpoint: "/var/home"

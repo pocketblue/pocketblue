@@ -1,0 +1,116 @@
+#!/usr/bin/env bash
+
+set -uexo pipefail
+
+cp -arfT files/usr /usr
+cp -arfT files/etc /etc
+
+# Set executable permissions on helper scripts
+chmod +x /usr/libexec/fp5-load-dsp
+chmod +x /usr/libexec/set-bt-mac
+chmod +x /usr/libexec/set-modem-sim-slot
+chmod +x /usr/libexec/ucsi-rebind
+
+# Install SELinux policy modules (CIL format)
+# - iio-sensor-proxy-qrtr: QRTR socket access for Qualcomm SSC sensors
+# - systemd-system-control: file context for /etc/systemd/system.control/
+#   (systemd-oomd drop-ins that otherwise get mislabeled as etc_t)
+semodule -X 400 -i \
+    /usr/share/selinux/packages/iio-sensor-proxy-qrtr.cil \
+    /usr/share/selinux/packages/systemd-system-control.cil
+
+# packages
+dnf -y install \
+    atheros-firmware \
+    qcom-firmware \
+    qrtr \
+    rmtfs \
+    tqftpserv \
+    alsa-ucm-utils \
+    bluez \
+    libcamera \
+    libcamera-ipa \
+    hexagonrpc \
+    libssc
+
+# alsa-ucm-conf-qcom-sc7280 used to ship a copy of the whole ucm2 tree, which
+# conflicts with alsa-ucm on every file the two have in common. Newer builds
+# carry only the device configuration and require alsa-ucm instead. Handle both,
+# keyed on whether the available package depends on alsa-ucm.
+ALSA_REPO='copr:copr.fedorainfracloud.org:pocketblue:sc7280'
+if dnf repoquery --repo="$ALSA_REPO" --requires alsa-ucm-conf-qcom-sc7280 | grep -qx 'alsa-ucm'; then
+    dnf -y install --enable-repo="$ALSA_REPO" alsa-ucm-conf-qcom-sc7280
+else
+    # old build: alsa-ucm has to go first, and alsa-utils depends on it
+    dnf -y swap --enable-repo="$ALSA_REPO" --allowerasing \
+        alsa-ucm alsa-ucm-conf-qcom-sc7280
+fi
+
+# Replace stock iio-sensor-proxy with the pocketblue build, which is built
+# against libssc for the Qualcomm Sensor Core and carries the
+# do-not-exit-on-sensor-events workaround. Fedora's release is higher, so this
+# has to be a swap rather than an upgrade.
+dnf -y swap --repo='copr:copr.fedorainfracloud.org:pocketblue:common' \
+    iio-sensor-proxy iio-sensor-proxy
+
+# Firmware comes from the device itself, not from this image: blob-wrangler
+# extracts it from the stock Android partitions, which the FP5 install leaves
+# untouched. qcom-firmware still provides the redistributable GPU core
+# firmware (a660_sqe, a660_gmu).
+# Our fork, which fixes the folder extraction that otherwise destroys the
+# already-extracted tree (samcday/blob-wrangler#4). --enable-repo rather than
+# --repo: blob-wrangler needs kmod, and --repo would restrict resolution to the
+# copr alone.
+dnf -y install --enable-repo='copr:copr.fedorainfracloud.org:group_mobility:common' \
+    blob-wrangler
+
+dnf -y install make-dynpart-mappings
+
+# The rpm's own fairphone,fp5.toml now carries the full extraction set: the
+# folders section (ADSP acdb/sensors/dsp trees plus the registry from persist)
+# and the sns_reg_config -> sns_reg.conf per-file copy. This image ships no
+# override any more, so fail the build loudly if an older rpm without them
+# gets installed - without the registry content the ADSP crash-loops the
+# device, and without sns_reg.conf its sensor task aborts.
+grep -q '^folders' /usr/share/blob-wrangler/configs/fairphone,fp5.toml
+grep -q 'sns_reg.conf' /usr/share/blob-wrangler/configs/fairphone,fp5.toml
+
+systemctl enable blob-wrangler.service
+
+# /usr is read-only, so point the two paths that receive extracted content at
+# /var. /usr/lib/firmware/updates is searched by the kernel ahead of
+# /usr/lib/firmware, and hexagonrpcd looks under /usr/share/qcom.
+rm -rf /usr/lib/firmware/updates
+ln -sf /var/lib/firmware-extract /usr/lib/firmware/updates
+
+mkdir -p /usr/share/qcom/qcm6490/Fairphone
+ln -sf /var/lib/blob-wrangler/sensors /usr/share/qcom/qcm6490/Fairphone/fp5
+
+# A shell over the USB gadget, for when wifi and the usb network are down
+systemctl enable serial-getty@ttyGS0.service
+
+systemctl enable \
+    hexagonrpcd-adsp-sensorspd.service \
+    hexagonrpcd-adsp-rootpd.service \
+    rmtfs.service \
+    tqftpserv.service
+
+# Mask services that don't apply to mobile ARM devices:
+# - bootloader-update: uses bootupd for EFI systems; FP5 uses Android A/B boot
+systemctl mask \
+    bootloader-update.service
+
+# kernel (the sc7280 ARK kernel, built from github.com/LorbusChris/linux-sc7280)
+dnf -y remove \
+    kernel \
+    kernel-core \
+    kernel-modules \
+    kernel-modules-core \
+    kernel-modules-extra
+
+dnf -y install --repo='copr:copr.fedorainfracloud.org:group_mobility:sc7280' \
+    kernel \
+    kernel-core \
+    kernel-modules \
+    kernel-modules-core \
+    kernel-modules-extra
