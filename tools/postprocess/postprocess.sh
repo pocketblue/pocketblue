@@ -15,7 +15,7 @@ if ls $OUTPUT/fedora_*.raw 1> /dev/null 2>&1; then
     export esp_part=$(losetup --find --show $OUTPUT/images/fedora_esp.raw)
     trap "losetup -d $esp_part" EXIT # in case the next `losetup` fails
     export root_part=$(losetup --find --show $OUTPUT/images/fedora_rootfs.raw)
-    trap "losetup -d $esp_part && losetup -d $root_part" EXIT
+    trap "losetup -d $esp_part; losetup -d $root_part" EXIT
 else
     chmod 666 $OUTPUT/disk.raw
 
